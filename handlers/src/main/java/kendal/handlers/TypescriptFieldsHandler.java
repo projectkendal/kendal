@@ -2,7 +2,7 @@ package kendal.handlers;
 
 import java.util.Collection;
 
-import com.sun.tools.javac.tree.JCTree;
+import com.sun.tools.javac.tree.JCTree.JCVariableDecl;
 import com.sun.tools.javac.util.Name;
 
 import kendal.annotations.PackagePrivate;
@@ -32,7 +32,7 @@ public abstract class TypescriptFieldsHandler<T> implements KendalHandler<T> {
             throw new KendalRuntimeException("Annotated element must be parameter of a constructor!");
         }
         Node classDecl = constructorDecl.getParent();
-        Name name = ((JCTree.JCVariableDecl)annotatedNode.getObject()).name;
+        Name name = ((JCVariableDecl)annotatedNode.getObject()).name;
         Node newVariableDecl = helper.getAstNodeBuilder().buildVariableDecl(getModifier(), "type", name);
         helper.addVariableDeclarationToClass(classDecl, newVariableDecl);
     }
