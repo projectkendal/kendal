@@ -48,6 +48,7 @@ public class KendalProcessor extends AbstractProcessor {
     }
 
     public boolean process(Set<? extends TypeElement> annotations, RoundEnvironment roundEnv) {
+        if (roundEnv.getRootElements().isEmpty()) return false;
         messager.printMessage(Diagnostic.Kind.NOTE, "Processor run!");
         Set<Node> forest = forestBuilder.buildForest(roundEnv.getRootElements());
         Set<KendalHandler> handlers = getHandlersFromSPI();
@@ -75,9 +76,12 @@ public class KendalProcessor extends AbstractProcessor {
         messager.printMessage(Diagnostic.Kind.NOTE, "### Kendal handles execution ###");
         Set<Node> annotatedNodes = new HashSet<>();
         annotatedNodes.add(annotatedElement);
-        handlers.iterator().next().handle(annotatedNodes, new AstHelperImpl(context));
-        // TODO: when handlers are properly handled (they are only called for their annotation) remove line above and uncomment line below
-        //handlers.forEach(handler -> handler.handle(annotatedNodes, new AstHelperImpl(context)));
+        handlers.forEach(handler -> {
+            // TODO: when handlers are properly handled (they are only called for their annotation) remove if below
+            if (handler.getHandledAnnotationType().getName().equals("kendal.annotations.Protected")) {
+                handler.handle(annotatedNodes, new AstHelperImpl(context));
+            }
+        });
     }
 
 

@@ -8,6 +8,7 @@ import kendal.annotations.Protected;
 import kendal.annotations.Public;
 import kendal.api.AstHelper;
 import kendal.api.KendalHandler;
+import kendal.api.Modifier;
 import kendal.exceptions.KendalRuntimeException;
 import kendal.model.Node;
 
@@ -29,7 +30,7 @@ public abstract class TypescriptFieldsHandler<T> implements KendalHandler<T> {
                 throw new KendalRuntimeException("Annotated element must be parameter of a constructor!");
             }
             Node classDecl = constructorDecl.getParent();
-            Node newVariableDecl = helper.getAstNodeBuilder().buildVariableDecl("someName", "type");
+            Node newVariableDecl = helper.getAstNodeBuilder().buildVariableDecl(getModifier(),"someName", "type");
             helper.addVariableDeclarationToClass(classDecl, newVariableDecl);
         }
         catch (RuntimeException ex) {
@@ -37,11 +38,18 @@ public abstract class TypescriptFieldsHandler<T> implements KendalHandler<T> {
         }
     }
 
+    abstract Modifier getModifier();
+
     public static class PrivateHandler extends TypescriptFieldsHandler<Private> {
 
         @Override
         public Class getHandledAnnotationType() {
             return Private.class;
+        }
+
+        @Override
+        Modifier getModifier() {
+            return Modifier.PRIVATE;
         }
     }
 
@@ -51,6 +59,11 @@ public abstract class TypescriptFieldsHandler<T> implements KendalHandler<T> {
         public Class getHandledAnnotationType() {
             return Protected.class;
         }
+
+        @Override
+        Modifier getModifier() {
+            return Modifier.PROTECTED;
+        }
     }
 
     public static class PackagePrivateHandler extends TypescriptFieldsHandler<PackagePrivate> {
@@ -58,6 +71,11 @@ public abstract class TypescriptFieldsHandler<T> implements KendalHandler<T> {
         @Override
         public Class getHandledAnnotationType() {
             return PackagePrivate.class;
+        }
+
+        @Override
+        Modifier getModifier() {
+            return Modifier.PACKAGE_PRIVATE;
         }
     }
 
@@ -67,7 +85,11 @@ public abstract class TypescriptFieldsHandler<T> implements KendalHandler<T> {
         public Class getHandledAnnotationType() {
             return Public.class;
         }
-    }
 
+        @Override
+        Modifier getModifier() {
+            return Modifier.PUBLIC;
+        }
+    }
 
 }

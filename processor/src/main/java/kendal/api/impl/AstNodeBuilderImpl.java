@@ -2,7 +2,6 @@ package kendal.api.impl;
 
 import java.util.HashSet;
 
-import com.sun.tools.javac.code.Flags;
 import com.sun.tools.javac.code.TypeTag;
 import com.sun.tools.javac.tree.JCTree.JCExpression;
 import com.sun.tools.javac.tree.JCTree.JCModifiers;
@@ -13,6 +12,7 @@ import com.sun.tools.javac.util.Name;
 
 import kendal.api.AstHelper;
 import kendal.api.AstNodeBuilder;
+import kendal.api.Modifier;
 import kendal.model.Node;
 
 public class AstNodeBuilderImpl implements AstNodeBuilder {
@@ -27,8 +27,8 @@ public class AstNodeBuilderImpl implements AstNodeBuilder {
     }
 
     @Override
-    public Node buildVariableDecl(String rawName, Object type) {
-        JCModifiers modifiers = treeMaker.Modifiers(Flags.PRIVATE);
+    public Node buildVariableDecl(Modifier modifier, Object type, String rawName) {
+        JCModifiers modifiers = treeMaker.Modifiers(modifier.getFlag());
         JCExpression returnType = treeMaker.TypeIdent(TypeTag.BOOLEAN);
         Name name = helper.nameFromString(rawName);
         JCVariableDecl variableDecl = treeMaker.VarDef(modifiers, name, returnType, NO_VALUE);

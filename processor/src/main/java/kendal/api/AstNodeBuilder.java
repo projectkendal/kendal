@@ -3,5 +3,5 @@ package kendal.api;
 import kendal.model.Node;
 
 public interface AstNodeBuilder {
-    Node buildVariableDecl(String name, Object type);
+    Node buildVariableDecl(Modifier modifier, Object type, String rawName);
 }
