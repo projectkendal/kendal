@@ -16,6 +16,10 @@ import com.sun.tools.javac.tree.JCTree.JCWhileLoop;
 
 public class TreeBuilder {
 
+    private TreeBuilder() {
+        // private constructor to hide default public one
+    }
+
     public static Node buildTree(JCCompilationUnit compilationUnit) {
         return buildNode(compilationUnit);
     }
