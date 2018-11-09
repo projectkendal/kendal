@@ -11,7 +11,6 @@ import java.util.Collection;
 
 public abstract class TypescriptFieldsHandler<T> implements KendalHandler<T> {
 
-
     @Override
     public void handle(Collection annotatedNodes, AstHelper helper) {
         // TODO implement me, please!!!

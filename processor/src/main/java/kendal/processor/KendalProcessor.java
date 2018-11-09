@@ -2,9 +2,11 @@ package kendal.processor;
 
 import java.util.ServiceLoader;
 import java.util.Set;
+import java.util.stream.Collectors;
 import java.util.stream.StreamSupport;
 
 import javax.annotation.processing.AbstractProcessor;
+import javax.annotation.processing.Messager;
 import javax.annotation.processing.ProcessingEnvironment;
 import javax.annotation.processing.RoundEnvironment;
 import javax.annotation.processing.SupportedAnnotationTypes;
@@ -28,30 +30,45 @@ public class KendalProcessor extends AbstractProcessor {
     private Context context;
     private Trees trees;
     private ForestBuilder forestBuilder;
+    private Messager messager;
 
     @Override
     public void init(ProcessingEnvironment processingEnv) {
         JavacProcessingEnvironment javacProcEnv = (JavacProcessingEnvironment) processingEnv;
         context = javacProcEnv.getContext();
         trees = Trees.instance(processingEnv);
+        messager = processingEnv.getMessager();
         forestBuilder = new ForestBuilder(trees);
         super.init(processingEnv);
     }
 
     public boolean process(Set<? extends TypeElement> annotations, RoundEnvironment roundEnv) {
-        this.processingEnv.getMessager().printMessage(Diagnostic.Kind.NOTE, "Processor run!");
-        registerHandlers();
+        messager.printMessage(Diagnostic.Kind.NOTE, "Processor run!");
+        Set<KendalHandler> handlers = getHandlersFromSPI();
+        registerHandlers(handlers);
+        executeHandlers(handlers);
         Set<Node> forest = forestBuilder.buildForest(roundEnv.getRootElements());
 
         return false;
     }
 
-    private void registerHandlers() {
-        StreamSupport.stream(ServiceLoader.load(KendalHandler.class, KendalProcessor.class.getClassLoader()).spliterator(), false).forEach(kendalHandler -> {
-            this.processingEnv.getMessager().printMessage(Diagnostic.Kind.NOTE,
-                    String.format("%s registered as provider for %s", kendalHandler.getClass().getName(), kendalHandler.getHandledAnnotationType()));
+    private Set<KendalHandler> getHandlersFromSPI() {
+        return StreamSupport
+                .stream(ServiceLoader.load(KendalHandler.class, KendalProcessor.class.getClassLoader()).spliterator(), false)
+                .collect(Collectors.toSet());
+    }
 
-        });
+    private void registerHandlers(Set<KendalHandler> handlers) {
+        messager.printMessage(Diagnostic.Kind.NOTE, "### Kendal handles registration ###");
+        handlers.forEach(handler ->
+            messager.printMessage(Diagnostic.Kind.NOTE,
+                    String.format("%s registered as provider for %s", handler.getClass().getName(), handler.getHandledAnnotationType()))
+        );
+    }
+
+    private void executeHandlers(Set<KendalHandler> handlers) {
+        messager.printMessage(Diagnostic.Kind.NOTE, "### Kendal handles execution ###");
+        handlers.forEach(handler -> handler.handle(null, null));
     }
 
 
