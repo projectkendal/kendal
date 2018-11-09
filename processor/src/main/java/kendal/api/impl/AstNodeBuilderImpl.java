@@ -1,0 +1,37 @@
+package kendal.api.impl;
+
+import java.util.HashSet;
+
+import com.sun.tools.javac.code.Flags;
+import com.sun.tools.javac.code.TypeTag;
+import com.sun.tools.javac.tree.JCTree.JCExpression;
+import com.sun.tools.javac.tree.JCTree.JCModifiers;
+import com.sun.tools.javac.tree.JCTree.JCVariableDecl;
+import com.sun.tools.javac.tree.TreeMaker;
+import com.sun.tools.javac.util.Context;
+import com.sun.tools.javac.util.Name;
+
+import kendal.api.AstHelper;
+import kendal.api.AstNodeBuilder;
+import kendal.model.Node;
+
+public class AstNodeBuilderImpl implements AstNodeBuilder {
+    private final static JCExpression NO_VALUE = null;
+
+    private final TreeMaker treeMaker;
+    private final AstHelper helper;
+
+    public AstNodeBuilderImpl(AstHelper helper, Context context) {
+        this.helper = helper;
+        this.treeMaker = TreeMaker.instance(context);
+    }
+
+    @Override
+    public Node buildVariableDecl(String rawName, Object type) {
+        JCModifiers modifiers = treeMaker.Modifiers(Flags.PRIVATE);
+        JCExpression returnType = treeMaker.TypeIdent(TypeTag.BOOLEAN);
+        Name name = helper.nameFromString(rawName);
+        JCVariableDecl variableDecl = treeMaker.VarDef(modifiers, name, returnType, NO_VALUE);
+        return new Node(variableDecl, new HashSet<>());
+    }
+}

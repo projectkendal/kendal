@@ -1,5 +1,6 @@
 package kendal.processor;
 
+import java.util.HashSet;
 import java.util.ServiceLoader;
 import java.util.Set;
 import java.util.stream.Collectors;
@@ -20,6 +21,7 @@ import com.sun.tools.javac.processing.JavacProcessingEnvironment;
 import com.sun.tools.javac.util.Context;
 
 import kendal.api.KendalHandler;
+import kendal.api.impl.AstHelperImpl;
 import kendal.model.ForestBuilder;
 import kendal.model.Node;
 
@@ -31,6 +33,9 @@ public class KendalProcessor extends AbstractProcessor {
     private Trees trees;
     private ForestBuilder forestBuilder;
     private Messager messager;
+
+    // TODO: remove variable below when annotations are collected properly
+    public static Node annotatedElement;
 
     @Override
     public void init(ProcessingEnvironment processingEnv) {
@@ -44,10 +49,10 @@ public class KendalProcessor extends AbstractProcessor {
 
     public boolean process(Set<? extends TypeElement> annotations, RoundEnvironment roundEnv) {
         messager.printMessage(Diagnostic.Kind.NOTE, "Processor run!");
+        Set<Node> forest = forestBuilder.buildForest(roundEnv.getRootElements());
         Set<KendalHandler> handlers = getHandlersFromSPI();
         registerHandlers(handlers);
         executeHandlers(handlers);
-        Set<Node> forest = forestBuilder.buildForest(roundEnv.getRootElements());
 
         return false;
     }
@@ -68,7 +73,11 @@ public class KendalProcessor extends AbstractProcessor {
 
     private void executeHandlers(Set<KendalHandler> handlers) {
         messager.printMessage(Diagnostic.Kind.NOTE, "### Kendal handles execution ###");
-        handlers.forEach(handler -> handler.handle(null, null));
+        Set<Node> annotatedNodes = new HashSet<>();
+        annotatedNodes.add(annotatedElement);
+        handlers.iterator().next().handle(annotatedNodes, new AstHelperImpl(context));
+        // TODO: when handlers are properly handled (they are only called for their annotation) remove line above and uncomment line below
+        //handlers.forEach(handler -> handler.handle(annotatedNodes, new AstHelperImpl(context)));
     }
 
 
