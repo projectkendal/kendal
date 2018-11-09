@@ -19,7 +19,7 @@ public class Node {
         // TODO: remove below when annotations are collected properly
         children.forEach(child -> {
             if (child.object instanceof JCAnnotation) {
-                KendalProcessor.annotatedElement = this;
+                KendalProcessor.annotatedNodes.add(this);
             }
         });
     }

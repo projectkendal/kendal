@@ -1,11 +1,12 @@
 package kendal.experiments;
 
+import kendal.annotations.Private;
 import kendal.annotations.Protected;
 
 public class TestClass {
 
 
-    public TestClass(@Protected String b) {
+    public TestClass(@Private int a, @Protected String b) {
 
     }
 }

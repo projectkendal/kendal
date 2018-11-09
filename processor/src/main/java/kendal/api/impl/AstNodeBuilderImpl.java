@@ -27,10 +27,9 @@ public class AstNodeBuilderImpl implements AstNodeBuilder {
     }
 
     @Override
-    public Node buildVariableDecl(Modifier modifier, Object type, String rawName) {
+    public Node buildVariableDecl(Modifier modifier, Object type, Name name) {
         JCModifiers modifiers = treeMaker.Modifiers(modifier.getFlag());
         JCExpression returnType = treeMaker.TypeIdent(TypeTag.BOOLEAN);
-        Name name = helper.nameFromString(rawName);
         JCVariableDecl variableDecl = treeMaker.VarDef(modifiers, name, returnType, NO_VALUE);
         return new Node(variableDecl, new HashSet<>());
     }

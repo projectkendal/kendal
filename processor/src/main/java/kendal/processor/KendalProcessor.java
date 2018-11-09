@@ -35,7 +35,7 @@ public class KendalProcessor extends AbstractProcessor {
     private Messager messager;
 
     // TODO: remove variable below when annotations are collected properly
-    public static Node annotatedElement;
+    public static Set<Node> annotatedNodes = new HashSet<>();
 
     @Override
     public void init(ProcessingEnvironment processingEnv) {
@@ -74,8 +74,6 @@ public class KendalProcessor extends AbstractProcessor {
 
     private void executeHandlers(Set<KendalHandler> handlers) {
         messager.printMessage(Diagnostic.Kind.NOTE, "### Kendal handles execution ###");
-        Set<Node> annotatedNodes = new HashSet<>();
-        annotatedNodes.add(annotatedElement);
         handlers.forEach(handler -> {
             // TODO: when handlers are properly handled (they are only called for their annotation) remove if below
             if (handler.getHandledAnnotationType().getName().equals("kendal.annotations.Protected")) {

@@ -2,6 +2,9 @@ package kendal.handlers;
 
 import java.util.Collection;
 
+import com.sun.tools.javac.tree.JCTree;
+import com.sun.tools.javac.util.Name;
+
 import kendal.annotations.PackagePrivate;
 import kendal.annotations.Private;
 import kendal.annotations.Protected;
@@ -24,18 +27,14 @@ public abstract class TypescriptFieldsHandler<T> implements KendalHandler<T> {
     }
 
     private void handleNode(Node annotatedNode, AstHelper helper) {
-        try {
-            Node constructorDecl = annotatedNode.getParent();
-            if (!helper.getAstValidator().isConstructorDecl(constructorDecl)) {
-                throw new KendalRuntimeException("Annotated element must be parameter of a constructor!");
-            }
-            Node classDecl = constructorDecl.getParent();
-            Node newVariableDecl = helper.getAstNodeBuilder().buildVariableDecl(getModifier(),"someName", "type");
-            helper.addVariableDeclarationToClass(classDecl, newVariableDecl);
+        Node constructorDecl = annotatedNode.getParent();
+        if (!helper.getAstValidator().isConstructorDecl(constructorDecl)) {
+            throw new KendalRuntimeException("Annotated element must be parameter of a constructor!");
         }
-        catch (RuntimeException ex) {
-            ex.printStackTrace();
-        }
+        Node classDecl = constructorDecl.getParent();
+        Name name = ((JCTree.JCVariableDecl)annotatedNode.getObject()).name;
+        Node newVariableDecl = helper.getAstNodeBuilder().buildVariableDecl(getModifier(), "type", name);
+        helper.addVariableDeclarationToClass(classDecl, newVariableDecl);
     }
 
     abstract Modifier getModifier();
