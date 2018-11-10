@@ -7,7 +7,7 @@ import javax.lang.model.element.Element;
 
 import com.sun.source.util.TreePath;
 import com.sun.source.util.Trees;
-import com.sun.tools.javac.tree.JCTree;
+import com.sun.tools.javac.tree.JCTree.JCCompilationUnit;
 
 public class ForestBuilder {
 
@@ -18,25 +18,25 @@ public class ForestBuilder {
     }
 
     public Set<Node> buildForest(Set<? extends Element> elements) {
-        final Set<JCTree.JCCompilationUnit> compilationUnits = toCompilationUnits(elements);
+        final Set<JCCompilationUnit> compilationUnits = toCompilationUnits(elements);
         Set<Node> forest = new HashSet<>();
         compilationUnits.forEach(compilationUnit -> forest.add(TreeBuilder.buildTree(compilationUnit)));
         return forest;
     }
 
-    private Set<JCTree.JCCompilationUnit> toCompilationUnits(Set<? extends Element> elements) {
-        final Set<JCTree.JCCompilationUnit> compilationUnits = new HashSet<>();
+    private Set<JCCompilationUnit> toCompilationUnits(Set<? extends Element> elements) {
+        final Set<JCCompilationUnit> compilationUnits = new HashSet<>();
         for (Element element : elements) {
-            JCTree.JCCompilationUnit unit = toUnit(element);
+            JCCompilationUnit unit = toUnit(element);
             if (unit == null) continue;
             compilationUnits.add(unit);
         }
         return compilationUnits;
     }
 
-    private JCTree.JCCompilationUnit toUnit(Element element) {
+    private JCCompilationUnit toUnit(Element element) {
         TreePath path = trees == null ? null : trees.getPath(element);
-        return path != null ? (JCTree.JCCompilationUnit) path.getCompilationUnit() : null;
+        return path != null ? (JCCompilationUnit) path.getCompilationUnit() : null;
     }
 
 }
