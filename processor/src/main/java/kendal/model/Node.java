@@ -1,11 +1,8 @@
 package kendal.model;
 
-import java.util.Set;
-
 import com.sun.tools.javac.tree.JCTree;
-import com.sun.tools.javac.tree.JCTree.JCAnnotation;
 
-import kendal.processor.KendalProcessor;
+import java.util.Set;
 
 public class Node {
     JCTree object;
@@ -16,12 +13,6 @@ public class Node {
         this.object = object;
         this.children = children;
         children.forEach(child -> child.parent = this);
-        // TODO: remove below when annotations are collected properly
-        children.forEach(child -> {
-            if (child.object instanceof JCAnnotation) {
-                KendalProcessor.annotatedNodes.add(this);
-            }
-        });
     }
 
     public JCTree getObject() {
