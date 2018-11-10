@@ -32,7 +32,7 @@ public abstract class TypescriptFieldsHandler<T> implements KendalHandler<T> {
     private void handleNode(Node annotationNode, AstHelper helper) throws InvalidAnnotationException {
         Node constructorDecl = annotationNode.getParent().getParent();
         if (!helper.getAstValidator().isConstructorDecl(constructorDecl)) {
-            throw new InvalidAnnotationException("Annotated element must be parameter of a constructor!");
+            throw new InvalidAnnotationException(String.format("%s Annotated element must be parameter of a constructor!", annotationNode.getObject().toString()));
         }
         Node classDecl = constructorDecl.getParent();
         Name name = ((JCVariableDecl)annotationNode.getParent().getObject()).name;
