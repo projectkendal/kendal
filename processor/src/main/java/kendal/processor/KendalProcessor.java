@@ -1,6 +1,11 @@
 package kendal.processor;
 
-import java.util.*;
+import static kendal.utils.Utils.with;
+
+import java.util.HashSet;
+import java.util.Map;
+import java.util.ServiceLoader;
+import java.util.Set;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 import java.util.stream.StreamSupport;
@@ -22,13 +27,11 @@ import com.sun.tools.javac.util.Context;
 
 import kendal.api.AstHelper;
 import kendal.api.KendalHandler;
-import kendal.api.exceptions.InvalidAnnotationException;
+import kendal.api.exceptions.KendalException;
 import kendal.api.impl.AstHelperImpl;
 import kendal.model.ForestBuilder;
 import kendal.model.Node;
 import kendal.utils.ForestUtils;
-
-import static kendal.utils.Utils.with;
 
 @SupportedAnnotationTypes("*")
 @SupportedSourceVersion(SourceVersion.RELEASE_8)
@@ -101,7 +104,7 @@ public class KendalProcessor extends AbstractProcessor {
         handlersMap.entrySet().forEach(entry -> {
             try {
                 entry.getKey().handle(entry.getValue(), astHelper);
-            } catch (InvalidAnnotationException e) {
+            } catch (KendalException e) {
                 messager.printMessage(Diagnostic.Kind.ERROR, e.getMessage());
             }
         });
