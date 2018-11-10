@@ -1,8 +1,6 @@
 package kendal.api;
 
-import com.sun.tools.javac.util.Name;
-
-import kendal.api.impl.AstValidatorImpl;
+import kendal.api.exceptions.ImproperNodeTypeException;
 import kendal.model.Node;
 
 /*
@@ -12,12 +10,11 @@ import kendal.model.Node;
 * */
 public interface AstHelper {
     // MODIFICATION METHODS
-    void addVariableDeclarationToClass(Node clazz, Node variableDeclaration);
+    void addVariableDeclarationToClass(Node clazz, Node variableDeclaration) throws ImproperNodeTypeException;
+    void addExpressionStatementToMethod(Node method, Node expressionStatement, int lineIndex)
+            throws ImproperNodeTypeException;
 
     // SPECIFIC HELPERS
     AstNodeBuilder getAstNodeBuilder();
-    AstValidatorImpl getAstValidator();
-
-    // UTILS
-    Name nameFromString(String name);
+    AstValidator getAstValidator();
 }

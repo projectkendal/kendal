@@ -26,4 +26,8 @@ public class Node {
     public List<Node> getChildren() {
         return children;
     }
+
+    public void addChild(Node newChild) {
+        children.add(newChild);
+    }
 }
