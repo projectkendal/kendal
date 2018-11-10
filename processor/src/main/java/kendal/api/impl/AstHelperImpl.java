@@ -36,7 +36,7 @@ public class AstHelperImpl implements AstHelper {
 
     @Override
     public AstNodeBuilder getAstNodeBuilder() {
-        return new AstNodeBuilderImpl(this, context);
+        return new AstNodeBuilderImpl( context);
     }
 
     @Override

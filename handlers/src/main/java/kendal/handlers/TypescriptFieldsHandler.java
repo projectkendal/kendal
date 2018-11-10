@@ -13,7 +13,6 @@ import kendal.api.AstHelper;
 import kendal.api.KendalHandler;
 import kendal.api.Modifier;
 import kendal.api.exceptions.InvalidAnnotationException;
-import kendal.exceptions.KendalRuntimeException;
 import kendal.model.Node;
 
 public abstract class TypescriptFieldsHandler<T> implements KendalHandler<T> {

@@ -1,15 +1,15 @@
 package kendal.model;
 
-import com.sun.tools.javac.tree.JCTree;
+import java.util.List;
 
-import java.util.Set;
+import com.sun.tools.javac.tree.JCTree;
 
 public class Node {
     JCTree object;
     Node parent;
-    Set<Node> children;
+    List<Node> children;
 
-    public Node(JCTree object, Set<Node> children) {
+    public Node(JCTree object, List<Node> children) {
         this.object = object;
         this.children = children;
         children.forEach(child -> child.parent = this);
@@ -23,7 +23,7 @@ public class Node {
         return parent;
     }
 
-    public Set<Node> getChildren() {
+    public List<Node> getChildren() {
         return children;
     }
 }
