@@ -12,6 +12,7 @@ import kendal.annotations.Public;
 import kendal.api.AstHelper;
 import kendal.api.KendalHandler;
 import kendal.api.Modifier;
+import kendal.api.exceptions.InvalidAnnotationException;
 import kendal.exceptions.KendalRuntimeException;
 import kendal.model.Node;
 
@@ -22,17 +23,19 @@ public abstract class TypescriptFieldsHandler<T> implements KendalHandler<T> {
      * {@link PackagePrivate}, {@link Private}, {@link Protected}, {@link Public}.
      */
     @Override
-    public void handle(Collection<Node> annotatedNodes, AstHelper helper) {
-        annotatedNodes.forEach(annotatedNode -> handleNode(annotatedNode, helper));
+    public void handle(Collection<Node> annotationNodes, AstHelper helper) throws InvalidAnnotationException {
+        for (Node annotationNode : annotationNodes) {
+            handleNode(annotationNode, helper);
+        }
     }
 
-    private void handleNode(Node annotatedNode, AstHelper helper) {
-        Node constructorDecl = annotatedNode.getParent();
+    private void handleNode(Node annotationNode, AstHelper helper) throws InvalidAnnotationException {
+        Node constructorDecl = annotationNode.getParent().getParent();
         if (!helper.getAstValidator().isConstructorDecl(constructorDecl)) {
-            throw new KendalRuntimeException("Annotated element must be parameter of a constructor!");
+            throw new InvalidAnnotationException("Annotated element must be parameter of a constructor!");
         }
         Node classDecl = constructorDecl.getParent();
-        Name name = ((JCVariableDecl)annotatedNode.getObject()).name;
+        Name name = ((JCVariableDecl)annotationNode.getParent().getObject()).name;
         Node newVariableDecl = helper.getAstNodeBuilder().buildVariableDecl(getModifier(), "type", name);
         helper.addVariableDeclarationToClass(classDecl, newVariableDecl);
     }
