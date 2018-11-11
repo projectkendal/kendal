@@ -29,7 +29,7 @@ import kendal.api.AstHelper;
 import kendal.api.KendalHandler;
 import kendal.api.exceptions.KendalException;
 import kendal.api.impl.AstHelperImpl;
-import kendal.model.ForestBuilder;
+import kendal.model.builders.ForestBuilder;
 import kendal.model.Node;
 import kendal.utils.ForestUtils;
 

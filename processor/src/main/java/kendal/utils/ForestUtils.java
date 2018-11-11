@@ -33,7 +33,7 @@ public class ForestUtils {
             roots.forEach(this::traverse);
         }
 
-        private void traverse(Node node) {
+        private void traverse(Node<?> node) {
             if(!visited.contains(node)) {
                 visited.add(node);
                 consumer.accept(node);

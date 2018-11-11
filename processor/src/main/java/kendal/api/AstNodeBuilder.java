@@ -4,12 +4,16 @@ import com.sun.tools.javac.util.Name;
 
 import kendal.api.exceptions.ImproperNodeTypeException;
 import kendal.model.Node;
+import kendal.model.nodes.ExpressionStatementNode;
+import kendal.model.nodes.FieldAccessNode;
+import kendal.model.nodes.IdentifierNode;
+import kendal.model.nodes.VariableDefNode;
 
 public interface AstNodeBuilder {
-    Node buildVariableDecl(Modifier modifier, Object type, Name Name);
-    Node buildObjectReference(Name fieldName);
-    Node buildFieldAccess(Node objectRef, Name fieldName) throws ImproperNodeTypeException;
+    VariableDefNode buildVariableDecl(Modifier modifier, Object type, Name Name);
+    IdentifierNode buildObjectReference(Name fieldName);
+    FieldAccessNode buildFieldAccess(IdentifierNode objectRef, Name fieldName) throws ImproperNodeTypeException;
 
     // ExpressionStatements:
-    Node buildAssignmentStatement(Node lhs, Node rhs) throws ImproperNodeTypeException;
+    ExpressionStatementNode buildAssignmentStatement(Node lhs, Node rhs) throws ImproperNodeTypeException;
 }

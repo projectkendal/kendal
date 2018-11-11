@@ -1,25 +1,36 @@
 package kendal.model;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import com.sun.tools.javac.tree.JCTree;
 
-public class Node {
-    JCTree object;
-    Node parent;
-    List<Node> children;
+public abstract class Node <T extends JCTree> {
+    protected T object;
+    protected Node parent;
+    protected List<Node> children;
+    private final boolean addedByKendal;
 
-    public Node(JCTree object) {
-        this.object = object;
+    public Node(T object) {
+        this(object, new ArrayList<>());
     }
 
-    public Node(JCTree object, List<Node> children) {
-        this(object);
+    public Node(T object, List<Node> children) {
+        this(object, children, false);
+    }
+
+    public Node(T object, boolean addedByKendal) {
+        this(object, new ArrayList<>(), addedByKendal);
+    }
+
+    public Node(T object, List<Node> children, boolean addedByKendal) {
+        this.object = object;
         this.children = children;
         children.forEach(child -> child.parent = this);
+        this.addedByKendal = addedByKendal;
     }
 
-    public JCTree getObject() {
+    public T getObject() {
         return object;
     }
 
@@ -29,6 +40,10 @@ public class Node {
 
     public List<Node> getChildren() {
         return children;
+    }
+
+    public boolean isAddedByKendal() {
+        return addedByKendal;
     }
 
     public void addChild(Node newChild) {

@@ -16,6 +16,10 @@ import kendal.api.AstUtils;
 import kendal.api.AstValidator;
 import kendal.api.exceptions.ImproperNodeTypeException;
 import kendal.model.Node;
+import kendal.model.nodes.ClassNode;
+import kendal.model.nodes.ExpressionStatementNode;
+import kendal.model.nodes.MethodNode;
+import kendal.model.nodes.VariableDefNode;
 
 public class AstHelperImpl implements AstHelper {
     private final Context context;
@@ -31,29 +35,25 @@ public class AstHelperImpl implements AstHelper {
     }
 
     @Override
-    public void addVariableDeclarationToClass(Node clazz, Node variableDeclaration) throws ImproperNodeTypeException {
+    public void addVariableDeclarationToClass(ClassNode clazz, VariableDefNode variableDeclaration) throws ImproperNodeTypeException {
         if (!astValidator.isClass(clazz) || !astValidator.isVariable(variableDeclaration)) {
             throw new ImproperNodeTypeException();
         }
         // Update Kendal AST:
         clazz.addChild(variableDeclaration);
         // Update javac AST:
-        JCClassDecl classDecl = (JCClassDecl)clazz.getObject();
-        JCVariableDecl variableDecl = (JCVariableDecl) variableDeclaration.getObject();
+        JCClassDecl classDecl = clazz.getObject();
+        JCVariableDecl variableDecl = variableDeclaration.getObject();
         addElementToClass(classDecl, variableDecl);
     }
 
     @Override
-    public void addExpressionStatementToMethod(Node method, Node expressionStatement)
-            throws ImproperNodeTypeException {
-        if (!astValidator.isMethod(method) || !astValidator.isExpressionStatement(expressionStatement)) {
-            throw new ImproperNodeTypeException();
-        }
+    public void addExpressionStatementToMethod(MethodNode method, ExpressionStatementNode expressionStatement) {
         // Update Kendal AST:
         method.addChild(expressionStatement);
         // Update javac AST:
-        JCMethodDecl methodDecl = (JCMethodDecl) method.getObject();
-        addElementToBlock(methodDecl.body, (JCExpressionStatement)expressionStatement.getObject());
+        JCMethodDecl methodDecl = method.getObject();
+        addElementToBlock(methodDecl.body, expressionStatement.getObject());
     }
 
     private void addElementToClass(JCClassDecl classDecl, JCTree element) {

@@ -17,6 +17,7 @@ import kendal.api.Modifier;
 import kendal.api.exceptions.InvalidAnnotationException;
 import kendal.api.exceptions.KendalException;
 import kendal.model.Node;
+import kendal.model.nodes.*;
 
 public abstract class TypescriptFieldsHandler<T> implements KendalHandler<T> {
 
@@ -37,19 +38,19 @@ public abstract class TypescriptFieldsHandler<T> implements KendalHandler<T> {
     }
 
     private void handleNode(Node annotationNode, AstHelper helper) throws KendalException {
-        Node constructor = annotationNode.getParent().getParent();
+        MethodNode constructor = (MethodNode) annotationNode.getParent().getParent();
         if (!helper.getAstValidator().isConstructor(constructor)) {
             throw new InvalidAnnotationException(
                     String.format("%s Annotated element must be parameter of a constructor!", annotationNode.getObject().toString()));
         }
         Node clazz = constructor.getParent();
         Name name = ((JCVariableDecl)annotationNode.getParent().getObject()).name;
-        Node newVariable = astNodeBuilder.buildVariableDecl(getModifier(), "type", name);
-        helper.addVariableDeclarationToClass(clazz, newVariable);
-        Node objectRef = astNodeBuilder.buildObjectReference(astUtils.nameFromString("this"));
-        Node fieldAccess = astNodeBuilder.buildFieldAccess(objectRef, ((JCVariableDecl) newVariable.getObject()).name);
-        Node newVariableRef = astNodeBuilder.buildObjectReference(((JCVariableDecl) newVariable.getObject()).name);
-        Node assignment = astNodeBuilder.buildAssignmentStatement(fieldAccess, newVariableRef);
+        VariableDefNode newVariable = astNodeBuilder.buildVariableDecl(getModifier(), "type", name);
+        helper.addVariableDeclarationToClass((ClassNode) clazz, newVariable);
+        IdentifierNode objectRef = astNodeBuilder.buildObjectReference(astUtils.nameFromString("this"));
+        FieldAccessNode fieldAccess = astNodeBuilder.buildFieldAccess(objectRef, newVariable.getObject().name);
+        IdentifierNode newVariableRef = astNodeBuilder.buildObjectReference(newVariable.getObject().name);
+        ExpressionStatementNode assignment = astNodeBuilder.buildAssignmentStatement(fieldAccess, newVariableRef);
         helper.addExpressionStatementToMethod(constructor, assignment);
     }
 

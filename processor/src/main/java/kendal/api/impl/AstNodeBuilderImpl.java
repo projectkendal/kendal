@@ -16,6 +16,10 @@ import kendal.api.AstValidator;
 import kendal.api.Modifier;
 import kendal.api.exceptions.ImproperNodeTypeException;
 import kendal.model.Node;
+import kendal.model.nodes.ExpressionStatementNode;
+import kendal.model.nodes.FieldAccessNode;
+import kendal.model.nodes.IdentifierNode;
+import kendal.model.nodes.VariableDefNode;
 
 public class AstNodeBuilderImpl implements AstNodeBuilder {
     private static final JCExpression NO_VALUE = null;
@@ -29,33 +33,32 @@ public class AstNodeBuilderImpl implements AstNodeBuilder {
     }
 
     @Override
-    public Node buildVariableDecl(Modifier modifier, Object type, Name name) {
+    public VariableDefNode buildVariableDecl(Modifier modifier, Object type, Name name) {
         JCModifiers modifiers = treeMaker.Modifiers(modifier.getFlag());
         JCExpression returnType = treeMaker.TypeIdent(TypeTag.INT);
         JCVariableDecl variableDecl = treeMaker.VarDef(modifiers, name, returnType, NO_VALUE);
-        return new Node(variableDecl);
+        return new VariableDefNode(variableDecl, true);
     }
 
     @Override
-    public Node buildObjectReference(Name fieldName) {
+    public IdentifierNode buildObjectReference(Name fieldName) {
         JCIdent objectReference = treeMaker.Ident(fieldName);
-        return new Node(objectReference);
+        return new IdentifierNode(objectReference, true);
     }
 
     @Override
-    public Node buildFieldAccess(Node objectRef, Name fieldName) throws ImproperNodeTypeException {
-        if (!astValidator.isIdent(objectRef)) throw new ImproperNodeTypeException();
-        JCFieldAccess fieldAccess = treeMaker.Select((JCIdent)objectRef.getObject(), fieldName);
-        return new Node(fieldAccess);
+    public FieldAccessNode buildFieldAccess(IdentifierNode objectRef, Name fieldName) {
+        JCFieldAccess fieldAccess = treeMaker.Select(objectRef.getObject(), fieldName);
+        return new FieldAccessNode(fieldAccess, true);
     }
 
     @Override
-    public Node buildAssignmentStatement(Node lhs, Node rhs) throws ImproperNodeTypeException {
+    public ExpressionStatementNode buildAssignmentStatement(Node lhs, Node rhs) throws ImproperNodeTypeException {
         if (!astValidator.isExpression(lhs) || !astValidator.isExpression(rhs)) {
             throw new ImproperNodeTypeException();
         }
         JCExpressionStatement expressionStatement =
                 treeMaker.Exec(treeMaker.Assign((JCExpression)lhs.getObject(), (JCExpression)rhs.getObject()));
-        return new Node(expressionStatement);
+        return new ExpressionStatementNode(expressionStatement, true);
     }
 }
