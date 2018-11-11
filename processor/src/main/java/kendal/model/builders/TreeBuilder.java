@@ -89,7 +89,7 @@ class TreeBuilder {
 
     private static List<Node> buildChildren(JCCompilationUnit compilationUnit) {
         return mapChildren(def -> {
-            if(def instanceof JCClassDecl) {
+            if (def instanceof JCClassDecl) {
                 return buildNode((JCClassDecl)def);
             }
             return buildNode((JCImport)def);
@@ -98,16 +98,19 @@ class TreeBuilder {
 
     private static List<Node> buildChildren(JCClassDecl classDecl) {
         return mapChildren(def -> {
-            if(def instanceof JCVariableDecl) {
+            if (def instanceof JCVariableDecl) {
                 return buildNode((JCVariableDecl) def);
             }
-            if(def instanceof JCMethodDecl) {
+            if (def instanceof JCMethodDecl) {
                 return buildNode((JCMethodDecl) def);
             }
-            if(def instanceof JCClassDecl) {
+            if (def instanceof JCClassDecl) {
                 return buildNode((JCClassDecl) def);
             }
-            return buildNode((JCAnnotation) def);
+            if (def instanceof JCAnnotation) {
+                return buildNode((JCAnnotation) def);
+            }
+            return null;
         }, classDecl.defs);
     }
 
