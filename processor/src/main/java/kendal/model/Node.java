@@ -5,7 +5,7 @@ import java.util.List;
 
 import com.sun.tools.javac.tree.JCTree;
 
-public abstract class Node <T extends JCTree> {
+public class Node <T extends JCTree> {
     protected T object;
     protected Node parent;
     protected List<Node> children;

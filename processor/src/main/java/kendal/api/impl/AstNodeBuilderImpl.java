@@ -1,6 +1,7 @@
 package kendal.api.impl;
 
 import com.sun.tools.javac.code.TypeTag;
+import com.sun.tools.javac.tree.JCTree;
 import com.sun.tools.javac.tree.JCTree.JCExpression;
 import com.sun.tools.javac.tree.JCTree.JCExpressionStatement;
 import com.sun.tools.javac.tree.JCTree.JCFieldAccess;
@@ -16,10 +17,6 @@ import kendal.api.AstValidator;
 import kendal.api.Modifier;
 import kendal.api.exceptions.ImproperNodeTypeException;
 import kendal.model.Node;
-import kendal.model.nodes.ExpressionStatementNode;
-import kendal.model.nodes.FieldAccessNode;
-import kendal.model.nodes.IdentifierNode;
-import kendal.model.nodes.VariableDefNode;
 
 public class AstNodeBuilderImpl implements AstNodeBuilder {
     private static final JCExpression NO_VALUE = null;
@@ -33,32 +30,33 @@ public class AstNodeBuilderImpl implements AstNodeBuilder {
     }
 
     @Override
-    public VariableDefNode buildVariableDecl(Modifier modifier, Object type, Name name) {
+    public Node<JCVariableDecl> buildVariableDecl(Modifier modifier, Object type, Name name) {
         JCModifiers modifiers = treeMaker.Modifiers(modifier.getFlag());
         JCExpression returnType = treeMaker.TypeIdent(TypeTag.INT);
         JCVariableDecl variableDecl = treeMaker.VarDef(modifiers, name, returnType, NO_VALUE);
-        return new VariableDefNode(variableDecl, true);
+        return new Node<>(variableDecl, true);
     }
 
     @Override
-    public IdentifierNode buildObjectReference(Name fieldName) {
+    public Node<JCIdent> buildObjectReference(Name fieldName) {
         JCIdent objectReference = treeMaker.Ident(fieldName);
-        return new IdentifierNode(objectReference, true);
+        return new Node<>(objectReference, true);
     }
 
     @Override
-    public FieldAccessNode buildFieldAccess(IdentifierNode objectRef, Name fieldName) {
+    public Node<JCFieldAccess> buildFieldAccess(Node<JCIdent> objectRef, Name fieldName) {
         JCFieldAccess fieldAccess = treeMaker.Select(objectRef.getObject(), fieldName);
-        return new FieldAccessNode(fieldAccess, true);
+        return new Node<>(fieldAccess, true);
     }
 
     @Override
-    public ExpressionStatementNode buildAssignmentStatement(Node lhs, Node rhs) throws ImproperNodeTypeException {
+    public <L extends JCTree.JCExpression, R extends JCTree.JCExpression> Node<JCTree.JCExpressionStatement>
+    buildAssignmentStatement(Node<L> lhs, Node<R> rhs) throws ImproperNodeTypeException {
         if (!astValidator.isExpression(lhs) || !astValidator.isExpression(rhs)) {
             throw new ImproperNodeTypeException();
         }
         JCExpressionStatement expressionStatement =
-                treeMaker.Exec(treeMaker.Assign((JCExpression)lhs.getObject(), (JCExpression)rhs.getObject()));
-        return new ExpressionStatementNode(expressionStatement, true);
+                treeMaker.Exec(treeMaker.Assign(lhs.getObject(), rhs.getObject()));
+        return new Node<>(expressionStatement, true);
     }
 }

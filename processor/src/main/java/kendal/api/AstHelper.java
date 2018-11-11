@@ -1,11 +1,9 @@
 package kendal.api;
 
+import com.sun.tools.javac.tree.JCTree;
+
 import kendal.api.exceptions.ImproperNodeTypeException;
 import kendal.model.Node;
-import kendal.model.nodes.ClassNode;
-import kendal.model.nodes.ExpressionStatementNode;
-import kendal.model.nodes.MethodNode;
-import kendal.model.nodes.VariableDefNode;
 
 /*
 *  Interface for AST modification helper class
@@ -14,12 +12,12 @@ import kendal.model.nodes.VariableDefNode;
 * */
 public interface AstHelper {
     // MODIFICATION METHODS
-    void addVariableDeclarationToClass(ClassNode clazz, VariableDefNode variableDeclaration) throws ImproperNodeTypeException;
+    void addVariableDeclarationToClass(Node<JCTree.JCClassDecl> clazz, Node<JCTree.JCVariableDecl> variableDeclaration) throws ImproperNodeTypeException;
 
     /**
      * Adds expression statement on the end of the method.
      */
-    void addExpressionStatementToMethod(MethodNode method, ExpressionStatementNode expressionStatement) throws ImproperNodeTypeException;
+    void addExpressionStatementToMethod(Node<JCTree.JCMethodDecl> method, Node<JCTree.JCExpressionStatement> expressionStatement) throws ImproperNodeTypeException;
 
     // SPECIFIC HELPERS
     AstNodeBuilder getAstNodeBuilder();

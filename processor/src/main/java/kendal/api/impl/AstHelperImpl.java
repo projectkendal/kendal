@@ -3,7 +3,6 @@ package kendal.api.impl;
 import com.sun.tools.javac.tree.JCTree;
 import com.sun.tools.javac.tree.JCTree.JCBlock;
 import com.sun.tools.javac.tree.JCTree.JCClassDecl;
-import com.sun.tools.javac.tree.JCTree.JCExpressionStatement;
 import com.sun.tools.javac.tree.JCTree.JCMethodDecl;
 import com.sun.tools.javac.tree.JCTree.JCStatement;
 import com.sun.tools.javac.tree.JCTree.JCVariableDecl;
@@ -16,10 +15,6 @@ import kendal.api.AstUtils;
 import kendal.api.AstValidator;
 import kendal.api.exceptions.ImproperNodeTypeException;
 import kendal.model.Node;
-import kendal.model.nodes.ClassNode;
-import kendal.model.nodes.ExpressionStatementNode;
-import kendal.model.nodes.MethodNode;
-import kendal.model.nodes.VariableDefNode;
 
 public class AstHelperImpl implements AstHelper {
     private final Context context;
@@ -35,7 +30,7 @@ public class AstHelperImpl implements AstHelper {
     }
 
     @Override
-    public void addVariableDeclarationToClass(ClassNode clazz, VariableDefNode variableDeclaration) throws ImproperNodeTypeException {
+    public void addVariableDeclarationToClass(Node<JCClassDecl> clazz, Node<JCVariableDecl> variableDeclaration) throws ImproperNodeTypeException {
         if (!astValidator.isClass(clazz) || !astValidator.isVariable(variableDeclaration)) {
             throw new ImproperNodeTypeException();
         }
@@ -48,7 +43,7 @@ public class AstHelperImpl implements AstHelper {
     }
 
     @Override
-    public void addExpressionStatementToMethod(MethodNode method, ExpressionStatementNode expressionStatement) {
+    public void addExpressionStatementToMethod(Node<JCMethodDecl> method, Node<JCTree.JCExpressionStatement> expressionStatement) {
         // Update Kendal AST:
         method.addChild(expressionStatement);
         // Update javac AST:

@@ -17,69 +17,69 @@ import com.sun.tools.javac.tree.JCTree.JCForLoop;
 import com.sun.tools.javac.tree.JCTree.JCMethodDecl;
 import com.sun.tools.javac.tree.JCTree.JCVariableDecl;
 import com.sun.tools.javac.tree.JCTree.JCWhileLoop;
-import kendal.model.Node;
-import kendal.model.nodes.*;
 
-public class TreeBuilder {
+import kendal.model.Node;
+
+class TreeBuilder {
 
     private TreeBuilder() {
         // private constructor to hide default public one
     }
 
-    public static Node buildTree(JCCompilationUnit compilationUnit) {
+    static Node buildTree(JCCompilationUnit compilationUnit) {
         return buildNode(compilationUnit);
     }
 
-    private static CompilationUnitNode buildNode(JCCompilationUnit jcCompilationUnit) {
-        return new CompilationUnitNode(jcCompilationUnit, buildChildren(jcCompilationUnit));
+    private static Node<JCCompilationUnit> buildNode(JCCompilationUnit jcCompilationUnit) {
+        return new Node<>(jcCompilationUnit, buildChildren(jcCompilationUnit));
     }
 
-    private static ClassNode buildNode(JCClassDecl jcClassDecl) {
-        return new ClassNode(jcClassDecl, buildChildren(jcClassDecl));
+    private static Node<JCClassDecl> buildNode(JCClassDecl jcClassDecl) {
+        return new Node<>(jcClassDecl, buildChildren(jcClassDecl));
     }
 
-    private static MethodNode buildNode(JCMethodDecl jcMethodDecl) {
-        return new MethodNode(jcMethodDecl, buildChildren(jcMethodDecl));
+    private static Node<JCMethodDecl> buildNode(JCMethodDecl jcMethodDecl) {
+        return new Node<>(jcMethodDecl, buildChildren(jcMethodDecl));
     }
 
-    private static BlockNode buildNode(JCBlock jcBlock) {
-        return new BlockNode(jcBlock, buildChildren(jcBlock));
+    private static Node<JCBlock> buildNode(JCBlock jcBlock) {
+        return new Node<>(jcBlock, buildChildren(jcBlock));
     }
 
-    private static VariableDefNode buildNode(JCVariableDecl jcVariableDecl) {
-        return new VariableDefNode(jcVariableDecl, buildChildren(jcVariableDecl));
+    private static Node<JCVariableDecl> buildNode(JCVariableDecl jcVariableDecl) {
+        return new Node<>(jcVariableDecl, buildChildren(jcVariableDecl));
     }
 
-    private static WhileLoopNode buildNode(JCWhileLoop jcWhileLoop) {
-        return new WhileLoopNode(jcWhileLoop, buildChildren(jcWhileLoop));
+    private static Node<JCWhileLoop> buildNode(JCWhileLoop jcWhileLoop) {
+        return new Node<>(jcWhileLoop, buildChildren(jcWhileLoop));
     }
 
-    private static DoWhileLoopNode buildNode(JCDoWhileLoop jcDoWhileLoop) {
-        return new DoWhileLoopNode(jcDoWhileLoop, buildChildren(jcDoWhileLoop));
+    private static Node<JCDoWhileLoop> buildNode(JCDoWhileLoop jcDoWhileLoop) {
+        return new Node<>(jcDoWhileLoop, buildChildren(jcDoWhileLoop));
     }
 
-    private static ForLoopNode buildNode(JCForLoop jcForLoop) {
-        return new ForLoopNode(jcForLoop, buildChildren(jcForLoop));
+    private static Node<JCForLoop> buildNode(JCForLoop jcForLoop) {
+        return new Node<>(jcForLoop, buildChildren(jcForLoop));
     }
 
-    private static EnhancedForLoopNode buildNode(JCEnhancedForLoop jcEnhancedForLoop) {
-        return new EnhancedForLoopNode(jcEnhancedForLoop, buildChildren(jcEnhancedForLoop));
+    private static Node<JCEnhancedForLoop> buildNode(JCEnhancedForLoop jcEnhancedForLoop) {
+        return new Node<>(jcEnhancedForLoop, buildChildren(jcEnhancedForLoop));
     }
 
-    private static ImportNode buildNode(JCTree.JCImport jcImport) {
-        return new ImportNode(jcImport);
+    private static Node<JCTree.JCImport> buildNode(JCTree.JCImport jcImport) {
+        return new Node<>(jcImport);
     }
 
-    private static AnnotationNode buildNode(JCTree.JCAnnotation jcAnnotation) {
-        return new AnnotationNode(jcAnnotation);
+    private static Node<JCTree.JCAnnotation> buildNode(JCTree.JCAnnotation jcAnnotation) {
+        return new Node<>(jcAnnotation);
     }
 
-    private static ExpressionStatementNode buildNode(JCTree.JCExpressionStatement jcExpressionStatement) {
-        return new ExpressionStatementNode(jcExpressionStatement);
+    private static Node<JCTree.JCExpressionStatement> buildNode(JCTree.JCExpressionStatement jcExpressionStatement) {
+        return new Node<>(jcExpressionStatement);
     }
 
-    private static StatementNode buildNode(JCTree.JCStatement jcStatement) {
-        return new StatementNode(jcStatement);
+    private static Node<JCTree.JCStatement> buildNode(JCTree.JCStatement jcStatement) {
+        return new Node<>(jcStatement);
     }
 
     private static List<Node> buildChildren(JCCompilationUnit compilationUnit) {
@@ -116,19 +116,19 @@ public class TreeBuilder {
 
     private static List<Node> buildChildren(JCBlock block) {
         return mapChildren(def -> {
-            if(def instanceof JCVariableDecl) {
+            if (def instanceof JCVariableDecl) {
                 return buildNode((JCVariableDecl) def);
             }
-            if(def instanceof JCWhileLoop) {
+            if (def instanceof JCWhileLoop) {
                 return buildNode((JCWhileLoop) def);
             }
-            if(def instanceof JCDoWhileLoop) {
+            if (def instanceof JCDoWhileLoop) {
                 return buildNode((JCDoWhileLoop) def);
             }
-            if(def instanceof JCForLoop) {
+            if (def instanceof JCForLoop) {
                 return buildNode((JCForLoop) def);
             }
-            if(def instanceof JCEnhancedForLoop) {
+            if (def instanceof JCEnhancedForLoop) {
                 return buildNode((JCEnhancedForLoop) def);
             }
             return buildNode((JCTree.JCExpressionStatement)def);
