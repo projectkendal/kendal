@@ -22,15 +22,15 @@ import javax.tools.Diagnostic;
 
 import com.sun.source.util.Trees;
 import com.sun.tools.javac.processing.JavacProcessingEnvironment;
-import com.sun.tools.javac.tree.JCTree;
+import com.sun.tools.javac.tree.JCTree.JCAnnotation;
 import com.sun.tools.javac.util.Context;
 
 import kendal.api.AstHelper;
 import kendal.api.KendalHandler;
 import kendal.api.exceptions.KendalException;
 import kendal.api.impl.AstHelperImpl;
-import kendal.model.builders.ForestBuilder;
 import kendal.model.Node;
+import kendal.model.builders.ForestBuilder;
 import kendal.utils.ForestUtils;
 
 @SupportedAnnotationTypes("*")
@@ -69,9 +69,9 @@ public class KendalProcessor extends AbstractProcessor {
     private Map<KendalHandler, Set<Node>> getHandlerAnnotationsMap(Set<KendalHandler> handlers, Set<Node> forest) {
         Map<KendalHandler, Set<Node>> result = handlers.stream().collect(Collectors.toMap(Function.identity(), h -> new HashSet<>()));
         ForestUtils.traverse(forest, node -> {
-            if(node.getObject() instanceof JCTree.JCAnnotation) {
+            if(node.getObject() instanceof JCAnnotation) {
                 handlers.forEach(handler -> {
-                    with((JCTree.JCAnnotation)node.getObject(), jcAnnotation -> {
+                    with((JCAnnotation)node.getObject(), jcAnnotation -> {
                         // TODO make proper resolution, this is just for now
                         if(handler.getHandledAnnotationType().getSimpleName().equals(jcAnnotation.annotationType.toString())) {
                             result.get(handler).add(node);

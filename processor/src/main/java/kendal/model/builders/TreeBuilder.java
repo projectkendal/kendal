@@ -3,18 +3,23 @@ package kendal.model.builders;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.util.Objects;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 import java.util.stream.StreamSupport;
 
 import com.sun.tools.javac.tree.JCTree;
+import com.sun.tools.javac.tree.JCTree.JCAnnotation;
 import com.sun.tools.javac.tree.JCTree.JCBlock;
 import com.sun.tools.javac.tree.JCTree.JCClassDecl;
 import com.sun.tools.javac.tree.JCTree.JCCompilationUnit;
 import com.sun.tools.javac.tree.JCTree.JCDoWhileLoop;
 import com.sun.tools.javac.tree.JCTree.JCEnhancedForLoop;
+import com.sun.tools.javac.tree.JCTree.JCExpressionStatement;
 import com.sun.tools.javac.tree.JCTree.JCForLoop;
+import com.sun.tools.javac.tree.JCTree.JCImport;
 import com.sun.tools.javac.tree.JCTree.JCMethodDecl;
+import com.sun.tools.javac.tree.JCTree.JCStatement;
 import com.sun.tools.javac.tree.JCTree.JCVariableDecl;
 import com.sun.tools.javac.tree.JCTree.JCWhileLoop;
 
@@ -66,19 +71,19 @@ class TreeBuilder {
         return new Node<>(jcEnhancedForLoop, buildChildren(jcEnhancedForLoop));
     }
 
-    private static Node<JCTree.JCImport> buildNode(JCTree.JCImport jcImport) {
+    private static Node<JCImport> buildNode(JCImport jcImport) {
         return new Node<>(jcImport);
     }
 
-    private static Node<JCTree.JCAnnotation> buildNode(JCTree.JCAnnotation jcAnnotation) {
+    private static Node<JCAnnotation> buildNode(JCAnnotation jcAnnotation) {
         return new Node<>(jcAnnotation);
     }
 
-    private static Node<JCTree.JCExpressionStatement> buildNode(JCTree.JCExpressionStatement jcExpressionStatement) {
+    private static Node<JCExpressionStatement> buildNode(JCExpressionStatement jcExpressionStatement) {
         return new Node<>(jcExpressionStatement);
     }
 
-    private static Node<JCTree.JCStatement> buildNode(JCTree.JCStatement jcStatement) {
+    private static Node<JCStatement> buildNode(JCStatement jcStatement) {
         return new Node<>(jcStatement);
     }
 
@@ -87,7 +92,7 @@ class TreeBuilder {
             if(def instanceof JCClassDecl) {
                 return buildNode((JCClassDecl)def);
             }
-            return buildNode((JCTree.JCImport)def);
+            return buildNode((JCImport)def);
         }, compilationUnit.defs);
     }
 
@@ -102,7 +107,7 @@ class TreeBuilder {
             if(def instanceof JCClassDecl) {
                 return buildNode((JCClassDecl) def);
             }
-            return buildNode((JCTree.JCAnnotation)def);
+            return buildNode((JCAnnotation) def);
         }, classDecl.defs);
     }
 
@@ -131,9 +136,11 @@ class TreeBuilder {
             if (def instanceof JCEnhancedForLoop) {
                 return buildNode((JCEnhancedForLoop) def);
             }
-            return buildNode((JCTree.JCExpressionStatement)def);
+            if (def instanceof JCExpressionStatement) {
+                return buildNode((JCExpressionStatement) def);
+            }
+            return null;
         }, block.stats);
-
     }
 
     private static List<Node> buildChildren(JCVariableDecl variableDecl) {
@@ -169,6 +176,7 @@ class TreeBuilder {
     private static <T extends JCTree> List<Node> mapChildren(Function<T, Node> mapping, Iterable<T>... childCollections) {
         return Arrays.stream(childCollections).flatMap(c -> StreamSupport.stream(c.spliterator(), false))
                 .map(mapping)
+                .filter(Objects::nonNull)
                 .collect(Collectors.toList());
     }
 }

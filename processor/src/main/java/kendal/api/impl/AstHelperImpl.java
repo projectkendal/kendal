@@ -3,6 +3,7 @@ package kendal.api.impl;
 import com.sun.tools.javac.tree.JCTree;
 import com.sun.tools.javac.tree.JCTree.JCBlock;
 import com.sun.tools.javac.tree.JCTree.JCClassDecl;
+import com.sun.tools.javac.tree.JCTree.JCExpressionStatement;
 import com.sun.tools.javac.tree.JCTree.JCMethodDecl;
 import com.sun.tools.javac.tree.JCTree.JCStatement;
 import com.sun.tools.javac.tree.JCTree.JCVariableDecl;
@@ -30,7 +31,7 @@ public class AstHelperImpl implements AstHelper {
     }
 
     @Override
-    public void addVariableDeclarationToClass(Node<JCClassDecl> clazz, Node<JCVariableDecl> variableDeclaration) throws ImproperNodeTypeException {
+    public void  addVariableDeclarationToClass(Node<JCClassDecl> clazz, Node<JCVariableDecl> variableDeclaration) throws ImproperNodeTypeException {
         if (!astValidator.isClass(clazz) || !astValidator.isVariable(variableDeclaration)) {
             throw new ImproperNodeTypeException();
         }
@@ -43,7 +44,7 @@ public class AstHelperImpl implements AstHelper {
     }
 
     @Override
-    public void addExpressionStatementToMethod(Node<JCMethodDecl> method, Node<JCTree.JCExpressionStatement> expressionStatement) {
+    public <T extends JCExpressionStatement> void addExpressionStatementToMethod(Node<JCMethodDecl> method, Node<T> expressionStatement) {
         // Update Kendal AST:
         method.addChild(expressionStatement);
         // Update javac AST:

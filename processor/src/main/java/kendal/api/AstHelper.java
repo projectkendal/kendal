@@ -1,6 +1,9 @@
 package kendal.api;
 
-import com.sun.tools.javac.tree.JCTree;
+import com.sun.tools.javac.tree.JCTree.JCClassDecl;
+import com.sun.tools.javac.tree.JCTree.JCExpressionStatement;
+import com.sun.tools.javac.tree.JCTree.JCMethodDecl;
+import com.sun.tools.javac.tree.JCTree.JCVariableDecl;
 
 import kendal.api.exceptions.ImproperNodeTypeException;
 import kendal.model.Node;
@@ -12,12 +15,13 @@ import kendal.model.Node;
 * */
 public interface AstHelper {
     // MODIFICATION METHODS
-    void addVariableDeclarationToClass(Node<JCTree.JCClassDecl> clazz, Node<JCTree.JCVariableDecl> variableDeclaration) throws ImproperNodeTypeException;
+    void addVariableDeclarationToClass(Node<JCClassDecl> clazz, Node<JCVariableDecl> variableDeclaration) throws ImproperNodeTypeException;
 
     /**
      * Adds expression statement on the end of the method.
      */
-    void addExpressionStatementToMethod(Node<JCTree.JCMethodDecl> method, Node<JCTree.JCExpressionStatement> expressionStatement) throws ImproperNodeTypeException;
+    <T extends JCExpressionStatement> void addExpressionStatementToMethod(Node<JCMethodDecl> method,
+            Node<T> expressionStatement) throws ImproperNodeTypeException;
 
     // SPECIFIC HELPERS
     AstNodeBuilder getAstNodeBuilder();

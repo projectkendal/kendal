@@ -1,7 +1,6 @@
 package kendal.api.impl;
 
 import com.sun.tools.javac.code.TypeTag;
-import com.sun.tools.javac.tree.JCTree;
 import com.sun.tools.javac.tree.JCTree.JCExpression;
 import com.sun.tools.javac.tree.JCTree.JCExpressionStatement;
 import com.sun.tools.javac.tree.JCTree.JCFieldAccess;
@@ -50,7 +49,7 @@ public class AstNodeBuilderImpl implements AstNodeBuilder {
     }
 
     @Override
-    public <L extends JCTree.JCExpression, R extends JCTree.JCExpression> Node<JCTree.JCExpressionStatement>
+    public <L extends JCExpression, R extends JCExpression> Node<JCExpressionStatement>
     buildAssignmentStatement(Node<L> lhs, Node<R> rhs) throws ImproperNodeTypeException {
         if (!astValidator.isExpression(lhs) || !astValidator.isExpression(rhs)) {
             throw new ImproperNodeTypeException();
