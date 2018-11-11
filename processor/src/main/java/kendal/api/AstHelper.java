@@ -11,10 +11,14 @@ import kendal.model.Node;
 public interface AstHelper {
     // MODIFICATION METHODS
     void addVariableDeclarationToClass(Node clazz, Node variableDeclaration) throws ImproperNodeTypeException;
-    void addExpressionStatementToMethod(Node method, Node expressionStatement, int lineIndex)
-            throws ImproperNodeTypeException;
+
+    /**
+     * Adds expression statement on the end of the method.
+     */
+    void addExpressionStatementToMethod(Node method, Node expressionStatement) throws ImproperNodeTypeException;
 
     // SPECIFIC HELPERS
     AstNodeBuilder getAstNodeBuilder();
     AstValidator getAstValidator();
+    AstUtils getAstUtils();
 }

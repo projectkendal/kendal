@@ -9,8 +9,12 @@ public class Node {
     Node parent;
     List<Node> children;
 
-    public Node(JCTree object, List<Node> children) {
+    public Node(JCTree object) {
         this.object = object;
+    }
+
+    public Node(JCTree object, List<Node> children) {
+        this(object);
         this.children = children;
         children.forEach(child -> child.parent = this);
     }
@@ -29,5 +33,9 @@ public class Node {
 
     public void addChild(Node newChild) {
         children.add(newChild);
+    }
+
+    public void addChild(int index, Node newChild) {
+        children.add(index, newChild);
     }
 }
