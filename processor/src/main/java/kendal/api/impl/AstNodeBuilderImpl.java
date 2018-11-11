@@ -18,12 +18,12 @@ import kendal.api.exceptions.ImproperNodeTypeException;
 import kendal.model.Node;
 
 public class AstNodeBuilderImpl implements AstNodeBuilder {
-    private final static JCExpression NO_VALUE = null;
+    private static final JCExpression NO_VALUE = null;
 
     private final TreeMaker treeMaker;
     private AstValidator astValidator;
 
-    public AstNodeBuilderImpl(Context context, AstValidator astValidator) {
+    AstNodeBuilderImpl(Context context, AstValidator astValidator) {
         this.treeMaker = TreeMaker.instance(context);
         this.astValidator = astValidator;
     }

@@ -61,9 +61,9 @@ public class AstHelperImpl implements AstHelper {
         classDecl.defs = List.from(newDefs);
     }
 
-    private void addElementToBlock(JCBlock classDecl, JCStatement element) {
-        JCStatement[] newStatements = getStatementsArray(classDecl.stats, element);
-        classDecl.stats = List.from(newStatements);
+    private void addElementToBlock(JCBlock block, JCStatement element) {
+        JCStatement[] newStatements = getStatementsArray(block.stats, element);
+        block.stats = List.from(newStatements);
     }
 
     @Override
