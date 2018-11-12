@@ -6,9 +6,9 @@ import java.util.List;
 import com.sun.tools.javac.tree.JCTree;
 
 public class Node <T extends JCTree> {
-    protected T object;
-    protected Node parent;
-    protected List<Node> children;
+    private T object;
+    private Node parent;
+    private List<Node> children;
     private final boolean addedByKendal;
 
     public Node(T object) {
