@@ -14,8 +14,15 @@ import kendal.api.AstHelper;
 import kendal.api.AstNodeBuilder;
 import kendal.api.AstUtils;
 import kendal.api.AstValidator;
+import kendal.api.exceptions.ElementNotFoundException;
 import kendal.api.exceptions.ImproperNodeTypeException;
 import kendal.model.Node;
+
+import java.lang.reflect.Array;
+import java.util.stream.Collectors;
+import java.util.stream.StreamSupport;
+
+import static kendal.utils.Utils.with;
 
 public class AstHelperImpl implements AstHelper {
     private final Context context;
@@ -40,26 +47,29 @@ public class AstHelperImpl implements AstHelper {
         // Update javac AST:
         JCClassDecl classDecl = clazz.getObject();
         JCVariableDecl variableDecl = variableDeclaration.getObject();
-        addElementToClass(classDecl, variableDecl);
+        classDecl.defs = append(classDecl.defs, variableDecl);
     }
 
     @Override
-    public <T extends JCExpressionStatement> void addExpressionStatementToMethod(Node<JCMethodDecl> method, Node<T> expressionStatement) {
+    public <T extends JCExpressionStatement> void appendExpressionStatementToMethod(Node<JCMethodDecl> method, Node<T> expressionStatement) {
         // Update Kendal AST:
         method.addChild(expressionStatement);
         // Update javac AST:
         JCMethodDecl methodDecl = method.getObject();
-        addElementToBlock(methodDecl.body, expressionStatement.getObject());
+        with(methodDecl.body, b -> {
+            b.stats = append(b.stats, expressionStatement.getObject());
+        });
     }
 
-    private void addElementToClass(JCClassDecl classDecl, JCTree element) {
-        JCTree[] newDefs = getDefinitionsArray(classDecl.defs, element);
-        classDecl.defs = List.from(newDefs);
-    }
-
-    private void addElementToBlock(JCBlock block, JCStatement element) {
-        JCStatement[] newStatements = getStatementsArray(block.stats, element);
-        block.stats = List.from(newStatements);
+    @Override
+    public <T extends JCExpressionStatement> void prependExpressionStatementToMethod(Node<JCMethodDecl> method, Node<T> expressionStatement) {
+        // Update Kendal AST:
+        method.addChild(0, expressionStatement);
+        // Update javac AST:
+        JCMethodDecl methodDecl = method.getObject();
+        with(methodDecl.body, b -> {
+            b.stats = prepend(b.stats, expressionStatement.getObject());
+        });
     }
 
     @Override
@@ -77,21 +87,35 @@ public class AstHelperImpl implements AstHelper {
         return astUtils;
     }
 
-    private JCTree[] getDefinitionsArray(List<JCTree> defs, JCTree element) {
-        JCTree[] newDefs = new JCTree[defs.size() + 1];
-        for (int i = 0; i < defs.size(); i++) {
-            newDefs[i] = defs.get(i);
-        }
-        newDefs[defs.size()] = element;
-        return newDefs;
+    private <T extends JCTree> List<T> addAfter(List<T> defs, T element, T after) {
+        int index = defs.indexOf(after);
+        assertFound(index);
+        return add(index + 1, defs, element);
     }
 
-    private JCStatement[] getStatementsArray(List<JCStatement> defs, JCStatement element) {
-        JCStatement[] newDefs = new JCStatement[defs.size() + 1];
-        for (int i = 0; i < defs.size(); i++) {
-            newDefs[i] = defs.get(i);
+    private <T extends JCTree> List<T> addBefore(List<T> defs, T element, T before) {
+        int index = defs.indexOf(before);
+        assertFound(index);
+        return add(index + 1, defs, element);
+    }
+
+    private <T extends JCTree> List<T> append(List<T> defs, T element) {
+        return add(defs.size(), defs, element);
+    }
+
+    private <T extends JCTree> List<T> prepend(List<T> defs, T element) {
+        return add(0, defs, element);
+    }
+
+    private <T extends JCTree> List<T> add(int index, List<T> defs, T element) {
+        java.util.List<T> list = StreamSupport.stream(defs.spliterator(), false).collect(Collectors.toList());
+        list.add(index, element);
+        return List.from(list);
+    }
+
+    private void assertFound(int index) {
+        if(index == -1) {
+            throw new ElementNotFoundException(String.format("Element %s not found in specified collection!"));
         }
-        newDefs[defs.size()] = element;
-        return newDefs;
     }
 }

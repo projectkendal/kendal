@@ -20,8 +20,15 @@ public interface AstHelper {
     /**
      * Adds expression statement on the end of the method.
      */
-    <T extends JCExpressionStatement> void addExpressionStatementToMethod(Node<JCMethodDecl> method,
-            Node<T> expressionStatement) throws ImproperNodeTypeException;
+    <T extends JCExpressionStatement> void appendExpressionStatementToMethod(Node<JCMethodDecl> method,
+                                                                             Node<T> expressionStatement) throws ImproperNodeTypeException;
+
+
+    /**
+     * Adds expression statement on the beginning of the method.
+     */
+    <T extends JCExpressionStatement> void prependExpressionStatementToMethod(Node<JCMethodDecl> method,
+                                                                             Node<T> expressionStatement) throws ImproperNodeTypeException;
 
     // SPECIFIC HELPERS
     AstNodeBuilder getAstNodeBuilder();
