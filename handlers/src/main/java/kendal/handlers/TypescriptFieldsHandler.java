@@ -55,7 +55,7 @@ public abstract class TypescriptFieldsHandler<T> implements KendalHandler<T> {
         Node<JCFieldAccess> fieldAccess = astNodeBuilder.buildFieldAccess(objectRef, newVariable.getObject().name);
         Node<JCIdent> newVariableRef = astNodeBuilder.buildObjectReference(newVariable.getObject().name);
         Node<JCExpressionStatement> assignment = astNodeBuilder.buildAssignmentStatement(fieldAccess, newVariableRef);
-        helper.addExpressionStatementToMethod(constructor, assignment);
+        helper.prependExpressionStatementToMethod(constructor, assignment);
     }
 
     abstract Modifier getModifier();
