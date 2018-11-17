@@ -12,6 +12,7 @@ public class TestClass {
     }
 
     private int someMethod() {
+        int var = a;
         a = 15;
         return a;
     }
