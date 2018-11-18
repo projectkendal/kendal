@@ -1,12 +1,16 @@
 package kendal.experiments;
 
 import kendal.annotations.Private;
+import kendal.annotations.Protected;
 import kendal.annotations.Public;
+
+import java.util.Map;
+import java.util.Set;
 
 public class TestClass {
     int x;
 
-    public TestClass(@Private int a, @Public int b) {
+    public TestClass(@Private(makeFinal = false) int a, @Public(makeFinal = false) int b, @Protected(makeFinal = false) int meineFinale) {
         this.x = a;
         System.out.println("Let's have here some expression statement");
     }

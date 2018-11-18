@@ -47,7 +47,7 @@ public class AstHelperImpl implements AstHelper {
         // Update javac AST:
         JCClassDecl classDecl = clazz.getObject();
         JCVariableDecl variableDecl = variableDeclaration.getObject();
-        classDecl.defs = append(classDecl.defs, variableDecl);
+        classDecl.defs = prepend(classDecl.defs, variableDecl);
     }
 
     @Override

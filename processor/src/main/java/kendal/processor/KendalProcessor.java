@@ -22,7 +22,10 @@ import javax.tools.Diagnostic;
 
 import com.sun.source.util.Trees;
 import com.sun.tools.javac.processing.JavacProcessingEnvironment;
+import com.sun.tools.javac.tree.DocPretty;
+import com.sun.tools.javac.tree.JCTree;
 import com.sun.tools.javac.tree.JCTree.JCAnnotation;
+import com.sun.tools.javac.tree.Pretty;
 import com.sun.tools.javac.util.Context;
 
 import kendal.api.AstHelper;

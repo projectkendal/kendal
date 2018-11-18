@@ -3,7 +3,7 @@ package kendal.experiments;
 public class MainClass {
 
     public static void main() {
-        TestClass testClass = new TestClass(12, 15);
+        TestClass testClass = new TestClass(12, 15, 90);
         int var = testClass.b;
         testClass.b = 15;
     }

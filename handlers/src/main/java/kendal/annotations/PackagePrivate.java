@@ -5,4 +5,6 @@ import java.lang.annotation.Target;
 
 @Target(value= ElementType.PARAMETER)
 public @interface PackagePrivate {
+
+    boolean makeFinal() default true;
 }

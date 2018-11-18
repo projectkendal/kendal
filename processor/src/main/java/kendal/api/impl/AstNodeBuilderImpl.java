@@ -1,6 +1,7 @@
 package kendal.api.impl;
 
 import com.sun.tools.javac.code.TypeTag;
+import com.sun.tools.javac.tree.JCTree;
 import com.sun.tools.javac.tree.JCTree.JCExpression;
 import com.sun.tools.javac.tree.JCTree.JCExpressionStatement;
 import com.sun.tools.javac.tree.JCTree.JCFieldAccess;
@@ -17,6 +18,10 @@ import kendal.api.Modifier;
 import kendal.api.exceptions.ImproperNodeTypeException;
 import kendal.model.Node;
 
+import java.util.List;
+
+import static kendal.utils.Utils.map;
+
 public class AstNodeBuilderImpl implements AstNodeBuilder {
     private static final JCExpression NO_VALUE = null;
 
@@ -29,10 +34,16 @@ public class AstNodeBuilderImpl implements AstNodeBuilder {
     }
 
     @Override
-    public Node<JCVariableDecl> buildVariableDecl(Modifier modifier, Object type, Name name) {
-        JCModifiers modifiers = treeMaker.Modifiers(modifier.getFlag());
+    public Node<JCVariableDecl> buildVariableDecl(List<Modifier> modifiers, Object type, Name name) {
+        JCModifiers jcModifiers = treeMaker.Modifiers(map(modifiers, (List<Modifier>m) -> {
+            long result = 0;
+            for (Modifier mod : m) {
+                result |= mod.getFlag();
+            }
+            return result;
+        }));
         JCExpression returnType = treeMaker.TypeIdent(TypeTag.INT);
-        JCVariableDecl variableDecl = treeMaker.VarDef(modifiers, name, returnType, NO_VALUE);
+        JCVariableDecl variableDecl = treeMaker.VarDef(jcModifiers, name, returnType, NO_VALUE);
         return new Node<>(variableDecl, true);
     }
 

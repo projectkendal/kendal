@@ -1,29 +1,23 @@
 package kendal.handlers;
 
-import java.util.Collection;
-
-import com.sun.tools.javac.tree.JCTree.JCClassDecl;
-import com.sun.tools.javac.tree.JCTree.JCExpressionStatement;
-import com.sun.tools.javac.tree.JCTree.JCFieldAccess;
-import com.sun.tools.javac.tree.JCTree.JCIdent;
-import com.sun.tools.javac.tree.JCTree.JCMethodDecl;
-import com.sun.tools.javac.tree.JCTree.JCVariableDecl;
+import com.sun.tools.javac.tree.JCTree;
+import com.sun.tools.javac.tree.JCTree.*;
 import com.sun.tools.javac.util.Name;
-
 import kendal.annotations.PackagePrivate;
 import kendal.annotations.Private;
 import kendal.annotations.Protected;
 import kendal.annotations.Public;
-import kendal.api.AstHelper;
-import kendal.api.AstNodeBuilder;
-import kendal.api.AstUtils;
-import kendal.api.KendalHandler;
-import kendal.api.Modifier;
+import kendal.api.*;
 import kendal.api.exceptions.InvalidAnnotationException;
 import kendal.api.exceptions.KendalException;
 import kendal.model.Node;
 
-public abstract class TypescriptFieldsHandler<T> implements KendalHandler<T> {
+import java.lang.annotation.Annotation;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.List;
+
+public abstract class TypescriptFieldsHandler<T extends Annotation> implements KendalHandler<T> {
 
     private AstNodeBuilder astNodeBuilder;
     private AstUtils astUtils;
@@ -47,9 +41,12 @@ public abstract class TypescriptFieldsHandler<T> implements KendalHandler<T> {
             throw new InvalidAnnotationException(
                     String.format("%s Annotated element must be parameter of a constructor!", annotationNode.getObject().toString()));
         }
+
+        List<Modifier> modifiers = getModifiers(getFinalParamValue(annotationNode));
+
         Node<JCClassDecl> clazz = (Node<JCClassDecl>) constructor.getParent();
         Name name = ((JCVariableDecl)annotationNode.getParent().getObject()).name;
-        Node<JCVariableDecl> newVariable = astNodeBuilder.buildVariableDecl(getModifier(), "type", name);
+        Node<JCVariableDecl> newVariable = astNodeBuilder.buildVariableDecl(modifiers, "type", name);
         helper.addVariableDeclarationToClass(clazz, newVariable);
         Node<JCIdent> objectRef = astNodeBuilder.buildObjectReference(astUtils.nameFromString("this"));
         Node<JCFieldAccess> fieldAccess = astNodeBuilder.buildFieldAccess(objectRef, newVariable.getObject().name);
@@ -58,6 +55,23 @@ public abstract class TypescriptFieldsHandler<T> implements KendalHandler<T> {
         helper.prependExpressionStatementToMethod(constructor, assignment);
     }
 
+    private List<Modifier> getModifiers(boolean finalParamValue) {
+        List<Modifier> list = new ArrayList<>();
+        list.add(getModifier());
+        if(finalParamValue) {
+            list.add(Modifier.FINAL);
+        }
+        return list;
+    }
+
+    private boolean getFinalParamValue(Node<JCTree.JCAnnotation> annotationNode) {
+        T annotation = ((JCVariableDecl) annotationNode.getParent().getObject()).sym.getAnnotation(getHandledAnnotationType());
+        annotation.annotationType();
+        return getMakeFinalValue(annotation);
+    }
+
+    protected abstract boolean getMakeFinalValue(T annotation);
+
     abstract Modifier getModifier();
 
     public static class PrivateHandler extends TypescriptFieldsHandler<Private> {
@@ -65,6 +79,11 @@ public abstract class TypescriptFieldsHandler<T> implements KendalHandler<T> {
         @Override
         public Class getHandledAnnotationType() {
             return Private.class;
+        }
+
+        @Override
+        protected boolean getMakeFinalValue(Private annotation) {
+            return annotation.makeFinal();
         }
 
         @Override
@@ -81,6 +100,11 @@ public abstract class TypescriptFieldsHandler<T> implements KendalHandler<T> {
         }
 
         @Override
+        protected boolean getMakeFinalValue(Protected annotation) {
+            return annotation.makeFinal();
+        }
+
+        @Override
         Modifier getModifier() {
             return Modifier.PROTECTED;
         }
@@ -94,6 +118,11 @@ public abstract class TypescriptFieldsHandler<T> implements KendalHandler<T> {
         }
 
         @Override
+        protected boolean getMakeFinalValue(PackagePrivate annotation) {
+            return annotation.makeFinal();
+        }
+
+        @Override
         Modifier getModifier() {
             return Modifier.PACKAGE_PRIVATE;
         }
@@ -104,6 +133,11 @@ public abstract class TypescriptFieldsHandler<T> implements KendalHandler<T> {
         @Override
         public Class getHandledAnnotationType() {
             return Public.class;
+        }
+
+        @Override
+        protected boolean getMakeFinalValue(Public annotation) {
+            return annotation.makeFinal();
         }
 
         @Override
