@@ -46,7 +46,7 @@ public abstract class TypescriptFieldsHandler<T extends Annotation> implements K
 
         Node<JCClassDecl> clazz = (Node<JCClassDecl>) constructor.getParent();
         Name name = ((JCVariableDecl)annotationNode.getParent().getObject()).name;
-        Node<JCVariableDecl> newVariable = astNodeBuilder.buildVariableDecl(modifiers, "type", name);
+        Node<JCVariableDecl> newVariable = astNodeBuilder.buildVariableDecl(modifiers, "type", name, annotationNode);
         helper.addVariableDeclarationToClass(clazz, newVariable);
         Node<JCIdent> objectRef = astNodeBuilder.buildObjectReference(astUtils.nameFromString("this"));
         Node<JCFieldAccess> fieldAccess = astNodeBuilder.buildFieldAccess(objectRef, newVariable.getObject().name);
@@ -73,7 +73,7 @@ public abstract class TypescriptFieldsHandler<T extends Annotation> implements K
     protected abstract boolean getMakeFinalValue(T annotation);
 
     abstract Modifier getModifier();
-
+    
     public static class PrivateHandler extends TypescriptFieldsHandler<Private> {
 
         @Override

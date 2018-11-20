@@ -2,6 +2,8 @@ package kendal.processor;
 
 import static kendal.utils.Utils.with;
 
+import java.io.IOException;
+import java.io.Writer;
 import java.util.HashSet;
 import java.util.Map;
 import java.util.ServiceLoader;
@@ -19,6 +21,7 @@ import javax.annotation.processing.SupportedSourceVersion;
 import javax.lang.model.SourceVersion;
 import javax.lang.model.element.TypeElement;
 import javax.tools.Diagnostic;
+import javax.tools.JavaFileObject;
 
 import com.sun.source.util.Trees;
 import com.sun.tools.javac.processing.JavacProcessingEnvironment;
@@ -59,8 +62,9 @@ public class KendalProcessor extends AbstractProcessor {
     }
 
     public boolean process(Set<? extends TypeElement> annotations, RoundEnvironment roundEnv) {
-        if (roundEnv.getRootElements().isEmpty()) return false;
         messager.printMessage(Diagnostic.Kind.NOTE, "Processor run!");
+        if (roundEnv.getRootElements().isEmpty()) return false;
+        if (roundEnv.processingOver()) return false;
         Set<Node> forest = forestBuilder.buildForest(roundEnv.getRootElements());
         Set<KendalHandler> handlers = getHandlersFromSPI();
         registerHandlers(handlers);

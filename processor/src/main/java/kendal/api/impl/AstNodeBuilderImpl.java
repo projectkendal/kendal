@@ -2,16 +2,10 @@ package kendal.api.impl;
 
 import com.sun.tools.javac.code.TypeTag;
 import com.sun.tools.javac.tree.JCTree;
-import com.sun.tools.javac.tree.JCTree.JCExpression;
-import com.sun.tools.javac.tree.JCTree.JCExpressionStatement;
-import com.sun.tools.javac.tree.JCTree.JCFieldAccess;
-import com.sun.tools.javac.tree.JCTree.JCIdent;
-import com.sun.tools.javac.tree.JCTree.JCModifiers;
-import com.sun.tools.javac.tree.JCTree.JCVariableDecl;
+import com.sun.tools.javac.tree.JCTree.*;
 import com.sun.tools.javac.tree.TreeMaker;
 import com.sun.tools.javac.util.Context;
 import com.sun.tools.javac.util.Name;
-
 import kendal.api.AstNodeBuilder;
 import kendal.api.AstValidator;
 import kendal.api.Modifier;
@@ -34,7 +28,7 @@ public class AstNodeBuilderImpl implements AstNodeBuilder {
     }
 
     @Override
-    public Node<JCVariableDecl> buildVariableDecl(List<Modifier> modifiers, Object type, Name name) {
+    public Node<JCVariableDecl> buildVariableDecl(List<Modifier> modifiers, Object type, Name name, Node<JCTree.JCAnnotation> source) {
         JCModifiers jcModifiers = treeMaker.Modifiers(map(modifiers, (List<Modifier>m) -> {
             long result = 0;
             for (Modifier mod : m) {
@@ -43,6 +37,7 @@ public class AstNodeBuilderImpl implements AstNodeBuilder {
             return result;
         }));
         JCExpression returnType = treeMaker.TypeIdent(TypeTag.INT);
+        treeMaker.at(source.getObject().pos);
         JCVariableDecl variableDecl = treeMaker.VarDef(jcModifiers, name, returnType, NO_VALUE);
         return new Node<>(variableDecl, true);
     }

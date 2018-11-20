@@ -1,15 +1,12 @@
 package kendal.api.impl;
 
 import com.sun.tools.javac.tree.JCTree;
-import com.sun.tools.javac.tree.JCTree.JCBlock;
 import com.sun.tools.javac.tree.JCTree.JCClassDecl;
 import com.sun.tools.javac.tree.JCTree.JCExpressionStatement;
 import com.sun.tools.javac.tree.JCTree.JCMethodDecl;
-import com.sun.tools.javac.tree.JCTree.JCStatement;
 import com.sun.tools.javac.tree.JCTree.JCVariableDecl;
 import com.sun.tools.javac.util.Context;
 import com.sun.tools.javac.util.List;
-
 import kendal.api.AstHelper;
 import kendal.api.AstNodeBuilder;
 import kendal.api.AstUtils;
@@ -18,7 +15,6 @@ import kendal.api.exceptions.ElementNotFoundException;
 import kendal.api.exceptions.ImproperNodeTypeException;
 import kendal.model.Node;
 
-import java.lang.reflect.Array;
 import java.util.stream.Collectors;
 import java.util.stream.StreamSupport;
 
