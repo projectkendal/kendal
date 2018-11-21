@@ -79,8 +79,8 @@ public class KendalProcessor extends AbstractProcessor {
             if(node.getObject() instanceof JCAnnotation) {
                 handlers.forEach(handler -> {
                     with((JCAnnotation)node.getObject(), jcAnnotation -> {
-                        // TODO make proper resolution, this is just for now
-                        if(handler.getHandledAnnotationType().getSimpleName().equals(jcAnnotation.annotationType.toString())) {
+                        // TODO This will PROBABLY work, but we have to make sure
+                        if(jcAnnotation.type.tsym.getQualifiedName().contentEquals(handler.getHandledAnnotationType().getName())) {
                             result.get(handler).add(node);
                             messager.printMessage(Diagnostic.Kind.NOTE, String.format("annotation %s handled by %s", jcAnnotation.toString(), handler.getClass().getName()));
                         }
