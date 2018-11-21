@@ -15,6 +15,8 @@ import kendal.api.exceptions.ElementNotFoundException;
 import kendal.api.exceptions.ImproperNodeTypeException;
 import kendal.model.Node;
 
+import javax.lang.model.element.Name;
+import java.util.Collection;
 import java.util.stream.Collectors;
 import java.util.stream.StreamSupport;
 
@@ -66,6 +68,13 @@ public class AstHelperImpl implements AstHelper {
         with(methodDecl.body, b -> {
             b.stats = prepend(b.stats, expressionStatement.getObject());
         });
+    }
+
+    @Override
+    public Node<JCVariableDecl> findFieldByName(Node<JCClassDecl> classDeclNode, Name name) {
+        return classDeclNode.getChildren().stream()
+                .filter(node -> node.getObject() instanceof JCVariableDecl && ((JCVariableDecl) node.getObject()).name.equals(name))
+                .findAny().orElse(null);
     }
 
     @Override

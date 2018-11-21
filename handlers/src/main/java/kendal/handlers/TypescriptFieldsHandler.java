@@ -46,8 +46,24 @@ public abstract class TypescriptFieldsHandler<T extends Annotation> implements K
 
         Node<JCClassDecl> clazz = (Node<JCClassDecl>) constructor.getParent();
         Name name = ((JCVariableDecl)annotationNode.getParent().getObject()).name;
+
+        Node<JCVariableDecl> existingField = helper.findFieldByName(clazz, name);
+
         Node<JCVariableDecl> newVariable = astNodeBuilder.buildVariableDecl(modifiers, "type", name, annotationNode);
-        helper.addVariableDeclarationToClass(clazz, newVariable);
+
+        if(existingField == null) {
+            helper.addVariableDeclarationToClass(clazz, newVariable);
+        } else {
+            if(!existingField.isAddedByKendal()) {
+                throw new InvalidAnnotationException("Auto generated field was already defined manually in this class!");
+            }
+            if (existingField.getObject().getModifiers().flags != newVariable.getObject().getModifiers().flags) {
+                throw new InvalidAnnotationException(String.format("Auto generated field %s in class %s occured more than once, with inconsistent definition!", existingField.getObject().name.toString(), clazz.getObject().name.toString()));
+            }
+            // here we have the case of identical field defined in more than one constructor. Let it be, skip field creation and just assign the value
+        }
+
+
         Node<JCIdent> objectRef = astNodeBuilder.buildObjectReference(astUtils.nameFromString("this"));
         Node<JCFieldAccess> fieldAccess = astNodeBuilder.buildFieldAccess(objectRef, newVariable.getObject().name);
         Node<JCIdent> newVariableRef = astNodeBuilder.buildObjectReference(newVariable.getObject().name);

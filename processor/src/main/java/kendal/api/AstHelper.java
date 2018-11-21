@@ -8,6 +8,8 @@ import com.sun.tools.javac.tree.JCTree.JCVariableDecl;
 import kendal.api.exceptions.ImproperNodeTypeException;
 import kendal.model.Node;
 
+import javax.lang.model.element.Name;
+
 /*
 *  Interface for AST modification helper class
 *  Instance of AstHelper is passed to implementations of {@link kendal.api.KendalHandler}
@@ -29,6 +31,8 @@ public interface AstHelper {
      */
     <T extends JCExpressionStatement> void prependExpressionStatementToMethod(Node<JCMethodDecl> method,
                                                                              Node<T> expressionStatement) throws ImproperNodeTypeException;
+
+    Node findFieldByName(Node<JCClassDecl> classDeclNode, Name name);
 
     // SPECIFIC HELPERS
     AstNodeBuilder getAstNodeBuilder();
