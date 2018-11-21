@@ -1,5 +1,6 @@
 package kendal.api.impl;
 
+import com.sun.tools.javac.code.Type;
 import com.sun.tools.javac.code.TypeTag;
 import com.sun.tools.javac.tree.JCTree;
 import com.sun.tools.javac.tree.JCTree.*;
@@ -28,7 +29,7 @@ public class AstNodeBuilderImpl implements AstNodeBuilder {
     }
 
     @Override
-    public Node<JCVariableDecl> buildVariableDecl(List<Modifier> modifiers, Object type, Name name, Node<JCTree.JCAnnotation> source) {
+    public Node<JCVariableDecl> buildVariableDecl(List<Modifier> modifiers, JCExpression type, Name name, Node<JCTree.JCAnnotation> source) {
         JCModifiers jcModifiers = treeMaker.Modifiers(map(modifiers, (List<Modifier>m) -> {
             long result = 0;
             for (Modifier mod : m) {
@@ -36,9 +37,8 @@ public class AstNodeBuilderImpl implements AstNodeBuilder {
             }
             return result;
         }));
-        JCExpression returnType = treeMaker.TypeIdent(TypeTag.INT);
         treeMaker.at(source.getObject().pos);
-        JCVariableDecl variableDecl = treeMaker.VarDef(jcModifiers, name, returnType, NO_VALUE);
+        JCVariableDecl variableDecl = treeMaker.VarDef(jcModifiers, name, type, NO_VALUE);
         return new Node<>(variableDecl, true);
     }
 

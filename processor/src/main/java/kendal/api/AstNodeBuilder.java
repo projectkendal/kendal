@@ -1,5 +1,6 @@
 package kendal.api;
 
+import com.sun.tools.javac.code.Type;
 import com.sun.tools.javac.tree.JCTree;
 import com.sun.tools.javac.tree.JCTree.*;
 import com.sun.tools.javac.util.Name;
@@ -9,7 +10,7 @@ import kendal.model.Node;
 import java.util.List;
 
 public interface AstNodeBuilder {
-    Node<JCVariableDecl> buildVariableDecl(List<Modifier> modifiers, Object type, Name Name, Node<JCTree.JCAnnotation> source);
+    Node<JCVariableDecl> buildVariableDecl(List<Modifier> modifiers, JCExpression type, Name Name, Node<JCTree.JCAnnotation> source);
     Node<JCIdent> buildObjectReference(Name fieldName);
     Node<JCFieldAccess> buildFieldAccess(Node<JCIdent> objectRef, Name fieldName) throws ImproperNodeTypeException;
 
