@@ -6,7 +6,7 @@ import java.lang.annotation.*;
 @Target({ElementType.METHOD, ElementType.ANNOTATION_TYPE})
 public @interface Clone {
 
-    Class wrapper();
+    Class<? extends Transformer> wrapper();
 
     /**
     * Java does not allow putting {@link java.lang.annotation.Annotation}, which is the base type for all annotations, as annotation member.
@@ -17,4 +17,7 @@ public @interface Clone {
 
     String methodName() default ""; //default name from original method + something, if this is empty
 
+    interface Transformer<T,R> {
+        R transform(T input);
+    }
 }

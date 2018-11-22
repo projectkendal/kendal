@@ -22,9 +22,10 @@ public class CloneTest {
         }
     }
 
-    class TestClassTransformer {
-        Object transform(Object o) {
-            return o;
+    class TestClassTransformer implements Clone.Transformer<Object, Object> {
+        @Override
+        public Object transform(Object input) {
+            return input;
         }
     }
 }
