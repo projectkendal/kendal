@@ -2,3 +2,4 @@ kendal.handlers.TypescriptFieldsHandler$PackagePrivateHandler
 kendal.handlers.TypescriptFieldsHandler$PrivateHandler
 kendal.handlers.TypescriptFieldsHandler$ProtectedHandler
 kendal.handlers.TypescriptFieldsHandler$PublicHandler
+kendal.handlers.CloneHandler

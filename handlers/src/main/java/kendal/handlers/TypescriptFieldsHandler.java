@@ -1,21 +1,31 @@
 package kendal.handlers;
 
-import com.sun.tools.javac.tree.JCTree;
-import com.sun.tools.javac.tree.JCTree.*;
-import com.sun.tools.javac.util.Name;
-import kendal.annotations.PackagePrivate;
-import kendal.annotations.Private;
-import kendal.annotations.Protected;
-import kendal.annotations.Public;
-import kendal.api.*;
-import kendal.api.exceptions.InvalidAnnotationException;
-import kendal.api.exceptions.KendalException;
-import kendal.model.Node;
-
 import java.lang.annotation.Annotation;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
+
+import com.sun.tools.javac.tree.JCTree;
+import com.sun.tools.javac.tree.JCTree.JCClassDecl;
+import com.sun.tools.javac.tree.JCTree.JCExpressionStatement;
+import com.sun.tools.javac.tree.JCTree.JCFieldAccess;
+import com.sun.tools.javac.tree.JCTree.JCIdent;
+import com.sun.tools.javac.tree.JCTree.JCMethodDecl;
+import com.sun.tools.javac.tree.JCTree.JCVariableDecl;
+import com.sun.tools.javac.util.Name;
+
+import kendal.annotations.PackagePrivate;
+import kendal.annotations.Private;
+import kendal.annotations.Protected;
+import kendal.annotations.Public;
+import kendal.api.AstHelper;
+import kendal.api.AstNodeBuilder;
+import kendal.api.AstUtils;
+import kendal.api.KendalHandler;
+import kendal.api.Modifier;
+import kendal.api.exceptions.InvalidAnnotationException;
+import kendal.api.exceptions.KendalException;
+import kendal.model.Node;
 
 public abstract class TypescriptFieldsHandler<T extends Annotation> implements KendalHandler<T> {
 
@@ -93,7 +103,7 @@ public abstract class TypescriptFieldsHandler<T extends Annotation> implements K
     public static class PrivateHandler extends TypescriptFieldsHandler<Private> {
 
         @Override
-        public Class getHandledAnnotationType() {
+        public Class<Private> getHandledAnnotationType() {
             return Private.class;
         }
 
@@ -111,7 +121,7 @@ public abstract class TypescriptFieldsHandler<T extends Annotation> implements K
     public static class ProtectedHandler extends TypescriptFieldsHandler<Protected> {
 
         @Override
-        public Class getHandledAnnotationType() {
+        public Class<Protected> getHandledAnnotationType() {
             return Protected.class;
         }
 
@@ -129,7 +139,7 @@ public abstract class TypescriptFieldsHandler<T extends Annotation> implements K
     public static class PackagePrivateHandler extends TypescriptFieldsHandler<PackagePrivate> {
 
         @Override
-        public Class getHandledAnnotationType() {
+        public Class<PackagePrivate> getHandledAnnotationType() {
             return PackagePrivate.class;
         }
 
@@ -147,7 +157,7 @@ public abstract class TypescriptFieldsHandler<T extends Annotation> implements K
     public static class PublicHandler extends TypescriptFieldsHandler<Public> {
 
         @Override
-        public Class getHandledAnnotationType() {
+        public Class<Public> getHandledAnnotationType() {
             return Public.class;
         }
 
