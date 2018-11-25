@@ -12,7 +12,7 @@ import kendal.model.Node;
  * Exception message is then printed out as a compilation error.
  *
  * Example: when node representing {@link JCTree.JCMethodDecl} is passed as argument for method
- * {@link AstHelper#addVariableDeclarationToClass(Node, Node)}
+ * {@link AstHelper#addElementToClass(Node, Node, AstHelper.Mode)}
  */
 public class ImproperNodeTypeException extends KendalException {
 

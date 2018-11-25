@@ -1,20 +1,19 @@
 package kendal.experiments;
 
-import kendal.annotations.Clone;
-
 import javax.annotation.Generated;
+
+import kendal.annotations.Clone;
 
 public class CloneTest {
 
-
     @Clone(wrapper = TestClassTransformer.class, methodName="transformerMethod", onMethod={@Generated("whatever")})
-    public Object aMethod() {
-        return new Object();
+    public static String aMethod(String param1, int param2) {
+        return param1 + param2;
     }
 
     @Generated("whatever")
     public Object aMethodClone() {
-        Object result = aMethod();
+        Object result = aMethod("sdas", 12);
         try {
             return TestClassTransformer.class.newInstance().transform(result);
         } catch (InstantiationException | IllegalAccessException e) {

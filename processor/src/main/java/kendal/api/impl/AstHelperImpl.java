@@ -1,5 +1,12 @@
 package kendal.api.impl;
 
+import static kendal.utils.Utils.with;
+
+import java.util.stream.Collectors;
+import java.util.stream.StreamSupport;
+
+import javax.lang.model.element.Name;
+
 import com.sun.tools.javac.tree.JCTree;
 import com.sun.tools.javac.tree.JCTree.JCClassDecl;
 import com.sun.tools.javac.tree.JCTree.JCExpressionStatement;
@@ -7,20 +14,13 @@ import com.sun.tools.javac.tree.JCTree.JCMethodDecl;
 import com.sun.tools.javac.tree.JCTree.JCVariableDecl;
 import com.sun.tools.javac.util.Context;
 import com.sun.tools.javac.util.List;
+
 import kendal.api.AstHelper;
 import kendal.api.AstNodeBuilder;
 import kendal.api.AstUtils;
 import kendal.api.AstValidator;
-import kendal.api.exceptions.ElementNotFoundException;
 import kendal.api.exceptions.ImproperNodeTypeException;
 import kendal.model.Node;
-
-import javax.lang.model.element.Name;
-import java.util.Collection;
-import java.util.stream.Collectors;
-import java.util.stream.StreamSupport;
-
-import static kendal.utils.Utils.with;
 
 public class AstHelperImpl implements AstHelper {
     private final Context context;
@@ -36,37 +36,32 @@ public class AstHelperImpl implements AstHelper {
     }
 
     @Override
-    public void  addVariableDeclarationToClass(Node<JCClassDecl> clazz, Node<JCVariableDecl> variableDeclaration) throws ImproperNodeTypeException {
-        if (!astValidator.isClass(clazz) || !astValidator.isVariable(variableDeclaration)) {
+    public <T extends JCTree> void addElementToClass(Node<JCClassDecl> clazz, Node<T> element, Mode mode) throws ImproperNodeTypeException {
+        if (!astValidator.isClass(clazz)) {
             throw new ImproperNodeTypeException();
         }
         // Update Kendal AST:
-        clazz.addChild(variableDeclaration);
+        if (mode == Mode.APPEND) clazz.addChild(element);
+        else clazz.addChild(0, element);
+
         // Update javac AST:
         JCClassDecl classDecl = clazz.getObject();
-        JCVariableDecl variableDecl = variableDeclaration.getObject();
-        classDecl.defs = prepend(classDecl.defs, variableDecl);
+        JCTree elementDecl = element.getObject();
+        if (mode == Mode.APPEND) classDecl.defs = append(classDecl.defs, elementDecl);
+        else classDecl.defs = prepend(classDecl.defs, elementDecl);
     }
 
     @Override
-    public <T extends JCExpressionStatement> void appendExpressionStatementToMethod(Node<JCMethodDecl> method, Node<T> expressionStatement) {
+    public <T extends JCExpressionStatement> void addExpressionStatementToMethod(Node<JCMethodDecl> method, Node<T> expressionStatement, Mode mode) {
         // Update Kendal AST:
-        method.addChild(expressionStatement);
-        // Update javac AST:
-        JCMethodDecl methodDecl = method.getObject();
-        with(methodDecl.body, b -> {
-            b.stats = append(b.stats, expressionStatement.getObject());
-        });
-    }
+        if (mode == Mode.APPEND) method.addChild(expressionStatement);
+        else method.addChild(0, expressionStatement);
 
-    @Override
-    public <T extends JCExpressionStatement> void prependExpressionStatementToMethod(Node<JCMethodDecl> method, Node<T> expressionStatement) {
-        // Update Kendal AST:
-        method.addChild(0, expressionStatement);
         // Update javac AST:
         JCMethodDecl methodDecl = method.getObject();
         with(methodDecl.body, b -> {
-            b.stats = prepend(b.stats, expressionStatement.getObject());
+            if (mode == Mode.APPEND) b.stats = append(b.stats, expressionStatement.getObject());
+            else b.stats = prepend(b.stats, expressionStatement.getObject());
         });
     }
 
@@ -92,18 +87,6 @@ public class AstHelperImpl implements AstHelper {
         return astUtils;
     }
 
-    private <T extends JCTree> List<T> addAfter(List<T> defs, T element, T after) {
-        int index = defs.indexOf(after);
-        assertFound(index);
-        return add(index + 1, defs, element);
-    }
-
-    private <T extends JCTree> List<T> addBefore(List<T> defs, T element, T before) {
-        int index = defs.indexOf(before);
-        assertFound(index);
-        return add(index + 1, defs, element);
-    }
-
     private <T extends JCTree> List<T> append(List<T> defs, T element) {
         return add(defs.size(), defs, element);
     }
@@ -118,9 +101,4 @@ public class AstHelperImpl implements AstHelper {
         return List.from(list);
     }
 
-    private void assertFound(int index) {
-        if(index == -1) {
-            throw new ElementNotFoundException(String.format("Element %s not found in specified collection!"));
-        }
-    }
 }

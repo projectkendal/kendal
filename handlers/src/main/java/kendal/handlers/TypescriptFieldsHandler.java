@@ -19,6 +19,7 @@ import kendal.annotations.Private;
 import kendal.annotations.Protected;
 import kendal.annotations.Public;
 import kendal.api.AstHelper;
+import kendal.api.AstHelper.Mode;
 import kendal.api.AstNodeBuilder;
 import kendal.api.AstUtils;
 import kendal.api.KendalHandler;
@@ -59,16 +60,18 @@ public abstract class TypescriptFieldsHandler<T extends Annotation> implements K
 
         Node<JCVariableDecl> existingField = helper.findFieldByName(clazz, name);
 
-        Node<JCVariableDecl> newVariable = astNodeBuilder.buildVariableDecl(modifiers, ((JCVariableDecl) annotationNode.getParent().getObject()).vartype, name, annotationNode);
+        Node<JCVariableDecl> newVariable = astNodeBuilder.buildVariableDecl(modifiers,
+                ((JCVariableDecl) annotationNode.getParent().getObject()).vartype, name, annotationNode);
 
-        if(existingField == null) {
-            helper.addVariableDeclarationToClass(clazz, newVariable);
+        if (existingField == null) {
+            helper.addElementToClass(clazz, newVariable, Mode.APPEND);
         } else {
             if(!existingField.isAddedByKendal()) {
                 throw new InvalidAnnotationException("Auto generated field was already defined manually in this class!");
             }
             if (existingField.getObject().getModifiers().flags != newVariable.getObject().getModifiers().flags) {
-                throw new InvalidAnnotationException(String.format("Auto generated field %s in class %s occured more than once, with inconsistent definition!", existingField.getObject().name.toString(), clazz.getObject().name.toString()));
+                throw new InvalidAnnotationException(String.format("Auto generated field %s in class %s occurred more than once, with inconsistent definition!",
+                        existingField.getObject().name.toString(), clazz.getObject().name.toString()));
             }
             // here we have the case of identical field defined in more than one constructor. Let it be, skip field creation and just assign the value
         }
@@ -78,13 +81,13 @@ public abstract class TypescriptFieldsHandler<T extends Annotation> implements K
         Node<JCFieldAccess> fieldAccess = astNodeBuilder.buildFieldAccess(objectRef, newVariable.getObject().name);
         Node<JCIdent> newVariableRef = astNodeBuilder.buildObjectReference(newVariable.getObject().name);
         Node<JCExpressionStatement> assignment = astNodeBuilder.buildAssignmentStatement(fieldAccess, newVariableRef);
-        helper.prependExpressionStatementToMethod(constructor, assignment);
+        helper.addExpressionStatementToMethod(constructor, assignment, Mode.PREPEND);
     }
 
     private List<Modifier> getModifiers(boolean finalParamValue) {
         List<Modifier> list = new ArrayList<>();
         list.add(getModifier());
-        if(finalParamValue) {
+        if (finalParamValue) {
             list.add(Modifier.FINAL);
         }
         return list;
