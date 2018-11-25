@@ -48,9 +48,11 @@ public class Node <T extends JCTree> {
 
     public void addChild(Node newChild) {
         children.add(newChild);
+        newChild.parent = this;
     }
 
     public void addChild(int index, Node newChild) {
         children.add(index, newChild);
+        newChild.parent = this;
     }
 }
