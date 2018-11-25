@@ -5,7 +5,7 @@
     <groupId>kendal</groupId>
     <artifactId>Kendal</artifactId>
     <packaging>pom</packaging>
-    <version>0.2-SNAPSHOT</version>
+    <version>0.2</version>
     <name>Project Kendal</name>
     <description>Java extensions triggered from annotations, implemented using annotation processing API</description>
     <url>https://github.com/projectkendal/kendal</url>
@@ -184,7 +184,7 @@
         <connection>scm:git:git://github.com/projectkendal/kendal.git</connection>
         <developerConnection>scm:git:git@github.com:projectkendal/kendal.git</developerConnection>
         <url>https://github.com/projectkendal/kendal</url>
-        <tag>HEAD</tag>
+        <tag>Kendal-0.2</tag>
     </scm>
 
 </project>
