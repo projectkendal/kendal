@@ -6,6 +6,25 @@
     <artifactId>Kendal</artifactId>
     <packaging>pom</packaging>
     <version>0.2-SNAPSHOT</version>
+    <name>Project Kendal</name>
+    <description>Java extensions triggered from annotations, implemented using annotation processing API</description>
+    <url>https://github.com/projectkendal/kendal</url>
+    <licenses>
+        <license>
+            <name>MIT License</name>
+            <url>https://opensource.org/licenses/MIT</url>
+        </license>
+    </licenses>
+    <developers>
+        <developer>
+            <name>Konrad Gancarz</name>
+            <email>konrad.gancarz9@gmail.com</email>
+        </developer>
+        <developer>
+            <name>Arkadiusz Ryszewski</name>
+            <email>a.ryszewski@gmail.com</email>
+        </developer>
+    </developers>
 
     <properties>
         <maven.compiler.source>1.8</maven.compiler.source>
