@@ -6,7 +6,7 @@ import kendal.annotations.Protected;
 import kendal.annotations.Public;
 
 public class TestClass {
-    int x;
+    protected int x;
 
     public TestClass(@Public(makeFinal = false) int a, @Public(makeFinal = false) List<Integer> b, @Protected Object meineFinale) {
         this.x = a;

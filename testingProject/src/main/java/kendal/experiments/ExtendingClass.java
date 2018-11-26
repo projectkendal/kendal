@@ -16,5 +16,6 @@ public class ExtendingClass extends TestClass implements Serializable {
     void someMethod() {
         TestClass testClass = new TestClass(69, new ArrayList<>(), null);
         int var = testClass.a;
+        int var2 = testClass.x;
     }
 }

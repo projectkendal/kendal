@@ -2,6 +2,7 @@ package kendal.model;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.stream.Collectors;
 
 import com.sun.tools.javac.tree.JCTree;
 
@@ -40,6 +41,10 @@ public class Node <T extends JCTree> {
 
     public List<Node> getChildren() {
         return children;
+    }
+
+    public <T extends JCTree> List<Node<T>> getChildrenOfType(Class<T> clazz) {
+        return children.stream().filter(c -> clazz.isInstance(c.object)).map(c -> (Node<T>)c).collect(Collectors.toList());
     }
 
     public boolean isAddedByKendal() {
