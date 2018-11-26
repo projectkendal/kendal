@@ -2,9 +2,8 @@ package kendal.handlers;
 
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Objects;
 
-import com.sun.tools.javac.tree.JCTree.JCAnnotation;
-import com.sun.tools.javac.tree.JCTree.JCAssign;
 import com.sun.tools.javac.tree.JCTree.JCClassDecl;
 import com.sun.tools.javac.tree.JCTree.JCMethodDecl;
 import com.sun.tools.javac.tree.JCTree.JCModifiers;
@@ -33,7 +32,6 @@ public class CloneHandler implements KendalHandler<Clone> {
         }
     }
 
-    // TODO: fix strange rename when methodName given
     public void handleNode(Node annotationNode, AstHelper helper) throws ImproperNodeTypeException {
         Node<JCMethodDecl> method = (Node<JCMethodDecl>) annotationNode.getParent();
         JCMethodDecl m = method.getObject();
@@ -48,11 +46,9 @@ public class CloneHandler implements KendalHandler<Clone> {
     }
 
     private Name getCloneMethodName(String originMethodName, Node annotationNode) {
-        JCAssign methodNameAssignment = (JCAssign)((JCAnnotation) annotationNode.getObject()).args.stream()
-                .filter(arg -> arg instanceof JCAssign
-                        && ((JCAssign) arg).lhs.toString().equals("methodName")).findFirst().orElse(null);
+        String originalMethodName = ((JCMethodDecl)annotationNode.getParent().getObject()).sym.getAnnotation(Clone.class).methodName();
         // TODO: what if name is not unique?
-        String name = methodNameAssignment != null ? methodNameAssignment.rhs.toString() : originMethodName + "Clone";
+        String name = Objects.equals("", originalMethodName) ? originMethodName + "Clone" : originalMethodName;
         return astUtils.nameFromString(name);
     }
 

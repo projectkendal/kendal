@@ -95,7 +95,6 @@ public abstract class TypescriptFieldsHandler<T extends Annotation> implements K
 
     private boolean getFinalParamValue(Node<JCTree.JCAnnotation> annotationNode) {
         T annotation = ((JCVariableDecl) annotationNode.getParent().getObject()).sym.getAnnotation(getHandledAnnotationType());
-        annotation.annotationType();
         return getMakeFinalValue(annotation);
     }
 

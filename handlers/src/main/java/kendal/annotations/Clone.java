@@ -1,7 +1,9 @@
 package kendal.annotations;
 
+import java.lang.annotation.ElementType;
+import java.lang.annotation.Target;
+
 import javax.annotation.Generated;
-import java.lang.annotation.*;
 
 @Target({ElementType.METHOD, ElementType.ANNOTATION_TYPE})
 public @interface Clone {
@@ -15,7 +17,7 @@ public @interface Clone {
     //TODO maybe just remove the field and handle it anyway during processing?
     Generated[] onMethod() default {};
 
-    String methodName() default ""; //default name from original method + something, if this is empty
+    String methodName() default ""; //defaults to original methodName + "^Clone[0-9]*$"
 
     interface Transformer<T,R> {
         R transform(T input);

@@ -5,14 +5,15 @@ import javax.annotation.Generated;
 import kendal.annotations.Clone;
 
 public class CloneTest {
+    public static final String XYZ = "transformerMethodLoL";
 
-    @Clone(wrapper = TestClassTransformer.class, methodName="transformerMethodABC", onMethod={@Generated("whatever")})
+    @Clone(wrapper = TestClassTransformer.class, methodName="transformerMethod", onMethod={@Generated("whatever")})
     public static String aMethod(String param1, int param2) {
         return param1 + param2;
     }
 
     @Generated("whatever")
-    public Object aMethodCloneXXX() {
+    public Object something() {
         Object result = aMethod("sdas", 12);
         try {
             return TestClassTransformer.class.newInstance().transform(result);
