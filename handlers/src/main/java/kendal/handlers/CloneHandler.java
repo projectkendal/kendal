@@ -43,12 +43,14 @@ public class CloneHandler implements KendalHandler<Clone> {
         JCMethodDecl m = method.getObject();
         Name cloneMethodName = getCloneMethodName(m.name.toString(), annotationNode.getParent(), clazz);
         JCModifiers modifiers = getModifiersForNewMethod(m);
+        // todo: we don't need return statements, simply run original method in clone method's body
         List<Node<JCReturn>> allReturnStatements = method.deepGetChildrenOfType(JCReturn.class);
         // TODO: enhance method's body
         Node<JCMethodDecl> cloneMethod = astNodeBuilder.buildMethodDecl(modifiers, cloneMethodName, m.restype, m.params, m.body);
         helper.addElementToClass(clazz, cloneMethod, Mode.APPEND);
     }
 
+    // todo: simplify and throw exceptions
     private Name getCloneMethodName(String originMethodName, Node<JCMethodDecl> clonedMethod, Node<JCClassDecl> clazz) {
         String proposedName = clonedMethod.getObject().sym.getAnnotation(Clone.class).methodName();
         Set<JCMethodDecl> allMethods = clazz.getChildrenOfType(JCMethodDecl.class).stream()
