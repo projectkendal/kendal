@@ -55,7 +55,7 @@ public class CloneHandler implements KendalHandler<Clone> {
                 .map(Node::getObject).collect(Collectors.toSet());
         String calculatedNewMethodName = Objects.equals("", proposedName) ? originMethodName + "Clone" : proposedName;
         String finalNewMethodName = calculatedNewMethodName;
-        int i = 1;
+        int i = 2;
         boolean methodNotUnique;
         do {
             methodNotUnique = false;

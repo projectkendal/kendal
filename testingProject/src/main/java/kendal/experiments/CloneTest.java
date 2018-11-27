@@ -22,11 +22,15 @@ public class CloneTest {
         }
     }
 
-    public static String transformerMethod(String param1, int param2) {
+    public static String aMethodClone(String param1, int param2) {
         return "abc";
     }
 
-    public static String transformerMethod1(String param1, int param2) {
+    public static String aMethodClone2(String param1, int param2) {
+        return "abc";
+    }
+
+    public static String transformerMethod(String param1, int param2) {
         return "abc";
     }
 
