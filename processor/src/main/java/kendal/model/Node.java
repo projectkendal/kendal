@@ -1,10 +1,13 @@
 package kendal.model;
 
 import java.util.ArrayList;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.stream.Collectors;
 
 import com.sun.tools.javac.tree.JCTree;
+
+import kendal.utils.ForestUtils;
 
 public class Node <T extends JCTree> {
     private T object;
@@ -45,6 +48,19 @@ public class Node <T extends JCTree> {
 
     public <T extends JCTree> List<Node<T>> getChildrenOfType(Class<T> clazz) {
         return children.stream().filter(c -> clazz.isInstance(c.object)).map(c -> (Node<T>)c).collect(Collectors.toList());
+    }
+
+    /**
+     * Gets children of given type, search all depths.
+     */
+    public <T extends JCTree> List<Node<T>> deepGetChildrenOfType(Class<T> clazz) {
+        List<Node<T>> result = new LinkedList<>();
+        ForestUtils.traverse(children, (child -> {
+            if (clazz.isInstance(child.object)) {
+                result.add(child);
+            }
+        }));
+        return result;
     }
 
     public boolean isAddedByKendal() {

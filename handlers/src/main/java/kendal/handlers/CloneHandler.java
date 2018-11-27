@@ -10,6 +10,7 @@ import java.util.stream.Collectors;
 import com.sun.tools.javac.tree.JCTree.JCClassDecl;
 import com.sun.tools.javac.tree.JCTree.JCMethodDecl;
 import com.sun.tools.javac.tree.JCTree.JCModifiers;
+import com.sun.tools.javac.tree.JCTree.JCReturn;
 import com.sun.tools.javac.tree.JCTree.JCVariableDecl;
 import com.sun.tools.javac.util.Name;
 
@@ -38,12 +39,11 @@ public class CloneHandler implements KendalHandler<Clone> {
 
     public void handleNode(Node annotationNode, AstHelper helper) throws ImproperNodeTypeException {
         Node<JCMethodDecl> method = (Node<JCMethodDecl>) annotationNode.getParent();
-        JCMethodDecl m = method.getObject();
         Node<JCClassDecl> clazz = (Node<JCClassDecl>) method.getParent();
+        JCMethodDecl m = method.getObject();
         Name cloneMethodName = getCloneMethodName(m.name.toString(), annotationNode.getParent(), clazz);
-        JCModifiers modifiers = (JCModifiers) m.mods.clone();
-        // Reset annotations, todo: add annotations based on @Clone annotation parameter
-        modifiers.annotations = com.sun.tools.javac.util.List.from(new ArrayList<>());
+        JCModifiers modifiers = getModifiersForNewMethod(m);
+        List<Node<JCReturn>> allReturnStatements = method.deepGetChildrenOfType(JCReturn.class);
         // TODO: enhance method's body
         Node<JCMethodDecl> cloneMethod = astNodeBuilder.buildMethodDecl(modifiers, cloneMethodName, m.restype, m.params, m.body);
         helper.addElementToClass(clazz, cloneMethod, Mode.APPEND);
@@ -71,19 +71,26 @@ public class CloneHandler implements KendalHandler<Clone> {
         return astUtils.nameFromString(finalNewMethodName);
     }
 
-    @Override
-    public Class<Clone> getHandledAnnotationType() {
-        return Clone.class;
+    private JCModifiers getModifiersForNewMethod(JCMethodDecl methodDecl) {
+        JCModifiers newModifiers = (JCModifiers) methodDecl.mods.clone();
+        // Reset annotations
+        newModifiers.annotations = com.sun.tools.javac.util.List.from(new ArrayList<>());
+        // todo: add annotations based on @Clone annotation parameter
+        return newModifiers;
     }
-
 
     private boolean collectionsOfParametersEqualByValues(List<JCVariableDecl> params1, List<JCVariableDecl> params2) {
         if (params1.size() != params2.size()) return false;
 
         return params1.stream().allMatch(p1 ->
-            params2.stream().anyMatch(p2 ->
-                p1.name == p2.name && Objects.equals(p1.vartype.toString(), p2.vartype.toString())
-            )
+                params2.stream().anyMatch(p2 ->
+                        p1.name == p2.name && Objects.equals(p1.vartype.toString(), p2.vartype.toString())
+                )
         );
+    }
+
+    @Override
+    public Class<Clone> getHandledAnnotationType() {
+        return Clone.class;
     }
 }

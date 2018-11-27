@@ -11,15 +11,20 @@ import java.util.stream.StreamSupport;
 import com.sun.tools.javac.tree.JCTree;
 import com.sun.tools.javac.tree.JCTree.JCAnnotation;
 import com.sun.tools.javac.tree.JCTree.JCBlock;
+import com.sun.tools.javac.tree.JCTree.JCCatch;
 import com.sun.tools.javac.tree.JCTree.JCClassDecl;
 import com.sun.tools.javac.tree.JCTree.JCCompilationUnit;
 import com.sun.tools.javac.tree.JCTree.JCDoWhileLoop;
 import com.sun.tools.javac.tree.JCTree.JCEnhancedForLoop;
+import com.sun.tools.javac.tree.JCTree.JCExpression;
 import com.sun.tools.javac.tree.JCTree.JCExpressionStatement;
 import com.sun.tools.javac.tree.JCTree.JCForLoop;
+import com.sun.tools.javac.tree.JCTree.JCIf;
 import com.sun.tools.javac.tree.JCTree.JCImport;
 import com.sun.tools.javac.tree.JCTree.JCMethodDecl;
+import com.sun.tools.javac.tree.JCTree.JCReturn;
 import com.sun.tools.javac.tree.JCTree.JCStatement;
+import com.sun.tools.javac.tree.JCTree.JCTry;
 import com.sun.tools.javac.tree.JCTree.JCVariableDecl;
 import com.sun.tools.javac.tree.JCTree.JCWhileLoop;
 
@@ -87,6 +92,26 @@ class TreeBuilder {
         return new Node<>(jcStatement);
     }
 
+    private static Node<JCExpression> buildNode(JCExpression jcExpression) {
+        return new Node<>(jcExpression);
+    }
+
+    private static Node<JCTree> buildNode(JCTry jcTry) {
+        return new Node<>(jcTry, buildChildren(jcTry));
+    }
+
+    private static Node<JCReturn> buildNode(JCReturn jcReturn) {
+        return new Node<>(jcReturn, buildChildren(jcReturn));
+    }
+
+    private static Node<JCIf> buildNode(JCIf jcIf) {
+        return new Node<>(jcIf, buildChildren(jcIf));
+    }
+
+    private static Node<JCCatch> buildNode(JCCatch jcCatch) {
+        return new Node<>(jcCatch, buildChildren(jcCatch));
+    }
+
     private static List<Node> buildChildren(JCCompilationUnit compilationUnit) {
         return mapChildren(def -> {
             if (def instanceof JCClassDecl) {
@@ -127,6 +152,18 @@ class TreeBuilder {
             if (def instanceof JCVariableDecl) {
                 return buildNode((JCVariableDecl) def);
             }
+            if (def instanceof JCIf) {
+                return buildNode((JCIf) def);
+            }
+            if (def instanceof JCExpressionStatement) {
+                return buildNode((JCExpressionStatement) def);
+            }
+            if (def instanceof JCTry) {
+                return buildNode((JCTry) def);
+            }
+            if (def instanceof JCReturn) {
+                return buildNode((JCReturn) def);
+            }
             if (def instanceof JCWhileLoop) {
                 return buildNode((JCWhileLoop) def);
             }
@@ -138,9 +175,6 @@ class TreeBuilder {
             }
             if (def instanceof JCEnhancedForLoop) {
                 return buildNode((JCEnhancedForLoop) def);
-            }
-            if (def instanceof JCExpressionStatement) {
-                return buildNode((JCExpressionStatement) def);
             }
             return null;
         }, block.stats);
@@ -173,6 +207,37 @@ class TreeBuilder {
     private static List<Node> buildChildren(JCEnhancedForLoop loop) {
         List<Node> children = new ArrayList<>();
         children.add(buildNode(loop.body));
+        return children;
+    }
+
+    private static List<Node> buildChildren(JCTry jcTry) {
+        List<Node> children = new ArrayList<>();
+        children.add(buildNode(jcTry.body));
+        jcTry.catchers.forEach(catcher -> {
+            children.add(buildNode(catcher));
+        });
+
+        return children;
+    }
+
+    private static List<Node> buildChildren(JCReturn jcReturn) {
+        List<Node> children = new ArrayList<>();
+        children.add(buildNode(jcReturn.expr));
+        return children;
+    }
+
+    private static List<Node> buildChildren(JCIf jcIf) {
+        List<Node> children = new ArrayList<>();
+        children.add(buildNode(jcIf.cond));
+        children.add(buildNode(jcIf.thenpart));
+        if (jcIf.elsepart != null) children.add(buildNode(jcIf.elsepart));
+        return children;
+    }
+
+    private static List<Node> buildChildren(JCCatch jcCatch) {
+        List<Node> children = new ArrayList<>();
+        children.add(buildNode(jcCatch.body));
+        children.add(buildNode(jcCatch.param));
         return children;
     }
 
