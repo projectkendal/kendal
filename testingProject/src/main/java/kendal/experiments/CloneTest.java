@@ -28,26 +28,6 @@ public class CloneTest {
         }
     }
 
-    public static String aMethodClone(String param1, int param2) {
-        return "abc";
-    }
-
-    public static String aMethodClone2(String param1, int param2) {
-        return "abc";
-    }
-
-    public static String transformerMethod(String param1, int param2) {
-        return "abc";
-    }
-
-    public static String transformerMethod2(String param1, int param2) {
-        return "abc";
-    }
-
-    public static String transformerMethod3(int param1, int param2) {
-        return "abc";
-    }
-
     class TestClassTransformer implements Clone.Transformer<Object, String> {
         @Override
         public String transform(Object input) {

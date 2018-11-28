@@ -24,6 +24,7 @@ import kendal.api.AstNodeBuilder;
 import kendal.api.AstUtils;
 import kendal.api.KendalHandler;
 import kendal.api.Modifier;
+import kendal.api.exceptions.DuplicatedElementsException;
 import kendal.api.exceptions.InvalidAnnotationException;
 import kendal.api.exceptions.KendalException;
 import kendal.model.Node;
@@ -66,8 +67,8 @@ public abstract class TypescriptFieldsHandler<T extends Annotation> implements K
         if (existingField == null) {
             helper.addElementToClass(clazz, newVariable, Mode.APPEND);
         } else {
-            if(!existingField.isAddedByKendal()) {
-                throw new InvalidAnnotationException("Auto generated field was already defined manually in this class!");
+            if (!existingField.isAddedByKendal()) {
+                throw new DuplicatedElementsException("Auto generated field was already defined manually in this class!");
             }
             if (existingField.getObject().getModifiers().flags != newVariable.getObject().getModifiers().flags) {
                 throw new InvalidAnnotationException(String.format("Auto generated field %s in class %s occurred more than once, with inconsistent definition!",
