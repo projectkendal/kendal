@@ -45,6 +45,9 @@ public class CloneHandler implements KendalHandler<Clone> {
         validateMethodIsUnique(cloneMethodName, m.params, clazz);
         JCModifiers modifiers = getModifiersForNewMethod(m);
         // todo: run original method in clone method's body
+//        Node<JCMethodInvocation> methodInvocation = astNodeBuilder.buildMethodInvocation(null ,null);
+//        Node<JCReturn> returnStatement = astNodeBuilder.buildReturnStatement(methodInvocation);
+//        Node<JCBlock> cloneMethodBlock = astNodeBuilder.buildBlock(Collections.singletonList(returnStatement));
         Node<JCMethodDecl> cloneMethod = astNodeBuilder.buildMethodDecl(modifiers, cloneMethodName, m.restype, m.params, m.body);
         helper.addElementToClass(clazz, cloneMethod, Mode.APPEND);
     }
@@ -82,7 +85,7 @@ public class CloneHandler implements KendalHandler<Clone> {
     private JCModifiers getModifiersForNewMethod(JCMethodDecl methodDecl) {
         JCModifiers newModifiers = (JCModifiers) methodDecl.mods.clone();
         // Reset annotations
-        newModifiers.annotations = com.sun.tools.javac.util.List.from(new ArrayList<>());
+        newModifiers.annotations = astUtils.toJCList(new ArrayList<>());
         // todo: add annotations based on @Clone annotation parameter
         return newModifiers;
     }

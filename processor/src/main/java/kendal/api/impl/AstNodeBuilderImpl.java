@@ -12,7 +12,10 @@ import com.sun.tools.javac.tree.JCTree.JCExpressionStatement;
 import com.sun.tools.javac.tree.JCTree.JCFieldAccess;
 import com.sun.tools.javac.tree.JCTree.JCIdent;
 import com.sun.tools.javac.tree.JCTree.JCMethodDecl;
+import com.sun.tools.javac.tree.JCTree.JCMethodInvocation;
 import com.sun.tools.javac.tree.JCTree.JCModifiers;
+import com.sun.tools.javac.tree.JCTree.JCReturn;
+import com.sun.tools.javac.tree.JCTree.JCStatement;
 import com.sun.tools.javac.tree.JCTree.JCTypeParameter;
 import com.sun.tools.javac.tree.JCTree.JCVariableDecl;
 import com.sun.tools.javac.tree.TreeMaker;
@@ -20,6 +23,7 @@ import com.sun.tools.javac.util.Context;
 import com.sun.tools.javac.util.Name;
 
 import kendal.api.AstNodeBuilder;
+import kendal.api.AstUtils;
 import kendal.api.AstValidator;
 import kendal.api.Modifier;
 import kendal.api.exceptions.ImproperNodeTypeException;
@@ -30,10 +34,12 @@ public class AstNodeBuilderImpl implements AstNodeBuilder {
 
     private final TreeMaker treeMaker;
     private AstValidator astValidator;
+    private AstUtils astUtils;
 
-    AstNodeBuilderImpl(Context context, AstValidator astValidator) {
+    AstNodeBuilderImpl(Context context, AstUtils astUtils, AstValidator astValidator) {
         this.treeMaker = TreeMaker.instance(context);
         this.astValidator = astValidator;
+        this.astUtils = astUtils;
     }
 
     @Override
@@ -54,8 +60,8 @@ public class AstNodeBuilderImpl implements AstNodeBuilder {
     public Node<JCMethodDecl> buildMethodDecl(JCModifiers modifiers, Name name, JCExpression resType,
             com.sun.tools.javac.util.List<JCVariableDecl> params, JCBlock body) {
         // todo: add support for typarams and thrown
-        com.sun.tools.javac.util.List<JCTypeParameter> typarams = com.sun.tools.javac.util.List.from(new ArrayList<>());
-        com.sun.tools.javac.util.List<JCExpression> thrown = com.sun.tools.javac.util.List.from(new ArrayList<>());
+        com.sun.tools.javac.util.List<JCTypeParameter> typarams = astUtils.toJCList(new ArrayList<>());
+        com.sun.tools.javac.util.List<JCExpression> thrown = astUtils.toJCList(new ArrayList<>());
         JCMethodDecl methodDecl = treeMaker.MethodDef(modifiers, name, resType, typarams, params, thrown,
                 body, null);
         return new Node<>(methodDecl, true);
@@ -68,9 +74,30 @@ public class AstNodeBuilderImpl implements AstNodeBuilder {
     }
 
     @Override
+    public Node<JCMethodInvocation> buildMethodInvocation(Node<JCExpression> method) {
+        return buildMethodInvocation(method, com.sun.tools.javac.util.List.nil());
+    }
+
+    @Override
+    public Node<JCMethodInvocation> buildMethodInvocation(Node<JCExpression> method, com.sun.tools.javac.util.List<JCExpression> parameters) {
+        treeMaker.App(method.getObject(), parameters);
+        return null;
+    }
+
+    @Override
     public Node<JCFieldAccess> buildFieldAccess(Node<JCIdent> objectRef, Name fieldName) {
         JCFieldAccess fieldAccess = treeMaker.Select(objectRef.getObject(), fieldName);
         return new Node<>(fieldAccess, true);
+    }
+
+    @Override
+    public <T extends JCExpression> Node<JCReturn> buildReturnStatement(Node<T> expression) {
+        return null;
+    }
+
+    @Override
+    public <T extends JCStatement> Node<JCBlock> buildBlock(List<Node<T>> statements) {
+        return null;
     }
 
     @Override
@@ -79,8 +106,7 @@ public class AstNodeBuilderImpl implements AstNodeBuilder {
         if (!astValidator.isExpression(lhs) || !astValidator.isExpression(rhs)) {
             throw new ImproperNodeTypeException();
         }
-        JCExpressionStatement expressionStatement =
-                treeMaker.Exec(treeMaker.Assign(lhs.getObject(), rhs.getObject()));
+        JCExpressionStatement expressionStatement = treeMaker.Exec(treeMaker.Assign(lhs.getObject(), rhs.getObject()));
         return new Node<>(expressionStatement, true);
     }
 }

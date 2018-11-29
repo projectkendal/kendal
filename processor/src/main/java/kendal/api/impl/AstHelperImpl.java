@@ -32,7 +32,7 @@ public class AstHelperImpl implements AstHelper {
         this.context = context;
         astUtils = new AstUtilsImpl(context);
         astValidator = new AstValidatorImpl(astUtils);
-        astNodeBuilder = new AstNodeBuilderImpl(context, astValidator);
+        astNodeBuilder = new AstNodeBuilderImpl(context, astUtils, astValidator);
     }
 
     @Override
@@ -98,7 +98,7 @@ public class AstHelperImpl implements AstHelper {
     private <T extends JCTree> List<T> add(int index, List<T> defs, T element) {
         java.util.List<T> list = StreamSupport.stream(defs.spliterator(), false).collect(Collectors.toList());
         list.add(index, element);
-        return List.from(list);
+        return astUtils.toJCList(list);
     }
 
 }

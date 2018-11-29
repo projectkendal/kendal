@@ -25,12 +25,14 @@ import kendal.api.AstUtils;
 import kendal.api.KendalHandler;
 import kendal.api.Modifier;
 import kendal.api.exceptions.DuplicatedElementsException;
+import kendal.api.exceptions.ImproperNodeTypeException;
 import kendal.api.exceptions.InvalidAnnotationException;
 import kendal.api.exceptions.KendalException;
 import kendal.model.Node;
 
 public abstract class TypescriptFieldsHandler<T extends Annotation> implements KendalHandler<T> {
 
+    private AstHelper helper;
     private AstNodeBuilder astNodeBuilder;
     private AstUtils astUtils;
 
@@ -40,14 +42,15 @@ public abstract class TypescriptFieldsHandler<T extends Annotation> implements K
      */
     @Override
     public void handle(Collection<Node> annotationNodes, AstHelper helper) throws KendalException {
+        this.helper = helper;
         astNodeBuilder = helper.getAstNodeBuilder();
         astUtils = helper.getAstUtils();
         for (Node annotationNode : annotationNodes) {
-            handleNode(annotationNode, helper);
+            handleNode(annotationNode);
         }
     }
 
-    private void handleNode(Node annotationNode, AstHelper helper) throws KendalException {
+    private void handleNode(Node annotationNode) throws KendalException {
         Node<JCMethodDecl> constructor = (Node<JCMethodDecl>) annotationNode.getParent().getParent();
         if (!helper.getAstValidator().isConstructor(constructor)) {
             throw new InvalidAnnotationException(
@@ -77,10 +80,14 @@ public abstract class TypescriptFieldsHandler<T extends Annotation> implements K
             // here we have the case of identical field defined in more than one constructor. Let it be, skip field creation and just assign the value
         }
 
+        addVariableAssignmentStatementToConstructor(constructor, newVariable);
+    }
 
+    private void addVariableAssignmentStatementToConstructor(Node<JCMethodDecl> constructor, Node<JCVariableDecl> variable)
+            throws ImproperNodeTypeException {
         Node<JCIdent> objectRef = astNodeBuilder.buildObjectReference(astUtils.nameFromString("this"));
-        Node<JCFieldAccess> fieldAccess = astNodeBuilder.buildFieldAccess(objectRef, newVariable.getObject().name);
-        Node<JCIdent> newVariableRef = astNodeBuilder.buildObjectReference(newVariable.getObject().name);
+        Node<JCFieldAccess> fieldAccess = astNodeBuilder.buildFieldAccess(objectRef, variable.getObject().name);
+        Node<JCIdent> newVariableRef = astNodeBuilder.buildObjectReference(variable.getObject().name);
         Node<JCExpressionStatement> assignment = astNodeBuilder.buildAssignmentStatement(fieldAccess, newVariableRef);
         helper.addExpressionStatementToMethod(constructor, assignment, Mode.PREPEND);
     }

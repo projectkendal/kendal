@@ -10,6 +10,7 @@ import java.util.stream.StreamSupport;
 
 import com.sun.tools.javac.tree.JCTree;
 import com.sun.tools.javac.tree.JCTree.JCAnnotation;
+import com.sun.tools.javac.tree.JCTree.JCBinary;
 import com.sun.tools.javac.tree.JCTree.JCBlock;
 import com.sun.tools.javac.tree.JCTree.JCCatch;
 import com.sun.tools.javac.tree.JCTree.JCClassDecl;
@@ -19,9 +20,12 @@ import com.sun.tools.javac.tree.JCTree.JCEnhancedForLoop;
 import com.sun.tools.javac.tree.JCTree.JCExpression;
 import com.sun.tools.javac.tree.JCTree.JCExpressionStatement;
 import com.sun.tools.javac.tree.JCTree.JCForLoop;
+import com.sun.tools.javac.tree.JCTree.JCIdent;
 import com.sun.tools.javac.tree.JCTree.JCIf;
 import com.sun.tools.javac.tree.JCTree.JCImport;
+import com.sun.tools.javac.tree.JCTree.JCLiteral;
 import com.sun.tools.javac.tree.JCTree.JCMethodDecl;
+import com.sun.tools.javac.tree.JCTree.JCMethodInvocation;
 import com.sun.tools.javac.tree.JCTree.JCReturn;
 import com.sun.tools.javac.tree.JCTree.JCStatement;
 import com.sun.tools.javac.tree.JCTree.JCTry;
@@ -94,6 +98,22 @@ class TreeBuilder {
 
     private static Node<JCExpression> buildNode(JCExpression jcExpression) {
         return new Node<>(jcExpression);
+    }
+
+    private static Node<JCMethodInvocation> buildNode(JCMethodInvocation jcMethodInvocation) {
+        return new Node<>(jcMethodInvocation, buildChildren(jcMethodInvocation));
+    }
+
+    private static Node<JCBinary> buildNode(JCBinary jcBinary) {
+        return new Node<>(jcBinary, buildChildren(jcBinary));
+    }
+
+    private static Node<JCIdent> buildNode(JCIdent jcIdent) {
+        return new Node<>(jcIdent);
+    }
+
+    private static Node<JCLiteral> buildNode(JCLiteral jcLiteral) {
+        return new Node<>(jcLiteral);
     }
 
     private static Node<JCTree> buildNode(JCTry jcTry) {
@@ -213,17 +233,55 @@ class TreeBuilder {
     private static List<Node> buildChildren(JCTry jcTry) {
         List<Node> children = new ArrayList<>();
         children.add(buildNode(jcTry.body));
-        jcTry.catchers.forEach(catcher -> {
-            children.add(buildNode(catcher));
-        });
-
+        jcTry.catchers.forEach(catcher -> children.add(buildNode(catcher)));
         return children;
     }
 
     private static List<Node> buildChildren(JCReturn jcReturn) {
         List<Node> children = new ArrayList<>();
-        children.add(buildNode(jcReturn.expr));
+        if (jcReturn.expr instanceof JCMethodInvocation) {
+            children.add(buildNode((JCMethodInvocation)jcReturn.expr));
+        }
+        else if (jcReturn.expr instanceof JCBinary) {
+            children.add(buildNode((JCBinary)jcReturn.expr));
+        }
+        else {
+            children.add(buildNode(jcReturn.expr));
+        }
         return children;
+    }
+
+    private static List<Node> buildChildren(JCMethodInvocation jcMethodInvocation) {
+        List<Node> children = new ArrayList<>();
+        if (jcMethodInvocation.meth instanceof JCMethodInvocation) {
+            children.add(buildNode((JCMethodInvocation) jcMethodInvocation.meth));
+        }
+        else if (jcMethodInvocation.meth instanceof JCIdent) {
+            children.add(buildNode((JCIdent) jcMethodInvocation.meth));
+        }
+        else {
+            children.add(buildNode(jcMethodInvocation.meth));
+        }
+        jcMethodInvocation.args.forEach(arg -> {
+            if (arg instanceof JCLiteral) {
+                children.add(buildNode((JCLiteral) arg));
+            }
+            else if (arg instanceof JCMethodInvocation) {
+                children.add(buildNode((JCMethodInvocation) arg));
+            } else {
+                children.add(buildNode(arg));
+            }
+        });
+        return children;
+    }
+
+    private static List<Node> buildChildren(JCBinary jcBinary) {
+        return mapChildren(def -> {
+            if (def instanceof JCIdent) {
+                return buildNode((JCIdent) def);
+            }
+            return buildNode(def);
+        }, Arrays.asList(jcBinary.lhs, jcBinary.rhs));
     }
 
     private static List<Node> buildChildren(JCIf jcIf) {

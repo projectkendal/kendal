@@ -19,10 +19,9 @@ public class CloneTest {
     }
 
     @Generated("whatever")
-    public Object something() {
-        Object result = aMethod("sdas", 12);
+    public Object something(String param1, int param2) {
         try {
-            return TestClassTransformer.class.newInstance().transform(result);
+            return TestClassTransformer.class.newInstance().transform(aMethod("sdas", 12));
         } catch (InstantiationException | IllegalAccessException e) {
             throw new RuntimeException(e);
         }
