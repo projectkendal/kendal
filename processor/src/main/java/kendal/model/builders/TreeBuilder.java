@@ -2,6 +2,7 @@ package kendal.model.builders;
 
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.List;
 import java.util.Objects;
 import java.util.function.Function;
@@ -252,27 +253,18 @@ class TreeBuilder {
     }
 
     private static List<Node> buildChildren(JCMethodInvocation jcMethodInvocation) {
-        List<Node> children = new ArrayList<>();
-        if (jcMethodInvocation.meth instanceof JCMethodInvocation) {
-            children.add(buildNode((JCMethodInvocation) jcMethodInvocation.meth));
-        }
-        else if (jcMethodInvocation.meth instanceof JCIdent) {
-            children.add(buildNode((JCIdent) jcMethodInvocation.meth));
-        }
-        else {
-            children.add(buildNode(jcMethodInvocation.meth));
-        }
-        jcMethodInvocation.args.forEach(arg -> {
-            if (arg instanceof JCLiteral) {
-                children.add(buildNode((JCLiteral) arg));
+        return mapChildren(def -> {
+            if (def instanceof JCMethodInvocation) {
+                return buildNode((JCMethodInvocation) def);
             }
-            else if (arg instanceof JCMethodInvocation) {
-                children.add(buildNode((JCMethodInvocation) arg));
-            } else {
-                children.add(buildNode(arg));
+            if (def instanceof JCIdent) {
+                return buildNode((JCIdent) def);
             }
-        });
-        return children;
+            if (def instanceof JCLiteral){
+                return buildNode((JCLiteral)def);
+            }
+            return null;
+        }, Collections.singletonList(jcMethodInvocation.meth), jcMethodInvocation.args);
     }
 
     private static List<Node> buildChildren(JCBinary jcBinary) {
