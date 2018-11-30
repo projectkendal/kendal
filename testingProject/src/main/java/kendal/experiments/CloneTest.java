@@ -8,13 +8,8 @@ public class CloneTest {
     public static final String XYZ = "transformerMethodLoL";
 
     @Clone(wrapper = TestClassTransformer.class, methodName="transformerMethod", onMethod={@Generated("whatever")})
-    public static String aMethod(String param1, int param2) {
+    public String aMethod(String param1, int param2) {
         System.out.println("asd");
-        try {
-            if (12 == 12) return TestClassTransformer.class.newInstance().transform("asd");
-        } catch (InstantiationException | IllegalAccessException e) {
-            throw new RuntimeException(e);
-        }
         return param1 + param2;
     }
 
@@ -25,6 +20,10 @@ public class CloneTest {
         } catch (InstantiationException | IllegalAccessException e) {
             throw new RuntimeException(e);
         }
+    }
+
+    private String lol(String param2) {
+        return aMethod(param2, 12);
     }
 
     class TestClassTransformer implements Clone.Transformer<Object, String> {

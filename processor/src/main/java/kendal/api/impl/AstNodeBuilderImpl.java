@@ -3,6 +3,7 @@ package kendal.api.impl;
 import static kendal.utils.Utils.map;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 
 import com.sun.tools.javac.tree.JCTree;
@@ -58,6 +59,12 @@ public class AstNodeBuilderImpl implements AstNodeBuilder {
 
     @Override
     public Node<JCMethodDecl> buildMethodDecl(JCModifiers modifiers, Name name, JCExpression resType,
+            com.sun.tools.javac.util.List<JCVariableDecl> params, Node<JCBlock> body) {
+        return buildMethodDecl(modifiers, name, resType, params, body.getObject());
+    }
+
+    @Override
+    public Node<JCMethodDecl> buildMethodDecl(JCModifiers modifiers, Name name, JCExpression resType,
             com.sun.tools.javac.util.List<JCVariableDecl> params, JCBlock body) {
         // todo: add support for typarams and thrown
         com.sun.tools.javac.util.List<JCTypeParameter> typarams = astUtils.toJCList(new ArrayList<>());
@@ -74,14 +81,26 @@ public class AstNodeBuilderImpl implements AstNodeBuilder {
     }
 
     @Override
-    public Node<JCMethodInvocation> buildMethodInvocation(Node<JCExpression> method) {
-        return buildMethodInvocation(method, com.sun.tools.javac.util.List.nil());
+    public <T extends JCExpression> Node<JCMethodInvocation> buildMethodInvocation(Node<T> method) {
+        return buildMethodInvocation(method, com.sun.tools.javac.util.List.<JCExpression>nil());
     }
 
     @Override
-    public Node<JCMethodInvocation> buildMethodInvocation(Node<JCExpression> method, com.sun.tools.javac.util.List<JCExpression> parameters) {
-        treeMaker.App(method.getObject(), parameters);
-        return null;
+    public <T extends JCExpression, P extends JCExpression> Node<JCMethodInvocation>
+    buildMethodInvocation(Node<T> method, List<Node<P>> parameters) {
+        return buildMethodInvocation(method, astUtils.mapNodesToJCList(parameters));
+    }
+
+    @Override
+    public <T extends JCExpression, P extends JCExpression> Node<JCMethodInvocation> buildMethodInvocation(Node<T> method,
+            com.sun.tools.javac.util.List<P> parameters) {
+        try {
+            JCMethodInvocation jcMethodInvocation = treeMaker.App(method.getObject(), (com.sun.tools.javac.util.List<JCExpression>) parameters);
+            return new Node<>(jcMethodInvocation);
+        } catch (RuntimeException ex) {
+            ex.printStackTrace();
+            throw ex;
+        }
     }
 
     @Override
@@ -92,12 +111,35 @@ public class AstNodeBuilderImpl implements AstNodeBuilder {
 
     @Override
     public <T extends JCExpression> Node<JCReturn> buildReturnStatement(Node<T> expression) {
-        return null;
+        JCReturn jcReturn = treeMaker.Return(expression.getObject());
+        return new Node<>(jcReturn);
     }
 
     @Override
     public <T extends JCStatement> Node<JCBlock> buildBlock(List<Node<T>> statements) {
-        return null;
+        return buildBlock(astUtils.mapNodesToJCList(statements));
+    }
+
+    @Override
+    public <T extends JCStatement> Node<JCBlock> buildBlock(Node<T> statement) {
+        return buildBlock(Collections.singletonList(statement));
+    }
+
+    @Override
+    public <T extends JCStatement> Node<JCBlock> buildBlock(com.sun.tools.javac.util.List<T> statements) {
+        JCBlock block = treeMaker.Block(0, (com.sun.tools.javac.util.List<JCStatement>) statements);
+        return new Node<>(block);
+    }
+
+    @Override
+    public Node<JCIdent> buildIdentifier(String name) {
+        return buildIdentifier(astUtils.nameFromString(name));
+    }
+
+    @Override
+    public Node<JCIdent> buildIdentifier(Name name) {
+        JCIdent identifier = treeMaker.Ident(name);
+        return new Node(identifier);
     }
 
     @Override

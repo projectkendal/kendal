@@ -2,14 +2,19 @@ package kendal.handlers;
 
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.Objects;
 import java.util.Set;
 import java.util.stream.Collectors;
 
+import com.sun.tools.javac.tree.JCTree.JCBlock;
 import com.sun.tools.javac.tree.JCTree.JCClassDecl;
+import com.sun.tools.javac.tree.JCTree.JCIdent;
 import com.sun.tools.javac.tree.JCTree.JCMethodDecl;
+import com.sun.tools.javac.tree.JCTree.JCMethodInvocation;
 import com.sun.tools.javac.tree.JCTree.JCModifiers;
+import com.sun.tools.javac.tree.JCTree.JCReturn;
 import com.sun.tools.javac.tree.JCTree.JCVariableDecl;
 import com.sun.tools.javac.util.Name;
 
@@ -38,18 +43,26 @@ public class CloneHandler implements KendalHandler<Clone> {
     }
 
     private void handleNode(Node annotationNode, AstHelper helper) throws KendalException {
-        Node<JCMethodDecl> method = (Node<JCMethodDecl>) annotationNode.getParent();
-        Node<JCClassDecl> clazz = (Node<JCClassDecl>) method.getParent();
-        JCMethodDecl m = method.getObject();
+        Node<JCMethodDecl> initialMethod = (Node<JCMethodDecl>) annotationNode.getParent();
+        Node<JCClassDecl> clazz = (Node<JCClassDecl>) initialMethod.getParent();
+        JCMethodDecl m = initialMethod.getObject();
         Name cloneMethodName = getCloneMethodName(m.name.toString(), annotationNode.getParent());
         validateMethodIsUnique(cloneMethodName, m.params, clazz);
         JCModifiers modifiers = getModifiersForNewMethod(m);
-        // todo: run original method in clone method's body
-//        Node<JCMethodInvocation> methodInvocation = astNodeBuilder.buildMethodInvocation(null ,null);
-//        Node<JCReturn> returnStatement = astNodeBuilder.buildReturnStatement(methodInvocation);
-//        Node<JCBlock> cloneMethodBlock = astNodeBuilder.buildBlock(Collections.singletonList(returnStatement));
-        Node<JCMethodDecl> cloneMethod = astNodeBuilder.buildMethodDecl(modifiers, cloneMethodName, m.restype, m.params, m.body);
+        // todo: enclose method in transformer and then in try-catch block
+        Node<JCMethodInvocation> methodInvocation = getInitialMethodInvocation(initialMethod);
+        Node<JCReturn> returnStatement = astNodeBuilder.buildReturnStatement(methodInvocation);
+        Node<JCBlock> cloneMethodBlock = astNodeBuilder.buildBlock(returnStatement);
+        Node<JCMethodDecl> cloneMethod = astNodeBuilder.buildMethodDecl(modifiers, cloneMethodName, m.restype, m.params, cloneMethodBlock);
         helper.addElementToClass(clazz, cloneMethod, Mode.APPEND);
+    }
+
+    private Node<JCMethodInvocation> getInitialMethodInvocation(Node<JCMethodDecl> initialMethod) {
+        Node<JCIdent> methodIdentifier = astNodeBuilder.buildIdentifier(initialMethod.getObject().name);
+        methodIdentifier.getObject().setType(initialMethod.getObject().restype.type);
+        List<Node<JCIdent>> parametersIdentifiers = new LinkedList<>();
+        initialMethod.getObject().params.forEach(param -> parametersIdentifiers.add(astNodeBuilder.buildIdentifier(param.name)));
+        return astNodeBuilder.buildMethodInvocation(methodIdentifier, parametersIdentifiers);
     }
 
     private Name getCloneMethodName(String originMethodName, Node<JCMethodDecl> clonedMethod) {

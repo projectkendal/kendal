@@ -24,20 +24,29 @@ public interface AstNodeBuilder {
             Node<JCAnnotation> source);
 
     Node<JCMethodDecl> buildMethodDecl(JCModifiers modifiers, Name name, JCExpression resType,
+            com.sun.tools.javac.util.List<JCVariableDecl> params, Node<JCBlock> body);
+    Node<JCMethodDecl> buildMethodDecl(JCModifiers modifiers, Name name, JCExpression resType,
             com.sun.tools.javac.util.List<JCVariableDecl> params, JCBlock body);
 
     Node<JCIdent> buildObjectReference(Name fieldName);
 
-    Node<JCMethodInvocation> buildMethodInvocation(Node<JCExpression> method);
-
-    Node<JCMethodInvocation> buildMethodInvocation(Node<JCExpression> method,
-            com.sun.tools.javac.util.List<JCExpression> parameters);
+    <T extends JCExpression>Node<JCMethodInvocation> buildMethodInvocation(Node<T> method);
+    <T extends JCExpression, P extends JCExpression> Node<JCMethodInvocation> buildMethodInvocation(Node<T> method,
+            List<Node<P>> parameters);
+    <T extends JCExpression, P extends JCExpression> Node<JCMethodInvocation> buildMethodInvocation(Node<T> method,
+            com.sun.tools.javac.util.List<P> parameters);
 
     Node<JCFieldAccess> buildFieldAccess(Node<JCIdent> objectRef, Name fieldName);
 
     <T extends JCExpression> Node<JCReturn> buildReturnStatement(Node<T> expression);
 
+    // todo: think if we want to move such similar methods to separate like for example "blockBuilder", etc...
     <T extends JCStatement> Node<JCBlock> buildBlock(List<Node<T>> statements);
+    <T extends JCStatement> Node<JCBlock> buildBlock(Node<T> statement);
+    <T extends JCStatement> Node<JCBlock> buildBlock(com.sun.tools.javac.util.List<T> statements);
+
+    Node<JCIdent> buildIdentifier(String name);
+    Node<JCIdent> buildIdentifier(Name name);
 
     // ExpressionStatements:
     <L extends JCExpression, R extends JCExpression> Node<JCExpressionStatement> buildAssignmentStatement(Node<L> lhs,
