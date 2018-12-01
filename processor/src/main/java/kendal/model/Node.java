@@ -13,25 +13,17 @@ public class Node <T extends JCTree> {
     private T object;
     private Node parent;
     private List<Node> children;
-    private final boolean addedByKendal;
+    private final boolean addedByHandler;
 
-    public Node(T object) {
-        this(object, new ArrayList<>());
+    Node(T object, boolean addedByHandler) {
+        this(object, new ArrayList<>(), addedByHandler);
     }
 
-    public Node(T object, List<Node> children) {
-        this(object, children, false);
-    }
-
-    public Node(T object, boolean addedByKendal) {
-        this(object, new ArrayList<>(), addedByKendal);
-    }
-
-    public Node(T object, List<Node> children, boolean addedByKendal) {
+    Node(T object, List<Node> children, boolean addedByHandler) {
         this.object = object;
         this.children = children;
         children.forEach(child -> child.parent = this);
-        this.addedByKendal = addedByKendal;
+        this.addedByHandler = addedByHandler;
     }
 
     public T getObject() {
@@ -63,8 +55,8 @@ public class Node <T extends JCTree> {
         return result;
     }
 
-    public boolean isAddedByKendal() {
-        return addedByKendal;
+    public boolean isAddedByHandler() {
+        return addedByHandler;
     }
 
     public void addChild(Node newChild) {

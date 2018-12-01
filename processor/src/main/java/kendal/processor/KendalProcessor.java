@@ -2,8 +2,6 @@ package kendal.processor;
 
 import static kendal.utils.Utils.with;
 
-import java.io.IOException;
-import java.io.Writer;
 import java.util.HashSet;
 import java.util.Map;
 import java.util.ServiceLoader;
@@ -21,22 +19,18 @@ import javax.annotation.processing.SupportedSourceVersion;
 import javax.lang.model.SourceVersion;
 import javax.lang.model.element.TypeElement;
 import javax.tools.Diagnostic;
-import javax.tools.JavaFileObject;
 
 import com.sun.source.util.Trees;
 import com.sun.tools.javac.processing.JavacProcessingEnvironment;
-import com.sun.tools.javac.tree.DocPretty;
-import com.sun.tools.javac.tree.JCTree;
 import com.sun.tools.javac.tree.JCTree.JCAnnotation;
-import com.sun.tools.javac.tree.Pretty;
 import com.sun.tools.javac.util.Context;
 
 import kendal.api.AstHelper;
 import kendal.api.KendalHandler;
 import kendal.api.exceptions.KendalException;
 import kendal.api.impl.AstHelperImpl;
+import kendal.model.ForestBuilder;
 import kendal.model.Node;
-import kendal.model.builders.ForestBuilder;
 import kendal.utils.ForestUtils;
 
 @SupportedAnnotationTypes("*")

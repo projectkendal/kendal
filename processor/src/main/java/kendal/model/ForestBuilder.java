@@ -1,4 +1,4 @@
-package kendal.model.builders;
+package kendal.model;
 
 import java.util.HashSet;
 import java.util.Set;
@@ -8,7 +8,6 @@ import javax.lang.model.element.Element;
 import com.sun.source.util.TreePath;
 import com.sun.source.util.Trees;
 import com.sun.tools.javac.tree.JCTree.JCCompilationUnit;
-import kendal.model.Node;
 
 public class ForestBuilder {
 
@@ -22,6 +21,7 @@ public class ForestBuilder {
         final Set<JCCompilationUnit> compilationUnits = toCompilationUnits(elements);
         Set<Node> forest = new HashSet<>();
         compilationUnits.forEach(compilationUnit -> forest.add(TreeBuilder.buildTree(compilationUnit)));
+        TreeBuilder.finishInitialPhase();
         return forest;
     }
 
