@@ -36,7 +36,7 @@ public class AstUtilsImpl implements AstUtils {
     }
 
     @Override
-    public <T extends JCTree> List<T> mapNodesToJCList(java.util.List<Node<T>> listOfNodes) {
+    public <T extends JCTree> List<T> mapNodesToJCListOfObjects(java.util.List<Node<T>> listOfNodes) {
         java.util.List<T> list = listOfNodes.stream()
                 .map(Node::getObject)
                 .collect(Collectors.toList());

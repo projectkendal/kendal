@@ -14,5 +14,5 @@ public interface AstUtils {
 
     <T> com.sun.tools.javac.util.List<T> toJCList(T element);
 
-    <T extends JCTree> com.sun.tools.javac.util.List<T> mapNodesToJCList(List<Node<T>> listOfNodes);
+    <T extends JCTree> com.sun.tools.javac.util.List<T> mapNodesToJCListOfObjects(List<Node<T>> listOfNodes);
 }

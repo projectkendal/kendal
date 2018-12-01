@@ -1,6 +1,7 @@
 package kendal.handlers;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collection;
 import java.util.LinkedList;
 import java.util.List;
@@ -9,12 +10,17 @@ import java.util.Set;
 import java.util.stream.Collectors;
 
 import com.sun.tools.javac.tree.JCTree.JCBlock;
+import com.sun.tools.javac.tree.JCTree.JCCatch;
 import com.sun.tools.javac.tree.JCTree.JCClassDecl;
 import com.sun.tools.javac.tree.JCTree.JCIdent;
 import com.sun.tools.javac.tree.JCTree.JCMethodDecl;
 import com.sun.tools.javac.tree.JCTree.JCMethodInvocation;
 import com.sun.tools.javac.tree.JCTree.JCModifiers;
+import com.sun.tools.javac.tree.JCTree.JCNewClass;
 import com.sun.tools.javac.tree.JCTree.JCReturn;
+import com.sun.tools.javac.tree.JCTree.JCThrow;
+import com.sun.tools.javac.tree.JCTree.JCTry;
+import com.sun.tools.javac.tree.JCTree.JCTypeUnion;
 import com.sun.tools.javac.tree.JCTree.JCVariableDecl;
 import com.sun.tools.javac.util.Name;
 
@@ -48,21 +54,50 @@ public class CloneHandler implements KendalHandler<Clone> {
         JCMethodDecl m = initialMethod.getObject();
         Name cloneMethodName = getCloneMethodName(m.name.toString(), annotationNode.getParent());
         validateMethodIsUnique(cloneMethodName, m.params, clazz);
+        Node<JCBlock> tryBody = buildTryBody(initialMethod);
+        Node<JCCatch> catcher = buildCatcher();
+        Node<JCTry> tryStatement = astNodeBuilder.buildTry(tryBody, catcher);
+        Node<JCBlock> cloneMethodBlock = astNodeBuilder.buildBlock(tryStatement);
         JCModifiers modifiers = getModifiersForNewMethod(m);
-        // todo: enclose method in transformer and then in try-catch block
-        Node<JCMethodInvocation> methodInvocation = getInitialMethodInvocation(initialMethod);
-        Node<JCReturn> returnStatement = astNodeBuilder.buildReturnStatement(methodInvocation);
-        Node<JCBlock> cloneMethodBlock = astNodeBuilder.buildBlock(returnStatement);
         Node<JCMethodDecl> cloneMethod = astNodeBuilder.buildMethodDecl(modifiers, cloneMethodName, m.restype, m.params, cloneMethodBlock);
         helper.addElementToClass(clazz, cloneMethod, Mode.APPEND);
     }
 
-    private Node<JCMethodInvocation> getInitialMethodInvocation(Node<JCMethodDecl> initialMethod) {
+    private Node<JCBlock> buildTryBody(Node<JCMethodDecl> initialMethod) {
+        // todo: enclose method call in transformer
+        Node<JCMethodInvocation> methodInvocation = buildInitialMethodInvocation(initialMethod);
+        Node<JCReturn> returnStatement = astNodeBuilder.buildReturnStatement(methodInvocation);
+        return astNodeBuilder.buildBlock(returnStatement);
+    }
+
+    private Node<JCMethodInvocation> buildInitialMethodInvocation(Node<JCMethodDecl> initialMethod) {
         Node<JCIdent> methodIdentifier = astNodeBuilder.buildIdentifier(initialMethod.getObject().name);
         methodIdentifier.getObject().setType(initialMethod.getObject().restype.type);
         List<Node<JCIdent>> parametersIdentifiers = new LinkedList<>();
         initialMethod.getObject().params.forEach(param -> parametersIdentifiers.add(astNodeBuilder.buildIdentifier(param.name)));
         return astNodeBuilder.buildMethodInvocation(methodIdentifier, parametersIdentifiers);
+    }
+
+    private Node<JCCatch> buildCatcher() {
+        String parameterName = "e";
+        Node<JCVariableDecl> catcherParameter = buildCatcherParameter(parameterName);
+        Node<JCBlock> catchBody = buildCatcherBody(parameterName);
+        return astNodeBuilder.buildCatch(catcherParameter, catchBody);
+    }
+
+    private Node<JCVariableDecl> buildCatcherParameter(String parameterName) {
+        Node<JCIdent> type1 = astNodeBuilder.buildIdentifier("InstantiationException");
+        Node<JCIdent> type2 = astNodeBuilder.buildIdentifier("IllegalAccessException");
+        Node<JCTypeUnion> typeUnion = astNodeBuilder.buildTypeUnion(Arrays.asList(type1, type2));
+        return astNodeBuilder.buildVariableDecl(typeUnion, parameterName);
+    }
+
+    private Node<JCBlock> buildCatcherBody(String parameterName) {
+        Node<JCIdent> parameterIdentifier = astNodeBuilder.buildIdentifier(parameterName);
+        Node<JCIdent> clazzIdentifier = astNodeBuilder.buildIdentifier("RuntimeException");
+        Node<JCNewClass> newClassStatement = astNodeBuilder.buildNewClass(clazzIdentifier, parameterIdentifier);
+        Node<JCThrow> throwStatement = astNodeBuilder.buildThrow(newClassStatement);
+        return astNodeBuilder.buildBlock(throwStatement);
     }
 
     private Name getCloneMethodName(String originMethodName, Node<JCMethodDecl> clonedMethod) {

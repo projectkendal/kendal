@@ -27,8 +27,10 @@ import com.sun.tools.javac.tree.JCTree.JCImport;
 import com.sun.tools.javac.tree.JCTree.JCLiteral;
 import com.sun.tools.javac.tree.JCTree.JCMethodDecl;
 import com.sun.tools.javac.tree.JCTree.JCMethodInvocation;
+import com.sun.tools.javac.tree.JCTree.JCNewClass;
 import com.sun.tools.javac.tree.JCTree.JCReturn;
 import com.sun.tools.javac.tree.JCTree.JCStatement;
+import com.sun.tools.javac.tree.JCTree.JCThrow;
 import com.sun.tools.javac.tree.JCTree.JCTry;
 import com.sun.tools.javac.tree.JCTree.JCVariableDecl;
 import com.sun.tools.javac.tree.JCTree.JCWhileLoop;
@@ -133,12 +135,20 @@ class TreeBuilder {
         return new Node<>(jcCatch, buildChildren(jcCatch));
     }
 
+    private static Node<JCThrow> buildNode(JCThrow jcThrow) {
+        return new Node<>(jcThrow, buildChildren(jcThrow));
+    }
+
+    private static Node<JCNewClass> buildNode(JCNewClass jcNewClass) {
+        return new Node<>(jcNewClass, buildChildren(jcNewClass));
+    }
+
     private static List<Node> buildChildren(JCCompilationUnit compilationUnit) {
         return mapChildren(def -> {
             if (def instanceof JCClassDecl) {
-                return buildNode((JCClassDecl)def);
+                return buildNode((JCClassDecl) def);
             }
-            return buildNode((JCImport)def);
+            return buildNode((JCImport) def);
         }, compilationUnit.defs);
     }
 
@@ -162,8 +172,8 @@ class TreeBuilder {
 
     private static List<Node> buildChildren(JCMethodDecl methodDecl) {
         List<Node> children = new ArrayList<>();
-        methodDecl.params.forEach(param -> children.add(buildNode(param)));
-        methodDecl.mods.annotations.forEach(annotation -> children.add(buildNode(annotation)));
+        methodDecl.params.forEach(param -> children.add(buildNode((JCVariableDecl) param)));
+        methodDecl.mods.annotations.forEach(annotation -> children.add(buildNode((JCAnnotation) annotation)));
         children.add(buildNode(methodDecl.body));
         return children;
     }
@@ -196,6 +206,9 @@ class TreeBuilder {
             }
             if (def instanceof JCEnhancedForLoop) {
                 return buildNode((JCEnhancedForLoop) def);
+            }
+            if (def instanceof JCThrow) {
+                return buildNode((JCThrow) def);
             }
             return null;
         }, block.stats);
@@ -289,6 +302,23 @@ class TreeBuilder {
         children.add(buildNode(jcCatch.body));
         children.add(buildNode(jcCatch.param));
         return children;
+    }
+
+    private static List<Node> buildChildren(JCThrow jcThrow) {
+        List<Node> children = new ArrayList<>();
+        if (jcThrow.expr instanceof JCNewClass) {
+            children.add(buildNode((JCNewClass) jcThrow.expr));
+        }
+        return children;
+    }
+
+    private static List<Node> buildChildren(JCNewClass jcNewClass) {
+        return mapChildren(def -> {
+            if (def instanceof JCIdent) {
+                return buildNode((JCIdent) def);
+            }
+            return null;
+        }, Collections.singletonList(jcNewClass.clazz), jcNewClass.args);
     }
 
     private static <T extends JCTree> List<Node> mapChildren(Function<T, Node> mapping, Iterable<T>... childCollections) {
