@@ -38,8 +38,6 @@ import com.sun.tools.javac.tree.JCTree.JCWhileLoop;
 
 public class TreeBuilder {
 
-    private static boolean isInitialPhase = true;
-
     private TreeBuilder() {
         // private constructor to hide default public one
     }
@@ -49,103 +47,103 @@ public class TreeBuilder {
     }
 
     public static Node<JCCompilationUnit> buildNode(JCCompilationUnit jcCompilationUnit) {
-        return new Node<>(jcCompilationUnit, buildChildren(jcCompilationUnit), isAddedByHandler());
+        return new Node<>(jcCompilationUnit, buildChildren(jcCompilationUnit));
     }
 
     public static Node<JCClassDecl> buildNode(JCClassDecl jcClassDecl) {
-        return new Node<>(jcClassDecl, buildChildren(jcClassDecl), isAddedByHandler());
+        return new Node<>(jcClassDecl, buildChildren(jcClassDecl));
     }
 
     public static Node<JCMethodDecl> buildNode(JCMethodDecl jcMethodDecl) {
-        return new Node<>(jcMethodDecl, buildChildren(jcMethodDecl), isAddedByHandler());
+        return new Node<>(jcMethodDecl, buildChildren(jcMethodDecl));
     }
 
     public static Node<JCBlock> buildNode(JCBlock jcBlock) {
-        return new Node<>(jcBlock, buildChildren(jcBlock), isAddedByHandler());
+        return new Node<>(jcBlock, buildChildren(jcBlock));
     }
 
     public static Node<JCVariableDecl> buildNode(JCVariableDecl jcVariableDecl) {
-        return new Node<>(jcVariableDecl, buildChildren(jcVariableDecl), isAddedByHandler());
+        return new Node<>(jcVariableDecl, buildChildren(jcVariableDecl));
     }
 
     public static Node<JCWhileLoop> buildNode(JCWhileLoop jcWhileLoop) {
-        return new Node<>(jcWhileLoop, buildChildren(jcWhileLoop), isAddedByHandler());
+        return new Node<>(jcWhileLoop, buildChildren(jcWhileLoop));
     }
 
     public static Node<JCDoWhileLoop> buildNode(JCDoWhileLoop jcDoWhileLoop) {
-        return new Node<>(jcDoWhileLoop, buildChildren(jcDoWhileLoop), isAddedByHandler());
+        return new Node<>(jcDoWhileLoop, buildChildren(jcDoWhileLoop));
     }
 
     public static Node<JCForLoop> buildNode(JCForLoop jcForLoop) {
-        return new Node<>(jcForLoop, buildChildren(jcForLoop), isAddedByHandler());
+        return new Node<>(jcForLoop, buildChildren(jcForLoop));
     }
 
     public static Node<JCEnhancedForLoop> buildNode(JCEnhancedForLoop jcEnhancedForLoop) {
-        return new Node<>(jcEnhancedForLoop, buildChildren(jcEnhancedForLoop), isAddedByHandler());
+        return new Node<>(jcEnhancedForLoop, buildChildren(jcEnhancedForLoop));
     }
 
     public static Node<JCImport> buildNode(JCImport jcImport) {
-        return new Node<>(jcImport, isAddedByHandler());
+        return new Node<>(jcImport);
     }
 
     public static Node<JCAnnotation> buildNode(JCAnnotation jcAnnotation) {
-        return new Node<>(jcAnnotation, isAddedByHandler());
+        return new Node<>(jcAnnotation);
     }
 
     public static Node<JCExpressionStatement> buildNode(JCExpressionStatement jcExpressionStatement) {
-        return new Node<>(jcExpressionStatement, isAddedByHandler());
+        return new Node<>(jcExpressionStatement);
     }
 
     public static Node<JCMethodInvocation> buildNode(JCMethodInvocation jcMethodInvocation) {
-        return new Node<>(jcMethodInvocation, buildChildren(jcMethodInvocation), isAddedByHandler());
+        return new Node<>(jcMethodInvocation, buildChildren(jcMethodInvocation));
     }
 
     public static Node<JCBinary> buildNode(JCBinary jcBinary) {
-        return new Node<>(jcBinary, buildChildren(jcBinary), isAddedByHandler());
+        return new Node<>(jcBinary, buildChildren(jcBinary));
     }
 
     public static Node<JCIdent> buildNode(JCIdent jcIdent) {
-        return new Node<>(jcIdent, isAddedByHandler());
+        return new Node<>(jcIdent);
     }
 
     public static Node<JCLiteral> buildNode(JCLiteral jcLiteral) {
-        return new Node<>(jcLiteral, isAddedByHandler());
+        return new Node<>(jcLiteral);
     }
 
     public static Node<JCTry> buildNode(JCTry jcTry) {
-        return new Node<>(jcTry, buildChildren(jcTry), isAddedByHandler());
+        return new Node<>(jcTry, buildChildren(jcTry));
     }
 
     public static Node<JCReturn> buildNode(JCReturn jcReturn) {
-        return new Node<>(jcReturn, buildChildren(jcReturn), isAddedByHandler());
+        return new Node<>(jcReturn, buildChildren(jcReturn));
     }
 
     public static Node<JCIf> buildNode(JCIf jcIf) {
-        return new Node<>(jcIf, buildChildren(jcIf), isAddedByHandler());
+        return new Node<>(jcIf, buildChildren(jcIf));
     }
 
     public static Node<JCCatch> buildNode(JCCatch jcCatch) {
-        return new Node<>(jcCatch, buildChildren(jcCatch), isAddedByHandler());
+        return new Node<>(jcCatch, buildChildren(jcCatch));
     }
 
     public static Node<JCThrow> buildNode(JCThrow jcThrow) {
-        return new Node<>(jcThrow, buildChildren(jcThrow), isAddedByHandler());
+        return new Node<>(jcThrow, buildChildren(jcThrow));
     }
 
     public static Node<JCNewClass> buildNode(JCNewClass jcNewClass) {
-        return new Node<>(jcNewClass, buildChildren(jcNewClass), isAddedByHandler());
+        return new Node<>(jcNewClass, buildChildren(jcNewClass));
     }
 
     public static Node<JCParens> buildNode(JCParens jcParens) {
-        return new Node<>(jcParens, buildChildren(jcParens), isAddedByHandler());
+        return new Node<>(jcParens, buildChildren(jcParens));
     }
 
     public static Node<JCTypeUnion> buildNode(JCTypeUnion jcTypeUnion) {
-        return new Node<>(jcTypeUnion, buildChildren(jcTypeUnion), isAddedByHandler());
+        return new Node<>(jcTypeUnion, buildChildren(jcTypeUnion));
     }
 
     public static Node<JCFieldAccess> buildNode(JCTree.JCFieldAccess jcFieldAccess) {
-        return new Node<>(jcFieldAccess, buildChildren(jcFieldAccess), isAddedByHandler());
+        return new Node<>(jcFieldAccess, buildChildren(jcFieldAccess));
     }
 
     private static List<Node> buildChildren(JCCompilationUnit compilationUnit) {
@@ -465,10 +463,7 @@ public class TreeBuilder {
     }
 
     static void finishInitialPhase() {
-        isInitialPhase = false;
+        Node.finishInitialPhase();
     }
 
-    private static boolean isAddedByHandler() {
-        return !isInitialPhase;
-    }
 }
