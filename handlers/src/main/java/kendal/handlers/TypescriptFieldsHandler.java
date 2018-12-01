@@ -6,6 +6,7 @@ import java.util.Collection;
 import java.util.List;
 
 import com.sun.tools.javac.tree.JCTree;
+import com.sun.tools.javac.tree.JCTree.JCAnnotation;
 import com.sun.tools.javac.tree.JCTree.JCClassDecl;
 import com.sun.tools.javac.tree.JCTree.JCExpressionStatement;
 import com.sun.tools.javac.tree.JCTree.JCFieldAccess;
@@ -21,17 +22,18 @@ import kendal.annotations.Public;
 import kendal.api.AstHelper;
 import kendal.api.AstHelper.Mode;
 import kendal.api.AstNodeBuilder;
-import kendal.api.AstUtils;
 import kendal.api.KendalHandler;
 import kendal.api.Modifier;
+import kendal.api.exceptions.DuplicatedElementsException;
+import kendal.api.exceptions.ImproperNodeTypeException;
 import kendal.api.exceptions.InvalidAnnotationException;
 import kendal.api.exceptions.KendalException;
 import kendal.model.Node;
 
 public abstract class TypescriptFieldsHandler<T extends Annotation> implements KendalHandler<T> {
 
+    private AstHelper helper;
     private AstNodeBuilder astNodeBuilder;
-    private AstUtils astUtils;
 
     /**
      * This method assumes that all passed annotatedNodes are annotated with one of the following annotations:
@@ -39,14 +41,14 @@ public abstract class TypescriptFieldsHandler<T extends Annotation> implements K
      */
     @Override
     public void handle(Collection<Node> annotationNodes, AstHelper helper) throws KendalException {
+        this.helper = helper;
         astNodeBuilder = helper.getAstNodeBuilder();
-        astUtils = helper.getAstUtils();
         for (Node annotationNode : annotationNodes) {
-            handleNode(annotationNode, helper);
+            handleNode(annotationNode);
         }
     }
 
-    private void handleNode(Node annotationNode, AstHelper helper) throws KendalException {
+    private void handleNode(Node<JCAnnotation> annotationNode) throws KendalException {
         Node<JCMethodDecl> constructor = (Node<JCMethodDecl>) annotationNode.getParent().getParent();
         if (!helper.getAstValidator().isConstructor(constructor)) {
             throw new InvalidAnnotationException(
@@ -66,8 +68,8 @@ public abstract class TypescriptFieldsHandler<T extends Annotation> implements K
         if (existingField == null) {
             helper.addElementToClass(clazz, newVariable, Mode.APPEND);
         } else {
-            if(!existingField.isAddedByKendal()) {
-                throw new InvalidAnnotationException("Auto generated field was already defined manually in this class!");
+            if (!existingField.isAddedByKendal()) {
+                throw new DuplicatedElementsException("Auto generated field was already defined manually in this class!");
             }
             if (existingField.getObject().getModifiers().flags != newVariable.getObject().getModifiers().flags) {
                 throw new InvalidAnnotationException(String.format("Auto generated field %s in class %s occurred more than once, with inconsistent definition!",
@@ -76,10 +78,14 @@ public abstract class TypescriptFieldsHandler<T extends Annotation> implements K
             // here we have the case of identical field defined in more than one constructor. Let it be, skip field creation and just assign the value
         }
 
+        addVariableAssignmentStatementToConstructor(constructor, newVariable);
+    }
 
-        Node<JCIdent> objectRef = astNodeBuilder.buildObjectReference(astUtils.nameFromString("this"));
-        Node<JCFieldAccess> fieldAccess = astNodeBuilder.buildFieldAccess(objectRef, newVariable.getObject().name);
-        Node<JCIdent> newVariableRef = astNodeBuilder.buildObjectReference(newVariable.getObject().name);
+    private void addVariableAssignmentStatementToConstructor(Node<JCMethodDecl> constructor, Node<JCVariableDecl> variable)
+            throws ImproperNodeTypeException {
+        Node<JCIdent> objectRef = astNodeBuilder.buildIdentifier("this");
+        Node<JCFieldAccess> fieldAccess = astNodeBuilder.buildFieldAccess(objectRef, variable.getObject().name);
+        Node<JCIdent> newVariableRef = astNodeBuilder.buildIdentifier(variable.getObject().name);
         Node<JCExpressionStatement> assignment = astNodeBuilder.buildAssignmentStatement(fieldAccess, newVariableRef);
         helper.addExpressionStatementToMethod(constructor, assignment, Mode.PREPEND);
     }

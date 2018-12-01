@@ -5,43 +5,29 @@ import javax.annotation.Generated;
 import kendal.annotations.Clone;
 
 public class CloneTest {
-    public static final String XYZ = "transformerMethodLoL";
+    public static final String XYZ = "clonner";
 
-    @Clone(wrapper = TestClassTransformer.class, methodName="transformerMethod", onMethod={@Generated("whatever")})
-    public static String aMethod(String param1, int param2) {
+    @Clone(wrapper = TestClassTransformer.class, methodName=XYZ, onMethod={@Generated("whatever")})
+    public String aMethod(String param1, int param2) throws InstantiationException, IllegalAccessException {
+        System.out.println("asd");
+        if ("as" == "") throw new InstantiationException("ds");
+        if (12 == 13) throw new IllegalAccessException("ds");
         return param1 + param2;
     }
 
     @Generated("whatever")
-    public Object something() {
-        Object result = aMethod("sdas", 12);
+    public Object something(String param1, int param2) {
         try {
-            return TestClassTransformer.class.newInstance().transform(result);
+            return TestClassTransformer.class.newInstance().transform(aMethod("sdas", 12));
         } catch (InstantiationException | IllegalAccessException e) {
             throw new RuntimeException(e);
         }
     }
 
-    public static String transformerMethod(String param1, int param2) {
-        return "abc";
-    }
-
-    public static String transformerMethod1(String param1, int param2) {
-        return "abc";
-    }
-
-    public static String transformerMethod2(String param1, int param2) {
-        return "abc";
-    }
-
-    public static String transformerMethod3(int param1, int param2) {
-        return "abc";
-    }
-
-    class TestClassTransformer implements Clone.Transformer<Object, Object> {
+    class TestClassTransformer implements Clone.Transformer<Object, String> {
         @Override
-        public Object transform(Object input) {
-            return input;
+        public String transform(Object input) {
+            return "asdas";
         }
     }
 }
