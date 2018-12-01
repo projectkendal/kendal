@@ -68,7 +68,7 @@ public abstract class TypescriptFieldsHandler<T extends Annotation> implements K
         if (existingField == null) {
             helper.addElementToClass(clazz, newVariable, Mode.APPEND);
         } else {
-            if (!existingField.isAddedByKendal()) {
+            if (!existingField.isAddedByHandler()) {
                 throw new DuplicatedElementsException("Auto generated field was already defined manually in this class!");
             }
             if (existingField.getObject().getModifiers().flags != newVariable.getObject().getModifiers().flags) {

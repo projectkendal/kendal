@@ -35,6 +35,7 @@ import kendal.api.AstValidator;
 import kendal.api.Modifier;
 import kendal.api.exceptions.ImproperNodeTypeException;
 import kendal.model.Node;
+import kendal.model.TreeBuilder;
 
 public class AstNodeBuilderImpl implements AstNodeBuilder {
     private static final JCExpression NO_VALUE = null;
@@ -71,7 +72,7 @@ public class AstNodeBuilderImpl implements AstNodeBuilder {
         }));
         if (source != null) treeMaker.at(source.getObject().pos);
         JCVariableDecl jcVariableDecl = treeMaker.VarDef(jcModifiers, name, type, NO_VALUE);
-        return new Node<>(jcVariableDecl, true);
+        return TreeBuilder.buildNode(jcVariableDecl);
     }
 
     @Override
@@ -88,7 +89,7 @@ public class AstNodeBuilderImpl implements AstNodeBuilder {
         com.sun.tools.javac.util.List<JCExpression> thrown = astUtils.toJCList(new ArrayList<>());
         JCMethodDecl jcMethodDecl = treeMaker.MethodDef(jcModifiers, name, resType, typarams, params, thrown,
                 body, null);
-        return new Node<>(jcMethodDecl, true);
+        return TreeBuilder.buildNode(jcMethodDecl);
     }
 
     @Override
@@ -108,7 +109,7 @@ public class AstNodeBuilderImpl implements AstNodeBuilder {
         try {
             JCMethodInvocation jcMethodInvocation = treeMaker.App(method.getObject(),
                     (com.sun.tools.javac.util.List<JCExpression>) parameters);
-            return new Node<>(jcMethodInvocation);
+            return TreeBuilder.buildNode(jcMethodInvocation);
         } catch (RuntimeException ex) {
             ex.printStackTrace();
             throw ex;
@@ -118,13 +119,13 @@ public class AstNodeBuilderImpl implements AstNodeBuilder {
     @Override
     public Node<JCFieldAccess> buildFieldAccess(Node<JCIdent> objectRef, Name fieldName) {
         JCFieldAccess jcFieldAccess = treeMaker.Select(objectRef.getObject(), fieldName);
-        return new Node<>(jcFieldAccess, true);
+        return TreeBuilder.buildNode(jcFieldAccess);
     }
 
     @Override
     public <T extends JCExpression> Node<JCReturn> buildReturnStatement(Node<T> expression) {
         JCReturn jcReturn = treeMaker.Return(expression.getObject());
-        return new Node<>(jcReturn);
+        return TreeBuilder.buildNode(jcReturn);
     }
 
     @Override
@@ -140,7 +141,7 @@ public class AstNodeBuilderImpl implements AstNodeBuilder {
     @Override
     public <T extends JCStatement> Node<JCBlock> buildBlock(com.sun.tools.javac.util.List<T> statements) {
         JCBlock jcBlock = treeMaker.Block(0, (com.sun.tools.javac.util.List<JCStatement>) statements);
-        return new Node<>(jcBlock);
+        return TreeBuilder.buildNode(jcBlock);
     }
 
     @Override
@@ -151,7 +152,7 @@ public class AstNodeBuilderImpl implements AstNodeBuilder {
     @Override
     public Node<JCIdent> buildIdentifier(Name name) {
         JCIdent jcIdentifier = treeMaker.Ident(name);
-        return new Node(jcIdentifier);
+        return TreeBuilder.buildNode(jcIdentifier);
     }
 
     @Override
@@ -167,19 +168,19 @@ public class AstNodeBuilderImpl implements AstNodeBuilder {
     @Override
     public Node<JCTry> buildTry(Node<JCBlock> body, com.sun.tools.javac.util.List<JCCatch> catchers) {
         JCTry jcTry = treeMaker.Try(body.getObject(), catchers, null);
-        return new Node<>(jcTry);
+        return TreeBuilder.buildNode(jcTry);
     }
 
     @Override
     public Node<JCCatch> buildCatch(Node<JCVariableDecl> param, Node<JCBlock> body) {
         JCCatch jcCatch = treeMaker.Catch(param.getObject(), body.getObject());
-        return new Node<>(jcCatch);
+        return TreeBuilder.buildNode(jcCatch);
     }
 
     @Override
     public <T extends JCExpression> Node<JCThrow> buildThrow(Node<T> expression) {
         JCThrow jcThrow = treeMaker.Throw(expression.getObject());
-        return new Node<>(jcThrow);
+        return TreeBuilder.buildNode(jcThrow);
     }
 
     @Override
@@ -192,14 +193,14 @@ public class AstNodeBuilderImpl implements AstNodeBuilder {
         com.sun.tools.javac.util.List jcArgs = astUtils.mapNodesToJCListOfObjects(args);
         JCNewClass jcNewClass = treeMaker.NewClass(null, com.sun.tools.javac.util.List.nil(),
                 clazz.getObject(), jcArgs, null);
-        return new Node<>(jcNewClass);
+        return TreeBuilder.buildNode(jcNewClass);
     }
 
     @Override
     public <T extends JCExpression> Node<JCTypeUnion> buildTypeUnion(List<Node<T>> components) {
         JCTypeUnion jcTypeUnion =
                 treeMaker.TypeUnion((com.sun.tools.javac.util.List<JCExpression>) astUtils.mapNodesToJCListOfObjects(components));
-        return new Node<>(jcTypeUnion);
+        return TreeBuilder.buildNode(jcTypeUnion);
     }
 
     @Override
@@ -209,6 +210,6 @@ public class AstNodeBuilderImpl implements AstNodeBuilder {
             throw new ImproperNodeTypeException();
         }
         JCExpressionStatement jcExpressionStatement = treeMaker.Exec(treeMaker.Assign(lhs.getObject(), rhs.getObject()));
-        return new Node<>(jcExpressionStatement, true);
+        return TreeBuilder.buildNode(jcExpressionStatement);
     }
 }
