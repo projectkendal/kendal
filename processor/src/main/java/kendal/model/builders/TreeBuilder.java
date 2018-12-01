@@ -1,12 +1,9 @@
 package kendal.model.builders;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collections;
-import java.util.List;
-import java.util.Objects;
+import java.util.*;
 import java.util.function.Function;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
 import java.util.stream.StreamSupport;
 
 import com.sun.tools.javac.tree.JCTree;
@@ -158,11 +155,15 @@ class TreeBuilder {
             if (def instanceof JCClassDecl) {
                 return buildNode((JCClassDecl) def);
             }
-            if (def instanceof JCAnnotation) {
+            if (def instanceof JCBlock) {
+                return buildNode((JCBlock) def);
+            }
+            if(def instanceof JCAnnotation) {
                 return buildNode((JCAnnotation) def);
             }
             return null;
-        }, classDecl.defs);
+        }, classDecl.defs, classDecl.mods.annotations);
+
     }
 
     private static List<Node> buildChildren(JCMethodDecl methodDecl) {
@@ -210,9 +211,27 @@ class TreeBuilder {
     }
 
     private static List<Node> buildChildren(JCVariableDecl variableDecl) {
-        List<Node> children = new ArrayList<>();
-        variableDecl.mods.annotations.forEach(annotation -> children.add(buildNode(annotation)));
-        return children;
+        return mapChildren(def -> {
+            if (def instanceof JCIdent) {
+                return buildNode((JCIdent) def);
+            }
+            if (def instanceof JCLiteral) {
+                return buildNode((JCLiteral) def);
+            }
+            if (def instanceof JCMethodInvocation) {
+                return buildNode((JCMethodInvocation) def);
+            }
+            if (def instanceof JCBinary) {
+                return buildNode((JCBinary) def);
+            }
+            if (def instanceof JCParens) {
+                return buildNode((JCParens) def);
+            }
+            if(def instanceof JCAnnotation) {
+                return buildNode((JCAnnotation)def);
+            }
+            return null;
+        }, Collections.singletonList(variableDecl.init), variableDecl.mods.annotations);
     }
 
     private static List<Node> buildChildren(JCWhileLoop loop) {
@@ -251,7 +270,34 @@ class TreeBuilder {
         List<Node> children = new ArrayList<>();
         children.add(buildNode(jcTry.body));
         jcTry.catchers.forEach(catcher -> children.add(buildNode(catcher)));
-        return children;
+
+        return mapChildren(def -> {
+            if (def instanceof JCIdent) {
+                return buildNode((JCIdent) def);
+            }
+            if (def instanceof JCLiteral) {
+                return buildNode((JCLiteral) def);
+            }
+            if (def instanceof JCMethodInvocation) {
+                return buildNode((JCMethodInvocation) def);
+            }
+            if (def instanceof JCBinary) {
+                return buildNode((JCBinary) def);
+            }
+            if (def instanceof JCParens) {
+                return buildNode((JCParens) def);
+            }
+            if (def instanceof JCBlock) {
+                return buildNode((JCBlock) def);
+            }
+            if (def instanceof JCCatch) {
+                return buildNode((JCCatch) def);
+            }
+            if (def instanceof JCVariableDecl) {
+                return buildNode((JCVariableDecl) def);
+            }
+            return null;
+        }, jcTry.catchers, jcTry.resources, Collections.singletonList(jcTry.body), Collections.singletonList(jcTry.finalizer));
     }
 
     private static List<Node> buildChildren(JCReturn jcReturn) {
@@ -313,6 +359,18 @@ class TreeBuilder {
 
     private static List<Node> buildChildren(JCIf jcIf) {
         return mapChildren(def -> {
+            if (def instanceof JCIdent) {
+                return buildNode((JCIdent) def);
+            }
+            if (def instanceof JCLiteral) {
+                return buildNode((JCLiteral) def);
+            }
+            if (def instanceof JCMethodInvocation) {
+                return buildNode((JCMethodInvocation) def);
+            }
+            if (def instanceof JCBinary) {
+                return buildNode((JCBinary) def);
+            }
             if (def instanceof JCParens) {
                 return buildNode((JCParens) def);
             }
@@ -368,7 +426,7 @@ class TreeBuilder {
         }, Collections.singletonList(jcParens.expr));
     }
 
-    private static <T extends JCTree> List<Node> mapChildren(Function<T, Node> mapping, Iterable<T>... childCollections) {
+    private static List<Node> mapChildren(Function<JCTree, Node> mapping, Iterable<? extends JCTree>... childCollections) {
         return Arrays.stream(childCollections).flatMap(c -> StreamSupport.stream(c.spliterator(), false))
                 .map(mapping)
                 .filter(Objects::nonNull)
