@@ -9,9 +9,14 @@ import java.util.Objects;
 import java.util.Set;
 import java.util.stream.Collectors;
 
+import javax.lang.model.type.MirroredTypeException;
+import javax.lang.model.type.TypeMirror;
+
+import com.sun.tools.javac.tree.JCTree;
 import com.sun.tools.javac.tree.JCTree.JCBlock;
 import com.sun.tools.javac.tree.JCTree.JCCatch;
 import com.sun.tools.javac.tree.JCTree.JCClassDecl;
+import com.sun.tools.javac.tree.JCTree.JCFieldAccess;
 import com.sun.tools.javac.tree.JCTree.JCIdent;
 import com.sun.tools.javac.tree.JCTree.JCMethodDecl;
 import com.sun.tools.javac.tree.JCTree.JCMethodInvocation;
@@ -32,6 +37,7 @@ import kendal.api.AstUtils;
 import kendal.api.KendalHandler;
 import kendal.api.exceptions.DuplicatedElementsException;
 import kendal.api.exceptions.KendalException;
+import kendal.api.exceptions.KendalRuntimeException;
 import kendal.model.Node;
 
 public class CloneHandler implements KendalHandler<Clone> {
@@ -59,23 +65,42 @@ public class CloneHandler implements KendalHandler<Clone> {
         Node<JCTry> tryStatement = astNodeBuilder.buildTry(tryBody, catcher);
         Node<JCBlock> cloneMethodBlock = astNodeBuilder.buildBlock(tryStatement);
         JCModifiers modifiers = getModifiersForNewMethod(m);
+        // todo: return type of method below should depend on "transform" method's declaration
         Node<JCMethodDecl> cloneMethod = astNodeBuilder.buildMethodDecl(modifiers, cloneMethodName, m.restype, m.params, cloneMethodBlock);
         helper.addElementToClass(clazz, cloneMethod, Mode.APPEND);
     }
 
     private Node<JCBlock> buildTryBody(Node<JCMethodDecl> initialMethod) {
-        // todo: enclose method call in transformer
         Node<JCMethodInvocation> methodInvocation = buildInitialMethodInvocation(initialMethod);
-        Node<JCReturn> returnStatement = astNodeBuilder.buildReturnStatement(methodInvocation);
+        Node<JCTree.JCExpression> wrapperClassAccessor = getWrapperClassAccessor(initialMethod);
+        Node<JCFieldAccess> classFieldAccess = astNodeBuilder.buildFieldAccess(wrapperClassAccessor, "class");
+        Node<JCFieldAccess> newInstanceFieldAccess = astNodeBuilder.buildFieldAccess(classFieldAccess, "newInstance");
+        Node<JCMethodInvocation> transformerNewInstanceMethodInvocation = astNodeBuilder.buildMethodInvocation(
+                newInstanceFieldAccess);
+        Node<JCFieldAccess> transformFieldAccess = astNodeBuilder.buildFieldAccess(transformerNewInstanceMethodInvocation, "transform");
+        Node<JCMethodInvocation> transformerMethodInvocation = astNodeBuilder.buildMethodInvocation(
+                transformFieldAccess, methodInvocation);
+        Node<JCReturn> returnStatement = astNodeBuilder.buildReturnStatement(transformerMethodInvocation);
         return astNodeBuilder.buildBlock(returnStatement);
     }
 
     private Node<JCMethodInvocation> buildInitialMethodInvocation(Node<JCMethodDecl> initialMethod) {
         Node<JCIdent> methodIdentifier = astNodeBuilder.buildIdentifier(initialMethod.getObject().name);
-        methodIdentifier.getObject().setType(initialMethod.getObject().restype.type);
+        methodIdentifier.getObject().setType(initialMethod.getObject().getReturnType().type);
         List<Node<JCIdent>> parametersIdentifiers = new LinkedList<>();
         initialMethod.getObject().params.forEach(param -> parametersIdentifiers.add(astNodeBuilder.buildIdentifier(param.name)));
         return astNodeBuilder.buildMethodInvocation(methodIdentifier, parametersIdentifiers);
+    }
+
+    private Node<JCTree.JCExpression> getWrapperClassAccessor(Node<JCMethodDecl> initialMethod) {
+        try {
+            initialMethod.getObject().sym.getAnnotation(Clone.class).wrapper();
+        }
+        catch (MirroredTypeException e) {
+            TypeMirror wrapperClassType = e.getTypeMirror();
+            return astNodeBuilder.getAccessor(wrapperClassType.toString());
+        }
+        throw new KendalRuntimeException("Could not get wrapper method identifier! This should never happen!");
     }
 
     private Node<JCCatch> buildCatcher() {

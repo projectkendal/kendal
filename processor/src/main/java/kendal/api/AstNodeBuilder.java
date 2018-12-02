@@ -46,9 +46,18 @@ public interface AstNodeBuilder {
     <T extends JCExpression, P extends JCExpression> Node<JCMethodInvocation> buildMethodInvocation(Node<T> method,
             List<Node<P>> parameters);
     <T extends JCExpression, P extends JCExpression> Node<JCMethodInvocation> buildMethodInvocation(Node<T> method,
+            Node<P> parameter);
+    <T extends JCExpression, P extends JCExpression> Node<JCMethodInvocation> buildMethodInvocation(Node<T> method,
             com.sun.tools.javac.util.List<P> parameters);
 
-    Node<JCFieldAccess> buildFieldAccess(Node<JCIdent> objectRef, Name fieldName);
+    <T extends JCExpression> Node<JCFieldAccess> buildFieldAccess(Node<T> objectRef, String fieldName);
+    <T extends JCExpression> Node<JCFieldAccess> buildFieldAccess(Node<T> objectRef, Name fieldName);
+
+    /**
+     * Constructs field accessor for more complex expressions (the ones using dots).
+     * Returns either {@link Node<JCIdent>} or {@link Node<JCFieldAccess>}.
+     */
+    Node<JCExpression> getAccessor(String fullName);
 
     <T extends JCExpression> Node<JCReturn> buildReturnStatement(Node<T> expression);
 

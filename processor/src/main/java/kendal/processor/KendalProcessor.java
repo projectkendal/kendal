@@ -28,6 +28,7 @@ import com.sun.tools.javac.util.Context;
 import kendal.api.AstHelper;
 import kendal.api.KendalHandler;
 import kendal.api.exceptions.KendalException;
+import kendal.api.exceptions.KendalRuntimeException;
 import kendal.api.impl.AstHelperImpl;
 import kendal.model.ForestBuilder;
 import kendal.model.Node;
@@ -105,7 +106,7 @@ public class KendalProcessor extends AbstractProcessor {
         handlersMap.forEach((key, value) -> {
             try {
                 key.handle(value, astHelper);
-            } catch (KendalException e) {
+            } catch (KendalException | KendalRuntimeException e) {
                 messager.printMessage(Diagnostic.Kind.ERROR, e.getMessage());
             }
         });

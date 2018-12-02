@@ -343,6 +343,9 @@ public class TreeBuilder {
             if (def instanceof JCLiteral){
                 return buildNode((JCLiteral)def);
             }
+            if (def instanceof JCFieldAccess){
+                return buildNode((JCFieldAccess)def);
+            }
             return null;
         }, Collections.singletonList(jcMethodInvocation.meth), jcMethodInvocation.args);
     }
@@ -450,6 +453,12 @@ public class TreeBuilder {
         return mapChildren(def -> {
             if (def instanceof JCIdent) {
                 return buildNode((JCIdent) def);
+            }
+            if (def instanceof JCMethodInvocation) {
+                return buildNode((JCMethodInvocation) def);
+            }
+            if (def instanceof JCFieldAccess) {
+                return buildNode((JCFieldAccess) def);
             }
             return null;
         }, Collections.singletonList(fieldAccess.selected));
