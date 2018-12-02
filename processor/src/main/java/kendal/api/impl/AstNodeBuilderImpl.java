@@ -9,7 +9,7 @@ import java.util.LinkedList;
 import java.util.List;
 
 import com.sun.tools.javac.code.Type;
-import com.sun.tools.javac.tree.JCTree.JCAnnotation;
+import com.sun.tools.javac.tree.JCTree;
 import com.sun.tools.javac.tree.JCTree.JCBlock;
 import com.sun.tools.javac.tree.JCTree.JCCatch;
 import com.sun.tools.javac.tree.JCTree.JCExpression;
@@ -63,8 +63,14 @@ public class AstNodeBuilderImpl implements AstNodeBuilder {
     }
 
     @Override
-    public <T extends JCExpression> Node<JCVariableDecl> buildVariableDecl(List<Modifier> modifiers, T type, Name name,
-            Node<JCAnnotation> source) {
+    public <T extends JCExpression, K extends JCTree> Node<JCVariableDecl> buildVariableDecl(Node<T> type, String name,
+            Node<K> source) {
+        return buildVariableDecl(new LinkedList<>(), type.getObject(), astUtils.nameFromString(name), source);
+    }
+
+    @Override
+    public <T extends JCExpression, K extends JCTree> Node<JCVariableDecl> buildVariableDecl(List<Modifier> modifiers, T type,
+            Name name, Node<K> source) {
         JCModifiers jcModifiers = treeMaker.Modifiers(map(modifiers, (List<Modifier>m) -> {
             long result = 0;
             for (Modifier mod : m) {
@@ -236,5 +242,10 @@ public class AstNodeBuilderImpl implements AstNodeBuilder {
         }
         JCExpressionStatement jcExpressionStatement = treeMaker.Exec(treeMaker.Assign(lhs.getObject(), rhs.getObject()));
         return TreeBuilder.buildNode(jcExpressionStatement);
+    }
+
+    @Override
+    public JCExpression buildType(Type type) {
+        return treeMaker.Type(type);
     }
 }

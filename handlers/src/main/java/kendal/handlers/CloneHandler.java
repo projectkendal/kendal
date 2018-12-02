@@ -12,6 +12,7 @@ import java.util.stream.Collectors;
 import javax.lang.model.type.MirroredTypeException;
 import javax.lang.model.type.TypeMirror;
 
+import com.sun.tools.javac.code.Type;
 import com.sun.tools.javac.tree.JCTree.JCBlock;
 import com.sun.tools.javac.tree.JCTree.JCCatch;
 import com.sun.tools.javac.tree.JCTree.JCClassDecl;
@@ -25,7 +26,6 @@ import com.sun.tools.javac.tree.JCTree.JCNewClass;
 import com.sun.tools.javac.tree.JCTree.JCReturn;
 import com.sun.tools.javac.tree.JCTree.JCThrow;
 import com.sun.tools.javac.tree.JCTree.JCTry;
-import com.sun.tools.javac.tree.JCTree.JCTypeApply;
 import com.sun.tools.javac.tree.JCTree.JCTypeUnion;
 import com.sun.tools.javac.tree.JCTree.JCVariableDecl;
 import com.sun.tools.javac.util.Name;
@@ -34,7 +34,6 @@ import kendal.annotations.Clone;
 import kendal.api.AstHelper;
 import kendal.api.AstHelper.Mode;
 import kendal.api.AstNodeBuilder;
-import kendal.api.AstSearcher;
 import kendal.api.AstUtils;
 import kendal.api.KendalHandler;
 import kendal.api.exceptions.DuplicatedElementsException;
@@ -44,8 +43,8 @@ import kendal.model.Node;
 
 public class CloneHandler implements KendalHandler<Clone> {
 
-    private static final String TRANSFORM_RETURN_TYPE_NOT_FOUND = "This should never happen because transformer"
-            + " parameter, extending Clone.Transformer class is required for @Clone annotation!";
+    private static final String TRANSFORM_RETURN_TYPE_NOT_FOUND = "Return type for cloned method is undefined!" +
+     "This should never happen because transformer parameter, extending Clone.Transformer class is required for @Clone annotation!";
 
     private AstNodeBuilder astNodeBuilder;
     private AstUtils astUtils;
@@ -74,7 +73,7 @@ public class CloneHandler implements KendalHandler<Clone> {
         Node<JCExpression> transformerClassAccessor = getTransformerClassAccessor(initialMethod);
         Node<JCBlock> newMethodBlock = buildNewMethodBody(initialMethod, transformerClassAccessor);
         JCModifiers modifiers = getModifiersForNewMethod(m);
-        JCExpression transformerReturnType = getTransformMethodReturnType(transformerClassAccessor);
+        JCExpression transformerReturnType = getTransformMethodReturnType(initialMethod);
         Node<JCMethodDecl> newMethod = astNodeBuilder.buildMethodDecl(modifiers, newMethodName, transformerReturnType,
                 m.params, newMethodBlock);
         helper.addElementToClass(clazz, newMethod, Mode.APPEND);
@@ -82,7 +81,7 @@ public class CloneHandler implements KendalHandler<Clone> {
 
     private Node<JCBlock> buildNewMethodBody(Node<JCMethodDecl> initialMethod, Node<JCExpression> transformerClassAccessor) {
         Node<JCBlock> tryBody = buildTryBody(initialMethod, transformerClassAccessor);
-        Node<JCCatch> catcher = buildCatcher();
+        Node<JCCatch> catcher = buildCatcher(initialMethod);
         Node<JCTry> tryStatement = astNodeBuilder.buildTry(tryBody, catcher);
         return astNodeBuilder.buildBlock(tryStatement);
     }
@@ -103,21 +102,26 @@ public class CloneHandler implements KendalHandler<Clone> {
      * Returns declared return type of method {@link Clone.Transformer#transform(Object)} defined by class specified
      * as {@link Clone#transformer()} for the method that is to be cloned.
      */
-    private JCExpression getTransformMethodReturnType(Node<JCExpression> transformerClassAccessor) {
-        String transformerClassFullName = getTransformerClassFullName(transformerClassAccessor);
-        Node<JCClassDecl> transformerClass = AstSearcher.getClassDeclarationByName(transformerClassFullName);
-        JCTypeApply implementedTransformer = (JCTypeApply) transformerClass.getObject().implementing.stream()
-                .filter(type -> type instanceof JCTypeApply &&
-                        Objects.equals("kendal.annotations.Clone.Transformer",
-                        ((JCFieldAccess) ((JCTypeApply) type).clazz).sym.toString()))
-                .findFirst().orElseThrow(() -> new KendalRuntimeException(TRANSFORM_RETURN_TYPE_NOT_FOUND));
-        // Second type identifier in interface defines return type of the method, so we have to get(1)
-        return implementedTransformer.arguments.get(1);
-    }
+    private JCExpression getTransformMethodReturnType(Node<JCMethodDecl> initialMethod) {
+        try {
+            initialMethod.getObject().sym.getAnnotation(Clone.class).transformer();
+        }
+        catch (MirroredTypeException e) {
+            Type.ClassType transformerClassType = (Type.ClassType) e.getTypeMirror();
+            com.sun.tools.javac.util.List<Type> interfaces = transformerClassType.interfaces_field;
+            while (interfaces == null || interfaces.isEmpty()) {
+                transformerClassType = (Type.ClassType) transformerClassType.supertype_field;
+                interfaces = transformerClassType.interfaces_field;
+            }
+            Type.ClassType transformerInterface = (Type.ClassType) interfaces.stream()
+                    .filter(i -> i.tsym.getQualifiedName().contentEquals("kendal.annotations.Clone.Transformer"))
+                    .findFirst().orElseThrow(() -> new KendalRuntimeException(TRANSFORM_RETURN_TYPE_NOT_FOUND));
+            // second type parameter of the interface represents returned type of the transform method, so we have to get(1)
+            Type returnedType = transformerInterface.typarams_field.get(1);
+            return astNodeBuilder.buildType(returnedType);
 
-    private String getTransformerClassFullName(Node<JCExpression> transformerClassAccessor) {
-        JCFieldAccess jcTransformerClassAccessor = (JCFieldAccess) transformerClassAccessor.getObject();
-        return jcTransformerClassAccessor.selected.toString() + "." + jcTransformerClassAccessor.name.toString();
+        }
+        throw new KendalRuntimeException("Could not get transformer method identifier! This should never happen!");
     }
 
     /**
@@ -149,18 +153,18 @@ public class CloneHandler implements KendalHandler<Clone> {
         return astNodeBuilder.buildBlock(returnStatement);
     }
 
-    private Node<JCCatch> buildCatcher() {
+    private Node<JCCatch> buildCatcher(Node<JCMethodDecl> initialMethod) {
         String parameterName = "e";
-        Node<JCVariableDecl> catcherParameter = buildCatcherParameter(parameterName);
+        Node<JCVariableDecl> catcherParameter = buildCatcherParameter(parameterName, initialMethod);
         Node<JCBlock> catchBody = buildCatcherBody(parameterName);
         return astNodeBuilder.buildCatch(catcherParameter, catchBody);
     }
 
-    private Node<JCVariableDecl> buildCatcherParameter(String parameterName) {
+    private Node<JCVariableDecl> buildCatcherParameter(String parameterName, Node<JCMethodDecl> initialMethod) {
         Node<JCIdent> type1 = astNodeBuilder.buildIdentifier("InstantiationException");
         Node<JCIdent> type2 = astNodeBuilder.buildIdentifier("IllegalAccessException");
         Node<JCTypeUnion> typeUnion = astNodeBuilder.buildTypeUnion(Arrays.asList(type1, type2));
-        return astNodeBuilder.buildVariableDecl(typeUnion, parameterName);
+        return astNodeBuilder.buildVariableDecl(typeUnion, parameterName, initialMethod);
     }
 
     private Node<JCBlock> buildCatcherBody(String parameterName) {

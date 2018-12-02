@@ -2,7 +2,8 @@ package kendal.api;
 
 import java.util.List;
 
-import com.sun.tools.javac.tree.JCTree.JCAnnotation;
+import com.sun.tools.javac.code.Type;
+import com.sun.tools.javac.tree.JCTree;
 import com.sun.tools.javac.tree.JCTree.JCBlock;
 import com.sun.tools.javac.tree.JCTree.JCCatch;
 import com.sun.tools.javac.tree.JCTree.JCExpression;
@@ -25,17 +26,12 @@ import kendal.api.exceptions.ImproperNodeTypeException;
 import kendal.model.Node;
 
 public interface AstNodeBuilder {
-    /**
-     * Create variable declaration representing declarations inside of methods and also methods' parameters.
-     */
+
     <T extends JCExpression> Node<JCVariableDecl> buildVariableDecl(Node<T> type, String name);
     <T extends JCExpression> Node<JCVariableDecl> buildVariableDecl(Node<T> type, Name name);
-
-    /**
-     * Create variable declaration representing variable declarations inside of a a class.
-     */
-    <T extends JCExpression> Node<JCVariableDecl> buildVariableDecl(List<Modifier> modifiers, T type, Name name,
-            Node<JCAnnotation> source);
+    <T extends JCExpression, K extends JCTree> Node<JCVariableDecl> buildVariableDecl(Node<T> type, String name, Node<K> source);
+    <T extends JCExpression, K extends JCTree> Node<JCVariableDecl> buildVariableDecl(List<Modifier> modifiers, T type, Name name,
+            Node<K> source);
 
     Node<JCMethodDecl> buildMethodDecl(JCModifiers modifiers, Name name, JCExpression resType,
             com.sun.tools.javac.util.List<JCVariableDecl> params, Node<JCBlock> body);
@@ -85,4 +81,6 @@ public interface AstNodeBuilder {
     // ExpressionStatements:
     <L extends JCExpression, R extends JCExpression> Node<JCExpressionStatement> buildAssignmentStatement(Node<L> lhs,
             Node<R> rhs) throws ImproperNodeTypeException;
+
+    JCExpression buildType(Type type);
 }
