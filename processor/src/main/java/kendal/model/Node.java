@@ -7,7 +7,6 @@ import java.util.stream.Collectors;
 
 import com.sun.tools.javac.tree.JCTree;
 
-import kendal.api.AstSearcher;
 import kendal.utils.ForestUtils;
 
 public class Node <T extends JCTree> {
@@ -27,7 +26,6 @@ public class Node <T extends JCTree> {
         this.children = children;
         children.forEach(child -> child.parent = this);
         this.addedByHandler = !isInitialPhase;
-        AstSearcher.registerNode(this);
     }
 
     public T getObject() {

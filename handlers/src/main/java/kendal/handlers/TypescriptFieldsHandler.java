@@ -22,7 +22,6 @@ import kendal.annotations.Public;
 import kendal.api.AstHelper;
 import kendal.api.AstHelper.Mode;
 import kendal.api.AstNodeBuilder;
-import kendal.api.AstSearcher;
 import kendal.api.KendalHandler;
 import kendal.api.Modifier;
 import kendal.api.exceptions.DuplicatedElementsException;
@@ -61,7 +60,7 @@ public abstract class TypescriptFieldsHandler<T extends Annotation> implements K
         Node<JCClassDecl> clazz = (Node<JCClassDecl>) constructor.getParent();
         Name name = ((JCVariableDecl)annotationNode.getParent().getObject()).name;
 
-        Node<JCVariableDecl> existingField = AstSearcher.findFieldByNameAndType(clazz, name);
+        Node<JCVariableDecl> existingField = helper.findFieldByNameAndType(clazz, name);
 
         Node<JCVariableDecl> newVariable = astNodeBuilder.buildVariableDecl(modifiers,
                 ((JCVariableDecl) annotationNode.getParent().getObject()).vartype, name, annotationNode);
