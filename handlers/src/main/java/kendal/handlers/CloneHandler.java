@@ -34,6 +34,7 @@ import kendal.annotations.Clone;
 import kendal.api.AstHelper;
 import kendal.api.AstHelper.Mode;
 import kendal.api.AstNodeBuilder;
+import kendal.api.AstSearcher;
 import kendal.api.AstUtils;
 import kendal.api.KendalHandler;
 import kendal.api.exceptions.DuplicatedElementsException;
@@ -104,7 +105,7 @@ public class CloneHandler implements KendalHandler<Clone> {
      */
     private JCExpression getTransformMethodReturnType(Node<JCExpression> transformerClassAccessor) {
         String transformerClassFullName = getTransformerClassFullName(transformerClassAccessor);
-        Node<JCClassDecl> transformerClass = Node.getClassDeclaration(transformerClassFullName);
+        Node<JCClassDecl> transformerClass = AstSearcher.getClassDeclarationByName(transformerClassFullName);
         JCTypeApply implementedTransformer = (JCTypeApply) transformerClass.getObject().implementing.stream()
                 .filter(type -> type instanceof JCTypeApply &&
                         Objects.equals("kendal.annotations.Clone.Transformer",

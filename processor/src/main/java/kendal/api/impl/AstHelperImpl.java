@@ -5,13 +5,10 @@ import static kendal.utils.Utils.with;
 import java.util.stream.Collectors;
 import java.util.stream.StreamSupport;
 
-import javax.lang.model.element.Name;
-
 import com.sun.tools.javac.tree.JCTree;
 import com.sun.tools.javac.tree.JCTree.JCClassDecl;
 import com.sun.tools.javac.tree.JCTree.JCExpressionStatement;
 import com.sun.tools.javac.tree.JCTree.JCMethodDecl;
-import com.sun.tools.javac.tree.JCTree.JCVariableDecl;
 import com.sun.tools.javac.util.Context;
 import com.sun.tools.javac.util.List;
 
@@ -63,13 +60,6 @@ public class AstHelperImpl implements AstHelper {
             if (mode == Mode.APPEND) b.stats = append(b.stats, expressionStatement.getObject());
             else b.stats = prepend(b.stats, expressionStatement.getObject());
         });
-    }
-
-    @Override
-    public Node<JCVariableDecl> findFieldByName(Node<JCClassDecl> classDeclNode, Name name) {
-        return classDeclNode.getChildren().stream()
-                .filter(node -> node.getObject() instanceof JCVariableDecl && ((JCVariableDecl) node.getObject()).name.equals(name))
-                .findAny().orElse(null);
     }
 
     @Override

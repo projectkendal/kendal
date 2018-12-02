@@ -3,17 +3,15 @@ package kendal.model;
 import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.List;
-import java.util.Objects;
 import java.util.stream.Collectors;
 
 import com.sun.tools.javac.tree.JCTree;
-import com.sun.tools.javac.tree.JCTree.JCClassDecl;
 
+import kendal.api.AstSearcher;
 import kendal.utils.ForestUtils;
 
 public class Node <T extends JCTree> {
     private static boolean isInitialPhase = true;
-    private static List<Node<JCClassDecl>> classDeclarations = new ArrayList<>();
 
     private T object;
     private Node parent;
@@ -29,7 +27,7 @@ public class Node <T extends JCTree> {
         this.children = children;
         children.forEach(child -> child.parent = this);
         this.addedByHandler = !isInitialPhase;
-        if (object instanceof JCClassDecl) classDeclarations.add((Node<JCClassDecl>) this);
+        AstSearcher.registerNode(this);
     }
 
     public T getObject() {
@@ -79,11 +77,4 @@ public class Node <T extends JCTree> {
         isInitialPhase = false;
     }
 
-    public static Node<JCClassDecl> getClassDeclaration(String fullName) {
-        Node<JCClassDecl> jcClassDeclNode = classDeclarations.stream()
-                .filter(classDeclaration -> Objects.equals(classDeclaration.getObject().sym.toString(), fullName))
-                .findFirst()
-                .orElse(null);
-        return jcClassDeclNode;
-    }
 }
