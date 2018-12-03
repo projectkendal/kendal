@@ -111,16 +111,16 @@ public class CloneHandler implements KendalHandler<Clone> {
             com.sun.tools.javac.util.List<Type> interfaces = transformerClassType.interfaces_field;
             Type.ClassType transformerInterface = null;
             while (transformerInterface == null) {
+                // look for the first class in inheritance hierarchy which has an interface
                 while (interfaces == null || interfaces.isEmpty()) {
-                    // look for the first class in inheritance hierarchy which has an interface
                     transformerClassType = (Type.ClassType) transformerClassType.supertype_field;
                     interfaces = transformerClassType.interfaces_field;
                 }
                 transformerInterface = (Type.ClassType) interfaces.stream()
                         .filter(i -> i.tsym.getQualifiedName().contentEquals("kendal.annotations.Clone.Transformer"))
                         .findFirst().orElse(null);
+                // check if one of interfaces is Clone.Transformer, if not, below is null
                 if (transformerInterface == null) {
-                    // check if one of interfaces is Clone.Transformer, if not, above is null
                     transformerClassType = (Type.ClassType) transformerClassType.supertype_field;
                     interfaces = transformerClassType.interfaces_field;
                 }
