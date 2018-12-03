@@ -103,9 +103,9 @@ public class KendalProcessor extends AbstractProcessor {
 
     private void executeHandlers(Map<KendalHandler, Set<Node>> handlersMap) {
         messager.printMessage(Diagnostic.Kind.NOTE, "### Kendal handles execution ###");
-        handlersMap.forEach((key, value) -> {
+        handlersMap.forEach((handler, nodes) -> {
             try {
-                key.handle(value, astHelper);
+                handler.handle(nodes, astHelper);
             } catch (KendalException | KendalRuntimeException e) {
                 messager.printMessage(Diagnostic.Kind.ERROR, e.getMessage());
             }
