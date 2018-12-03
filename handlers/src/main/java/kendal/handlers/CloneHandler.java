@@ -109,13 +109,22 @@ public class CloneHandler implements KendalHandler<Clone> {
         catch (MirroredTypeException e) {
             Type.ClassType transformerClassType = (Type.ClassType) e.getTypeMirror();
             com.sun.tools.javac.util.List<Type> interfaces = transformerClassType.interfaces_field;
-            while (interfaces == null || interfaces.isEmpty()) {
-                transformerClassType = (Type.ClassType) transformerClassType.supertype_field;
-                interfaces = transformerClassType.interfaces_field;
+            Type.ClassType transformerInterface = null;
+            while (transformerInterface == null) {
+                while (interfaces == null || interfaces.isEmpty()) {
+                    // look for the first class in inheritance hierarchy which has an interface
+                    transformerClassType = (Type.ClassType) transformerClassType.supertype_field;
+                    interfaces = transformerClassType.interfaces_field;
+                }
+                transformerInterface = (Type.ClassType) interfaces.stream()
+                        .filter(i -> i.tsym.getQualifiedName().contentEquals("kendal.annotations.Clone.Transformer"))
+                        .findFirst().orElse(null);
+                if (transformerInterface == null) {
+                    // check if one of interfaces is Clone.Transformer, if not, above is null
+                    transformerClassType = (Type.ClassType) transformerClassType.supertype_field;
+                    interfaces = transformerClassType.interfaces_field;
+                }
             }
-            Type.ClassType transformerInterface = (Type.ClassType) interfaces.stream()
-                    .filter(i -> i.tsym.getQualifiedName().contentEquals("kendal.annotations.Clone.Transformer"))
-                    .findFirst().orElseThrow(() -> new KendalRuntimeException(TRANSFORM_RETURN_TYPE_NOT_FOUND));
             // second type parameter of the interface represents returned type of the transform method, so we have to get(1)
             Type returnedType = transformerInterface.typarams_field.get(1);
             return astNodeBuilder.buildType(returnedType);
