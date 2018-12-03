@@ -151,7 +151,10 @@ public class TreeBuilder {
             if (def instanceof JCClassDecl) {
                 return buildNode((JCClassDecl) def);
             }
-            return buildNode((JCImport) def);
+            if (def instanceof JCImport) {
+                return buildNode((JCImport) def);
+            }
+            return null;
         }, compilationUnit.defs);
     }
 
