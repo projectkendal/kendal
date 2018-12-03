@@ -74,4 +74,5 @@ public class Node <T extends JCTree> {
     static void finishInitialPhase() {
         isInitialPhase = false;
     }
+
 }

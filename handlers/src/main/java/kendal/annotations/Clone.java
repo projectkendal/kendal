@@ -8,7 +8,7 @@ import javax.annotation.Generated;
 @Target({ElementType.METHOD, ElementType.ANNOTATION_TYPE})
 public @interface Clone {
 
-    Class<? extends Transformer> wrapper();
+    Class<? extends Transformer> transformer();
 
     /**
     * Java does not allow putting {@link java.lang.annotation.Annotation}, which is the base type for all annotations, as annotation member.

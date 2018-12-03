@@ -3,11 +3,13 @@ package kendal.api.impl;
 import static kendal.utils.Utils.map;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.LinkedList;
 import java.util.List;
 
-import com.sun.tools.javac.tree.JCTree.JCAnnotation;
+import com.sun.tools.javac.code.Type;
+import com.sun.tools.javac.tree.JCTree;
 import com.sun.tools.javac.tree.JCTree.JCBlock;
 import com.sun.tools.javac.tree.JCTree.JCCatch;
 import com.sun.tools.javac.tree.JCTree.JCExpression;
@@ -61,8 +63,14 @@ public class AstNodeBuilderImpl implements AstNodeBuilder {
     }
 
     @Override
-    public <T extends JCExpression> Node<JCVariableDecl> buildVariableDecl(List<Modifier> modifiers, T type, Name name,
-            Node<JCAnnotation> source) {
+    public <T extends JCExpression, K extends JCTree> Node<JCVariableDecl> buildVariableDecl(Node<T> type, String name,
+            Node<K> source) {
+        return buildVariableDecl(new LinkedList<>(), type.getObject(), astUtils.nameFromString(name), source);
+    }
+
+    @Override
+    public <T extends JCExpression, K extends JCTree> Node<JCVariableDecl> buildVariableDecl(List<Modifier> modifiers, T type,
+            Name name, Node<K> source) {
         JCModifiers jcModifiers = treeMaker.Modifiers(map(modifiers, (List<Modifier>m) -> {
             long result = 0;
             for (Modifier mod : m) {
@@ -104,6 +112,12 @@ public class AstNodeBuilderImpl implements AstNodeBuilder {
     }
 
     @Override
+    public <T extends JCExpression, P extends JCExpression> Node<JCMethodInvocation> buildMethodInvocation(
+            Node<T> method, Node<P> parameter) {
+        return buildMethodInvocation(method, Collections.singletonList(parameter));
+    }
+
+    @Override
     public <T extends JCExpression, P extends JCExpression> Node<JCMethodInvocation> buildMethodInvocation(Node<T> method,
             com.sun.tools.javac.util.List<P> parameters) {
         try {
@@ -117,9 +131,26 @@ public class AstNodeBuilderImpl implements AstNodeBuilder {
     }
 
     @Override
-    public Node<JCFieldAccess> buildFieldAccess(Node<JCIdent> objectRef, Name fieldName) {
+    public <T extends JCExpression> Node<JCFieldAccess> buildFieldAccess(Node<T> objectRef, String fieldName) {
+        return buildFieldAccess(objectRef, astUtils.nameFromString(fieldName));
+    }
+
+    @Override
+    public <T extends JCExpression> Node<JCFieldAccess> buildFieldAccess(Node<T> objectRef, Name fieldName) {
         JCFieldAccess jcFieldAccess = treeMaker.Select(objectRef.getObject(), fieldName);
+        jcFieldAccess.setType(Type.noType);
         return TreeBuilder.buildNode(jcFieldAccess);
+    }
+
+    public Node<JCExpression> getAccessor(String fullName) {
+        List<String> elements = Arrays.asList(fullName.split("\\."));
+
+        Node<?> result = null;
+        for (String elem : elements) {
+            if (result == null) result = buildIdentifier(elem);
+            else result = buildFieldAccess((Node<JCExpression>) result, elem);
+        }
+        return (Node<JCExpression>) result;
     }
 
     @Override
@@ -211,5 +242,10 @@ public class AstNodeBuilderImpl implements AstNodeBuilder {
         }
         JCExpressionStatement jcExpressionStatement = treeMaker.Exec(treeMaker.Assign(lhs.getObject(), rhs.getObject()));
         return TreeBuilder.buildNode(jcExpressionStatement);
+    }
+
+    @Override
+    public JCExpression buildType(Type type) {
+        return treeMaker.Type(type);
     }
 }

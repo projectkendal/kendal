@@ -66,9 +66,11 @@ public class AstHelperImpl implements AstHelper {
     }
 
     @Override
-    public Node<JCVariableDecl> findFieldByName(Node<JCClassDecl> classDeclNode, Name name) {
+    public Node<JCVariableDecl> findFieldByNameAndType(Node<JCClassDecl> classDeclNode, Name name) {
         return classDeclNode.getChildren().stream()
-                .filter(node -> node.getObject() instanceof JCVariableDecl && ((JCVariableDecl) node.getObject()).name.equals(name))
+                .filter(node -> node.getObject() instanceof JCVariableDecl
+                        && ((JCVariableDecl) node.getObject()).name.equals(name))
+                .map(node -> (Node<JCVariableDecl>) node)
                 .findAny().orElse(null);
     }
 
