@@ -186,11 +186,18 @@ public class TreeBuilder {
     }
 
     private static List<Node> buildChildren(JCMethodDecl methodDecl) {
-        List<Node> children = new ArrayList<>();
-        methodDecl.params.forEach(param -> children.add(buildNode((JCVariableDecl) param)));
-        methodDecl.mods.annotations.forEach(annotation -> children.add(buildNode((JCAnnotation) annotation)));
-        children.add(buildNode(methodDecl.body));
-        return children;
+        return mapChildren(def -> {
+            if (def instanceof JCVariableDecl) {
+                return buildNode((JCVariableDecl) def);
+            }
+            if (def instanceof JCAnnotation) {
+                return buildNode((JCAnnotation) def);
+            }
+            if (def instanceof JCBlock) {
+                return buildNode((JCBlock) def);
+            }
+            return null;
+        }, methodDecl.params, methodDecl.mods.annotations, Collections.singletonList(methodDecl.body));
     }
 
     private static List<Node> buildChildren(JCBlock block) {
