@@ -323,6 +323,33 @@ public class TreeBuilder {
         }, Arrays.asList(loop.body, loop.var, loop.expr));
     }
 
+    private static List<Node> buildChildren(JCExpressionStatement jcExpressionStatement) {
+        return mapChildren(def -> {
+            if (def instanceof JCMethodInvocation) {
+                return buildNode((JCMethodInvocation) def);
+            }
+            if (def instanceof JCIdent) {
+                return buildNode((JCIdent) def);
+            }
+            if (def instanceof JCLiteral){
+                return buildNode((JCLiteral)def);
+            }
+            if (def instanceof JCFieldAccess){
+                return buildNode((JCFieldAccess)def);
+            }
+            if (def instanceof JCBinary) {
+                return buildNode((JCBinary) def);
+            }
+            if(def instanceof JCTree.JCUnary) {
+                return buildNode((JCTree.JCUnary)def);
+            }
+            if (def instanceof JCParens) {
+                return buildNode((JCParens) def);
+            }
+            return null;
+        }, Collections.singletonList(jcExpressionStatement.expr));
+    }
+
     private static List<Node> buildChildren(JCTry jcTry) {
         return mapChildren(def -> {
             if (def instanceof JCIdent) {
@@ -396,6 +423,12 @@ public class TreeBuilder {
             }
             if (def instanceof JCParens){
                 return buildNode((JCParens)def);
+            }
+            if (def instanceof JCBinary) {
+                return buildNode((JCBinary) def);
+            }
+            if(def instanceof JCTree.JCUnary) {
+                return buildNode((JCTree.JCUnary)def);
             }
             return null;
         }, Collections.singletonList(jcMethodInvocation.meth), jcMethodInvocation.args);
@@ -546,15 +579,6 @@ public class TreeBuilder {
             }
             return null;
         }, Collections.singletonList(fieldAccess.selected));
-    }
-
-    private static List<Node> buildChildren(JCExpressionStatement expressionStatement) {
-        return mapChildren(def -> {
-            if (def instanceof JCMethodInvocation) {
-                return buildNode((JCMethodInvocation) def);
-            }
-            return null;
-        }, Collections.singletonList(expressionStatement.expr));
     }
 
     private static List<Node> mapChildren(Function<JCTree, Node> mapping, Iterable<? extends JCTree>... childCollections) {
