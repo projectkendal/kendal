@@ -4,18 +4,25 @@ import com.sun.tools.javac.parser.ParserFactory;
 import com.sun.tools.javac.tree.JCTree;
 import com.sun.tools.javac.tree.TreeMaker;
 import com.sun.tools.javac.util.Context;
+import kendal.api.exceptions.KendalRuntimeException;
 import kendal.model.Node;
 import kendal.utils.ForestUtils;
 
+import java.lang.reflect.Array;
+import java.lang.reflect.Field;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.List;
 import java.util.Set;
+
+import static kendal.utils.Utils.with;
 
 public class StringInterpolationUtils {
 
     public static void interpolate(Set<Node> nodes, Context context) {
         ForestUtils.traverse(nodes, node -> {
             if(node.getObject() instanceof JCTree.JCUnary
+                    && node.getObject().getTag().equals(JCTree.Tag.POS) // unary +
                     && ((JCTree.JCUnary) node.getObject()).arg instanceof JCTree.JCLiteral
                     && ((JCTree.JCLiteral) ((JCTree.JCUnary) node.getObject()).arg).value instanceof String) {
 
@@ -29,11 +36,45 @@ public class StringInterpolationUtils {
                     result = TreeMaker.instance(context).Binary(JCTree.Tag.PLUS, result, expressions.get(0));
                     expressions.remove(0);
                 }
-                ((JCTree.JCVariableDecl) node.getParent().getObject()).init = result;
+
+                try {
+                    replaceJCTree(node.getParent().getObject(), node.getObject(), result);
+                } catch (IllegalAccessException e) {
+                    e.printStackTrace();
+                }
             }
         });
     }
 
+
+    private static void replaceJCTree(JCTree parent, JCTree oldNode, JCTree newNode) throws IllegalAccessException {
+        for (Field field : parent.getClass().getFields()) {
+            field.setAccessible(true);
+            Object obj = field.get(parent);
+            if(obj == oldNode) {
+                field.set(parent, newNode);
+                return;
+            }
+            if(obj.getClass().isArray()) {
+                for (int i = 0; i < Array.getLength(obj); i++) {
+                    if(Array.get(obj, i) == oldNode) {
+                        Array.set(obj, i, newNode);
+                        return;
+                    }
+                }
+            } else if(obj instanceof com.sun.tools.javac.util.List) {
+                Object[] array = ((com.sun.tools.javac.util.List) obj).toArray();
+                for (int i = 0; i < array.length; i++) {
+                    if(array[i] == oldNode) {
+                        array[i] = newNode;
+                        field.set(parent, com.sun.tools.javac.util.List.from(array));
+                        return;
+                    }
+                }
+            }
+        }
+        throw new KendalRuntimeException(String.format("Failed to replace child %s of %s", oldNode, parent));
+    }
 
     private static List<String> splitLiteral(String literal) {
         List<String> split = new ArrayList<>();

@@ -3,8 +3,9 @@ package kendal.experiments;
 public class InterpolateTest {
 
     private int field = 17;
+    private Object o = null;
 
-    public void test() {
-        String x = +"field equals ${field}";
+    public String test() {
+        return +"field equals ${field} and wunderbar ${field} $$object=${o}";
     }
 }
