@@ -11,15 +11,21 @@ import kendal.utils.ForestUtils;
 import java.lang.reflect.Array;
 import java.lang.reflect.Field;
 import java.util.ArrayList;
-import java.util.Collection;
 import java.util.List;
 import java.util.Set;
+import java.util.stream.Collectors;
 
-import static kendal.utils.Utils.with;
+public class StringInterpolator {
 
-public class StringInterpolationUtils {
+    private ParserFactory parserFactory;
+    private TreeMaker treeMaker;
 
-    public static void interpolate(Set<Node> nodes, Context context) {
+    public StringInterpolator(Context context) {
+        this.parserFactory = ParserFactory.instance(context);
+        this.treeMaker = TreeMaker.instance(context);
+    }
+
+    public void interpolate(Set<Node> nodes) {
         ForestUtils.traverse(nodes, node -> {
             if(node.getObject() instanceof JCTree.JCUnary
                     && node.getObject().getTag().equals(JCTree.Tag.POS) // unary +
@@ -28,12 +34,12 @@ public class StringInterpolationUtils {
 
                 String literal = (String) ((JCTree.JCLiteral) ((JCTree.JCUnary) node.getObject()).arg).value;
                 List<String> split = splitLiteral(literal);
-                List<JCTree.JCExpression> expressions = buildExpressions(split, context);
+                List<JCTree.JCExpression> expressions = buildExpressions(split);
 
                 JCTree.JCExpression result = expressions.get(0);
                 expressions.remove(0);
                 while (!expressions.isEmpty()) {
-                    result = TreeMaker.instance(context).Binary(JCTree.Tag.PLUS, result, expressions.get(0));
+                    result = treeMaker.Binary(JCTree.Tag.PLUS, result, expressions.get(0));
                     expressions.remove(0);
                 }
 
@@ -51,6 +57,9 @@ public class StringInterpolationUtils {
         for (Field field : parent.getClass().getFields()) {
             field.setAccessible(true);
             Object obj = field.get(parent);
+            if(obj == null) {
+                continue;
+            }
             if(obj == oldNode) {
                 field.set(parent, newNode);
                 return;
@@ -76,7 +85,7 @@ public class StringInterpolationUtils {
         throw new KendalRuntimeException(String.format("Failed to replace child %s of %s", oldNode, parent));
     }
 
-    private static List<String> splitLiteral(String literal) {
+    private List<String> splitLiteral(String literal) {
         List<String> split = new ArrayList<>();
         while (!literal.isEmpty()) {
             int exprStart = literal.indexOf("${");
@@ -93,25 +102,21 @@ public class StringInterpolationUtils {
                 }
             } else {
                 split.add(literal);
-                literal = "";
+                break;
             }
 
         }
         return split;
     }
 
-    private static List<JCTree.JCExpression> buildExpressions(List<String> split, Context context) {
-        List<JCTree.JCExpression> expressions = new ArrayList<>();
-        split.forEach(str -> {
+    private List<JCTree.JCExpression> buildExpressions(List<String> split) {
+        return split.stream().map(str -> {
             if(str.startsWith("${") && str.endsWith("}")) {
                 String expr = str.substring(2, str.length() - 1);
-                JCTree.JCExpression parsed = ParserFactory.instance(context).newParser(expr, false, true, false).parseExpression();
-                expressions.add(parsed);
+                return parserFactory.newParser(expr, false, true, false).parseExpression();
             } else {
-                expressions.add(TreeMaker.instance(context).Literal(str));
+                return treeMaker.Literal(str);
             }
-        });
-
-        return expressions;
+        }).collect(Collectors.toList());
     }
 }

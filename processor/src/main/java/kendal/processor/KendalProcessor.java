@@ -33,7 +33,7 @@ import kendal.api.impl.AstHelperImpl;
 import kendal.model.ForestBuilder;
 import kendal.model.Node;
 import kendal.utils.ForestUtils;
-import kendal.utils.interpolation.StringInterpolationUtils;
+import kendal.utils.interpolation.StringInterpolator;
 
 @SupportedAnnotationTypes("*")
 @SupportedSourceVersion(SourceVersion.RELEASE_8)
@@ -66,7 +66,7 @@ public class KendalProcessor extends AbstractProcessor {
         registerHandlers(handlers);
         executeHandlers(getHandlerAnnotationsMap(handlers, forest));
 
-        StringInterpolationUtils.interpolate(forest, context);
+        new StringInterpolator(context).interpolate(forest);
 
         return false;
     }
