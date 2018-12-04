@@ -33,6 +33,7 @@ import com.sun.tools.javac.tree.JCTree.JCReturn;
 import com.sun.tools.javac.tree.JCTree.JCThrow;
 import com.sun.tools.javac.tree.JCTree.JCTry;
 import com.sun.tools.javac.tree.JCTree.JCTypeUnion;
+import com.sun.tools.javac.tree.JCTree.JCUnary;
 import com.sun.tools.javac.tree.JCTree.JCVariableDecl;
 import com.sun.tools.javac.tree.JCTree.JCWhileLoop;
 
@@ -91,7 +92,7 @@ public class TreeBuilder {
     }
 
     public static Node<JCExpressionStatement> buildNode(JCExpressionStatement jcExpressionStatement) {
-        return new Node<>(jcExpressionStatement);
+        return new Node<>(jcExpressionStatement, buildChildren(jcExpressionStatement));
     }
 
     public static Node<JCMethodInvocation> buildNode(JCMethodInvocation jcMethodInvocation) {
@@ -102,7 +103,7 @@ public class TreeBuilder {
         return new Node<>(jcBinary, buildChildren(jcBinary));
     }
 
-    public static Node<JCTree.JCUnary> buildNode(JCTree.JCUnary jcUnary) {
+    public static Node<JCUnary> buildNode(JCUnary jcUnary) {
         return new Node<>(jcUnary, buildChildren(jcUnary));
     }
 
@@ -242,8 +243,8 @@ public class TreeBuilder {
             if (def instanceof JCBinary) {
                 return buildNode((JCBinary) def);
             }
-            if(def instanceof JCTree.JCUnary) {
-                return buildNode((JCTree.JCUnary)def);
+            if(def instanceof JCUnary) {
+                return buildNode((JCUnary)def);
             }
             if (def instanceof JCParens) {
                 return buildNode((JCParens) def);
@@ -256,42 +257,66 @@ public class TreeBuilder {
     }
 
     private static List<Node> buildChildren(JCWhileLoop loop) {
-        List<Node> children = new ArrayList<>();
-        if (loop.body instanceof JCBlock) {
-            children.add(buildNode((JCBlock) loop.body));
-        }
-        return children;
+        return mapChildren(def -> {
+            if (def instanceof JCParens) {
+                return buildNode((JCParens) def);
+            }
+            if (def instanceof JCBlock) {
+                return buildNode((JCBlock) def);
+            }
+            return null;
+        }, Arrays.asList(loop.body, loop.cond));
     }
 
     private static List<Node> buildChildren(JCDoWhileLoop loop) {
-        List<Node> children = new ArrayList<>();
-        if (loop.body instanceof JCBlock) {
-            children.add(buildNode((JCBlock) loop.body));
-        }
-        return children;
+        return mapChildren(def -> {
+            if (def instanceof JCParens) {
+                return buildNode((JCParens) def);
+            }
+            if (def instanceof JCBlock) {
+                return buildNode((JCBlock) def);
+            }
+            return null;
+        }, Arrays.asList(loop.body, loop.cond));
     }
 
     private static List<Node> buildChildren(JCForLoop loop) {
-        List<Node> children = new ArrayList<>();
-        if (loop.body instanceof JCBlock) {
-            children.add(buildNode((JCBlock) loop.body));
-        }
-        return children;
+        return mapChildren(def -> {
+            if (def instanceof JCVariableDecl) {
+                return buildNode((JCVariableDecl) def);
+            }
+            if (def instanceof JCBinary) {
+                return buildNode((JCBinary) def);
+            }
+            if (def instanceof JCBlock) {
+                return buildNode((JCBlock) def);
+            }
+            if (def instanceof JCExpressionStatement) {
+                return buildNode((JCExpressionStatement) def);
+            }
+            if (def instanceof JCParens) {
+                return buildNode((JCParens) def);
+            }
+            return null;
+        }, Arrays.asList(loop.body, loop.cond), loop.init, loop.step);
     }
 
     private static List<Node> buildChildren(JCEnhancedForLoop loop) {
-        List<Node> children = new ArrayList<>();
-        if (loop.body instanceof JCBlock) {
-            children.add(buildNode((JCBlock) loop.body));
-        }
-        return children;
+        return mapChildren(def -> {
+            if (def instanceof JCBlock) {
+                return buildNode((JCBlock) def);
+            }
+            if (def instanceof JCVariableDecl) {
+                return buildNode((JCVariableDecl) def);
+            }
+            if (def instanceof JCIdent) {
+                return buildNode((JCIdent) def);
+            }
+            return null;
+        }, Arrays.asList(loop.body, loop.var, loop.expr));
     }
 
     private static List<Node> buildChildren(JCTry jcTry) {
-        List<Node> children = new ArrayList<>();
-        children.add(buildNode(jcTry.body));
-        jcTry.catchers.forEach(catcher -> children.add(buildNode(catcher)));
-
         return mapChildren(def -> {
             if (def instanceof JCIdent) {
                 return buildNode((JCIdent) def);
@@ -305,8 +330,8 @@ public class TreeBuilder {
             if (def instanceof JCBinary) {
                 return buildNode((JCBinary) def);
             }
-            if(def instanceof JCTree.JCUnary) {
-                return buildNode((JCTree.JCUnary)def);
+            if(def instanceof JCUnary) {
+                return buildNode((JCUnary)def);
             }
             if (def instanceof JCParens) {
                 return buildNode((JCParens) def);
@@ -338,8 +363,8 @@ public class TreeBuilder {
             if (def instanceof JCBinary) {
                 return buildNode((JCBinary) def);
             }
-            if(def instanceof JCTree.JCUnary) {
-                return buildNode((JCTree.JCUnary)def);
+            if(def instanceof JCUnary) {
+                return buildNode((JCUnary)def);
             }
             if (def instanceof JCParens) {
                 return buildNode((JCParens) def);
@@ -362,6 +387,9 @@ public class TreeBuilder {
             if (def instanceof JCFieldAccess){
                 return buildNode((JCFieldAccess)def);
             }
+            if (def instanceof JCParens){
+                return buildNode((JCParens)def);
+            }
             return null;
         }, Collections.singletonList(jcMethodInvocation.meth), jcMethodInvocation.args);
     }
@@ -380,8 +408,8 @@ public class TreeBuilder {
             if (def instanceof JCBinary) {
                 return buildNode((JCBinary) def);
             }
-            if(def instanceof JCTree.JCUnary) {
-                return buildNode((JCTree.JCUnary)def);
+            if (def instanceof JCUnary) {
+                return buildNode((JCUnary)def);
             }
             if (def instanceof JCParens) {
                 return buildNode((JCParens) def);
@@ -390,7 +418,7 @@ public class TreeBuilder {
         }, Arrays.asList(jcBinary.lhs, jcBinary.rhs));
     }
 
-    private static List<Node> buildChildren(JCTree.JCUnary jcUnary) {
+    private static List<Node> buildChildren(JCUnary jcUnary) {
         return mapChildren(def -> {
             if (def instanceof JCIdent) {
                 return buildNode((JCIdent) def);
@@ -404,8 +432,8 @@ public class TreeBuilder {
             if (def instanceof JCBinary) {
                 return buildNode((JCBinary) def);
             }
-            if(def instanceof JCTree.JCUnary) {
-                return buildNode((JCTree.JCUnary)def);
+            if (def instanceof JCUnary) {
+                return buildNode((JCUnary)def);
             }
             if (def instanceof JCParens) {
                 return buildNode((JCParens) def);
@@ -428,8 +456,8 @@ public class TreeBuilder {
             if (def instanceof JCBinary) {
                 return buildNode((JCBinary) def);
             }
-            if(def instanceof JCTree.JCUnary) {
-                return buildNode((JCTree.JCUnary)def);
+            if (def instanceof JCUnary) {
+                return buildNode((JCUnary)def);
             }
             if (def instanceof JCParens) {
                 return buildNode((JCParens) def);
@@ -479,8 +507,8 @@ public class TreeBuilder {
             if (def instanceof JCBinary) {
                 return buildNode((JCBinary) def);
             }
-            if(def instanceof JCTree.JCUnary) {
-                return buildNode((JCTree.JCUnary)def);
+            if (def instanceof JCUnary) {
+                return buildNode((JCUnary)def);
             }
             if (def instanceof JCParens) {
                 return buildNode((JCParens) def);
@@ -511,6 +539,15 @@ public class TreeBuilder {
             }
             return null;
         }, Collections.singletonList(fieldAccess.selected));
+    }
+
+    private static List<Node> buildChildren(JCExpressionStatement expressionStatement) {
+        return mapChildren(def -> {
+            if (def instanceof JCMethodInvocation) {
+                return buildNode((JCMethodInvocation) def);
+            }
+            return null;
+        }, Collections.singletonList(expressionStatement.expr));
     }
 
     private static List<Node> mapChildren(Function<JCTree, Node> mapping, Iterable<? extends JCTree>... childCollections) {
