@@ -32,6 +32,7 @@ import com.sun.tools.javac.tree.JCTree.JCParens;
 import com.sun.tools.javac.tree.JCTree.JCReturn;
 import com.sun.tools.javac.tree.JCTree.JCThrow;
 import com.sun.tools.javac.tree.JCTree.JCTry;
+import com.sun.tools.javac.tree.JCTree.JCTypeParameter;
 import com.sun.tools.javac.tree.JCTree.JCTypeUnion;
 import com.sun.tools.javac.tree.JCTree.JCUnary;
 import com.sun.tools.javac.tree.JCTree.JCVariableDecl;
@@ -147,8 +148,12 @@ public class TreeBuilder {
         return new Node<>(jcTypeUnion, buildChildren(jcTypeUnion));
     }
 
-    public static Node<JCFieldAccess> buildNode(JCTree.JCFieldAccess jcFieldAccess) {
+    public static Node<JCFieldAccess> buildNode(JCFieldAccess jcFieldAccess) {
         return new Node<>(jcFieldAccess, buildChildren(jcFieldAccess));
+    }
+
+    public static Node<JCTypeParameter> buildNode(JCTypeParameter jcFieldAccess) {
+        return new Node<>(jcFieldAccess);
     }
 
     private static List<Node> buildChildren(JCCompilationUnit compilationUnit) {
@@ -196,8 +201,15 @@ public class TreeBuilder {
             if (def instanceof JCBlock) {
                 return buildNode((JCBlock) def);
             }
+            if (def instanceof JCIdent) {
+                return buildNode((JCIdent) def);
+            }
+            if (def instanceof JCTypeParameter) {
+                return buildNode((JCTypeParameter) def);
+            }
             return null;
-        }, methodDecl.params, methodDecl.mods.annotations, Collections.singletonList(methodDecl.body));
+        }, methodDecl.params, methodDecl.mods.annotations, Collections.singletonList(methodDecl.body), methodDecl.thrown,
+                methodDecl.typarams);
     }
 
     private static List<Node> buildChildren(JCBlock block) {
