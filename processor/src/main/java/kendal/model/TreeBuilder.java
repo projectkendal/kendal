@@ -352,8 +352,8 @@ public class TreeBuilder {
             if (def instanceof JCBinary) {
                 return buildNode((JCBinary) def);
             }
-            if(def instanceof JCTree.JCUnary) {
-                return buildNode((JCTree.JCUnary)def);
+            if (def instanceof JCUnary) {
+                return buildNode((JCUnary)def);
             }
             if (def instanceof JCParens) {
                 return buildNode((JCParens) def);
