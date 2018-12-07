@@ -182,7 +182,7 @@ public class TreeBuilder {
             if (def instanceof JCBlock) {
                 return buildNode((JCBlock) def);
             }
-            if(def instanceof JCAnnotation) {
+            if (def instanceof JCAnnotation) {
                 return buildNode((JCAnnotation) def);
             }
             return null;
@@ -262,13 +262,13 @@ public class TreeBuilder {
             if (def instanceof JCBinary) {
                 return buildNode((JCBinary) def);
             }
-            if(def instanceof JCUnary) {
+            if (def instanceof JCUnary) {
                 return buildNode((JCUnary)def);
             }
             if (def instanceof JCParens) {
                 return buildNode((JCParens) def);
             }
-            if(def instanceof JCAnnotation) {
+            if (def instanceof JCAnnotation) {
                 return buildNode((JCAnnotation)def);
             }
             return null;
@@ -376,7 +376,7 @@ public class TreeBuilder {
             if (def instanceof JCBinary) {
                 return buildNode((JCBinary) def);
             }
-            if(def instanceof JCUnary) {
+            if (def instanceof JCUnary) {
                 return buildNode((JCUnary)def);
             }
             if (def instanceof JCParens) {
@@ -409,11 +409,14 @@ public class TreeBuilder {
             if (def instanceof JCBinary) {
                 return buildNode((JCBinary) def);
             }
-            if(def instanceof JCUnary) {
+            if (def instanceof JCUnary) {
                 return buildNode((JCUnary)def);
             }
             if (def instanceof JCParens) {
                 return buildNode((JCParens) def);
+            }
+            if (def instanceof JCFieldAccess) {
+                return buildNode((JCFieldAccess) def);
             }
             return null;
         }, Collections.singletonList(jcReturn.expr));
@@ -439,13 +442,13 @@ public class TreeBuilder {
             if (def instanceof JCBinary) {
                 return buildNode((JCBinary) def);
             }
-            if(def instanceof JCTree.JCUnary) {
+            if (def instanceof JCTree.JCUnary) {
                 return buildNode((JCTree.JCUnary)def);
             }
             if (def instanceof JCBinary) {
                 return buildNode((JCBinary) def);
             }
-            if(def instanceof JCTree.JCUnary) {
+            if (def instanceof JCTree.JCUnary) {
                 return buildNode((JCTree.JCUnary)def);
             }
             if (def instanceof JCParens) {
