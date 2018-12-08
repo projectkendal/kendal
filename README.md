@@ -20,6 +20,30 @@ This project is a part of a Bachelor's diploma thesis in the field of Computer S
 * Diagrams describing javac: https://drive.google.com/file/d/1XBkKvlFzLuCMnuZSCdfivbncTcyaQW7w/view?usp=sharing
 * Thesis document repository: https://bitbucket.org/ArkadyPL/bsc-thesis
 
+## Testing negative compilation scenarios
+We use [jtreg](https://openjdk.java.net/jtreg/) for testing negative compilation scenarios.
+To set up environment for testing:
+1. Download jtreg from [Downloads page](https://ci.adoptopenjdk.net/view/Dependencies/job/jtreg/)
+2. Set up intellij plugin - [instructions](https://openjdk.java.net/jtreg/intellij-plugin.html)
+3. Set JTREG_HOME environment variable pointing to your jtreg home directory.
+4. Set jtreg home dir in jtreg settings in idea
+
+#### Running tests from terminal
+Execute in kendal root directory:
+```
+make negative-compile-tests
+```
+
+#### Running tests from IDEA
+1. Add jtreg run configuration
+2. Select directory containing TEST.ROOT file as "Directory"
+3. Add options:
+```
+-cpa:handlers/target/classes:processor/target/classes -javacoption:-Xlint:none -workDir tests-negative/target/JTwork -reportDir tests-negative/target/JTreport
+```
+Configuration will run all tests from selected directory.
+
+
 ## License
 
 This project is licensed under the MIT License - see the [MIT License](https://opensource.org/licenses/MIT) for details.
