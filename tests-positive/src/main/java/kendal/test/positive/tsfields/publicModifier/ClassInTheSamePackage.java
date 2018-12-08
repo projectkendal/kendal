@@ -56,7 +56,7 @@ public class ClassInTheSamePackage {
         return new ArrayList<>();
     }
 
-    // ### use methods to make methods look like they are used (yellow color instead of grey)
+    // ### use methods to make methods look like they are used (yellow color instead of grey) ###
     private void useMethods() {
         shouldAccessFieldFromOtherClassInTheSamePackage_primitive_identifier();
         shouldAccessAndModifyFieldFromOtherClassInTheSamePackage_primitive_newClass();

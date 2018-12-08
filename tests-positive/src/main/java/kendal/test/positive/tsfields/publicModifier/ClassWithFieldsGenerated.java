@@ -16,40 +16,40 @@ public class ClassWithFieldsGenerated {
 
     // ### Test cases ###
 
-    private int shouldAccessFieldFromOtherClassInTheSamePackage_primitive_identifier() {
+    private int shouldAccessField_primitive_identifier() {
         return new ClassWithFieldsGenerated(i(), l(), i(), l()).primitiveField;
     }
 
-    private int shouldAccessAndModifyFieldFromOtherClassInTheSamePackage_primitive_newClass() {
+    private int shouldAccessAndModifyField_primitive_newClass() {
         ClassWithFieldsGenerated classWithFieldsGenerated = new ClassWithFieldsGenerated(i(), l(), i(), l());
         classWithFieldsGenerated.primitiveFinalField = i();
         return classWithFieldsGenerated.primitiveField;
     }
 
-    private int shouldAccessFieldFromOtherClassInTheSamePackage_list_identifier() {
+    private int shouldAccessField_list_identifier() {
         return new ClassWithFieldsGenerated(i(), l(), i(), l()).listField.size();
     }
 
-    private int shouldAccessAndModifyFieldFromOtherClassInTheSamePackage_list_newClass() {
+    private int shouldAccessAndModifyField_list_newClass() {
         ClassWithFieldsGenerated classWithFieldsGenerated = new ClassWithFieldsGenerated(i(), l(), i(), l());
         classWithFieldsGenerated.listField = l();
         return classWithFieldsGenerated.listField.size();
     }
 
-    private int shouldAccessFieldFromOtherClassInTheSamePackage_primitiveFinal_identifier() {
+    private int shouldAccessField_primitiveFinal_identifier() {
         return new ClassWithFieldsGenerated(i(), l(), i(), l()).primitiveField;
     }
 
-    private int shouldAccessFieldFromOtherClassInTheSamePackage_primitiveFinal_newClass() {
+    private int shouldAccessField_primitiveFinal_newClass() {
         ClassWithFieldsGenerated classWithFieldsGenerated = new ClassWithFieldsGenerated(i(), l(), i(), l());
         return classWithFieldsGenerated.primitiveField;
     }
 
-    private int shouldAccessFieldFromOtherClassInTheSamePackage_listFinal_identifier() {
+    private int shouldAccessField_listFinal_identifier() {
         return new ClassWithFieldsGenerated(i(), l(), i(), l()).listField.size();
     }
 
-    private int shouldAccessFieldFromOtherClassInTheSamePackage_listFinal_newClass() {
+    private int shouldAccessField_listFinal_newClass() {
         ClassWithFieldsGenerated classWithFieldsGenerated = new ClassWithFieldsGenerated(i(), l(), i(), l());
         return classWithFieldsGenerated.listField.size();
     }
@@ -65,16 +65,16 @@ public class ClassWithFieldsGenerated {
         return new ArrayList<>();
     }
 
-    // ### use methods to make methods look like they are used (yellow color instead of grey)
+    // ### use methods to make methods look like they are used (yellow color instead of grey) ###
     private void useMethods() {
-        shouldAccessFieldFromOtherClassInTheSamePackage_primitive_identifier();
-        shouldAccessAndModifyFieldFromOtherClassInTheSamePackage_primitive_newClass();
-        shouldAccessFieldFromOtherClassInTheSamePackage_list_identifier();
-        shouldAccessAndModifyFieldFromOtherClassInTheSamePackage_list_newClass();
-        shouldAccessFieldFromOtherClassInTheSamePackage_primitiveFinal_identifier();
-        shouldAccessFieldFromOtherClassInTheSamePackage_primitiveFinal_newClass();
-        shouldAccessFieldFromOtherClassInTheSamePackage_listFinal_identifier();
-        shouldAccessFieldFromOtherClassInTheSamePackage_listFinal_newClass();
+        shouldAccessField_primitive_identifier();
+        shouldAccessAndModifyField_primitive_newClass();
+        shouldAccessField_list_identifier();
+        shouldAccessAndModifyField_list_newClass();
+        shouldAccessField_primitiveFinal_identifier();
+        shouldAccessField_primitiveFinal_newClass();
+        shouldAccessField_listFinal_identifier();
+        shouldAccessField_listFinal_newClass();
     }
 
 }
