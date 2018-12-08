@@ -11,7 +11,6 @@ import java.util.stream.Collectors;
 import java.util.stream.StreamSupport;
 
 import javax.annotation.processing.AbstractProcessor;
-import javax.annotation.processing.Messager;
 import javax.annotation.processing.ProcessingEnvironment;
 import javax.annotation.processing.RoundEnvironment;
 import javax.annotation.processing.SupportedAnnotationTypes;
@@ -33,6 +32,7 @@ import kendal.api.impl.AstHelperImpl;
 import kendal.model.ForestBuilder;
 import kendal.model.Node;
 import kendal.utils.ForestUtils;
+import kendal.utils.KendalMessager;
 import kendal.utils.interpolation.StringInterpolator;
 
 @SupportedAnnotationTypes("*")
@@ -42,7 +42,7 @@ public class KendalProcessor extends AbstractProcessor {
     private Context context;
     private Trees trees;
     private ForestBuilder forestBuilder;
-    private Messager messager;
+    private KendalMessager messager;
     private AstHelper astHelper;
 
 
@@ -51,13 +51,14 @@ public class KendalProcessor extends AbstractProcessor {
         JavacProcessingEnvironment javacProcEnv = (JavacProcessingEnvironment) processingEnv;
         context = javacProcEnv.getContext();
         trees = Trees.instance(processingEnv);
-        messager = processingEnv.getMessager();
-        forestBuilder = new ForestBuilder(trees);
+        messager = new KendalMessager(processingEnv.getMessager());
+        forestBuilder = new ForestBuilder(trees, messager);
         astHelper = new AstHelperImpl(context);
         super.init(processingEnv);
     }
 
     public boolean process(Set<? extends TypeElement> annotations, RoundEnvironment roundEnv) {
+        long startTime = System.currentTimeMillis();
         messager.printMessage(Diagnostic.Kind.NOTE, "Processor run!");
         if (roundEnv.getRootElements().isEmpty()) return false;
         if (roundEnv.processingOver()) return false;
@@ -68,10 +69,12 @@ public class KendalProcessor extends AbstractProcessor {
 
         new StringInterpolator(context).interpolate(forest);
 
+        messager.printElapsedTime("Processor", startTime);
         return false;
     }
 
     private Map<KendalHandler, Set<Node>> getHandlerAnnotationsMap(Set<KendalHandler> handlers, Set<Node> forest) {
+        long startTime = System.currentTimeMillis();
         Map<KendalHandler, Set<Node>> result = handlers.stream().collect(Collectors.toMap(Function.identity(), h -> new HashSet<>()));
         ForestUtils.traverse(forest, node -> {
             if(node.getObject() instanceof JCAnnotation) {
@@ -87,6 +90,7 @@ public class KendalProcessor extends AbstractProcessor {
             }
         });
 
+        messager.printElapsedTime("Annotations' scanner", startTime);
         return result;
     }
 
@@ -97,7 +101,7 @@ public class KendalProcessor extends AbstractProcessor {
     }
 
     private void registerHandlers(Set<KendalHandler> handlers) {
-        messager.printMessage(Diagnostic.Kind.NOTE, "### Kendal handles registration ###");
+        messager.printMessage(Diagnostic.Kind.NOTE, "### Handlers' registration ###");
         handlers.forEach(handler ->
             messager.printMessage(Diagnostic.Kind.NOTE,
                     String.format("%s registered as provider for %s", handler.getClass().getName(), handler.getHandledAnnotationType()))
@@ -105,16 +109,16 @@ public class KendalProcessor extends AbstractProcessor {
     }
 
     private void executeHandlers(Map<KendalHandler, Set<Node>> handlersMap) {
-        messager.printMessage(Diagnostic.Kind.NOTE, "### Kendal handles execution ###");
+        messager.printMessage(Diagnostic.Kind.NOTE, "### Handlers' execution ###");
         handlersMap.forEach((handler, nodes) -> {
             try {
+                long startTime = System.currentTimeMillis();
                 handler.handle(nodes, astHelper);
+                messager.printElapsedTime("Handler" + handler.getClass().getName(), startTime);
             } catch (KendalException | KendalRuntimeException e) {
                 messager.printMessage(Diagnostic.Kind.ERROR, e.getMessage());
             }
         });
     }
-
-
 
 }
