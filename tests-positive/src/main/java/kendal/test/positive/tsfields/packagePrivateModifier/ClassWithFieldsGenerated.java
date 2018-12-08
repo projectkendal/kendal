@@ -1,17 +1,17 @@
-package kendal.test.positive.tsfields.privateModifier;
+package kendal.test.positive.tsfields.packagePrivateModifier;
 
 import java.util.ArrayList;
 import java.util.List;
 
-import kendal.annotations.Private;
+import kendal.annotations.PackagePrivate;
 
 @SuppressWarnings("unused")
 class ClassWithFieldsGenerated {
 
-    ClassWithFieldsGenerated(@Private(makeFinal = false) int primitiveField,
-            @Private(makeFinal = false) List<Integer> listField,
-            @Private int primitiveFinalField,
-            @Private List<Integer> listFinalField) { }
+    ClassWithFieldsGenerated(@PackagePrivate(makeFinal = false) int primitiveField,
+            @PackagePrivate(makeFinal = false) List<Integer> listField,
+            @PackagePrivate int primitiveFinalField,
+            @PackagePrivate List<Integer> listFinalField) { }
 
     // ### Test cases ###
 

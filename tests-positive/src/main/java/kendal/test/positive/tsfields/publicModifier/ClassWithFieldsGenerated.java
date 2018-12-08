@@ -8,8 +8,6 @@ import kendal.annotations.Public;
 @SuppressWarnings("unused")
 public class ClassWithFieldsGenerated {
 
-    protected int x;
-
     public ClassWithFieldsGenerated(@Public(makeFinal = false) int primitiveField,
             @Public(makeFinal = false) List<Integer> listField,
             @Public int primitiveFinalField,
