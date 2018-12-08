@@ -6,3 +6,6 @@ prepare-release:
 
 perform-release:
 	mvn release:perform
+
+install:
+	mvn clean install
