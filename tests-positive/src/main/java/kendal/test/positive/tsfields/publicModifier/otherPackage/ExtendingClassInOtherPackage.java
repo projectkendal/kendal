@@ -5,6 +5,7 @@ import java.util.List;
 
 import kendal.test.positive.tsfields.publicModifier.ClassWithFieldsGenerated;
 
+@SuppressWarnings("unused")
 public class ExtendingClassInOtherPackage extends ClassWithFieldsGenerated {
 
     // ### Test cases ###
@@ -21,40 +22,40 @@ public class ExtendingClassInOtherPackage extends ClassWithFieldsGenerated {
         return someNewField;
     } */
 
-    private int shouldAccessFieldFromSuperClassInOtherPackage_primitive_identifier() {
+    private int shouldAccessField_primitive_newClass() {
         return new ClassWithFieldsGenerated(i(), l(), i(), l()).primitiveField;
     }
 
-    private int shouldAccessAndModifyFieldFromSuperClassInOtherPackage_primitive_newClass() {
+    private int shouldAccessAndModifyField_primitive_identifier() {
         ClassWithFieldsGenerated classWithFieldsGenerated = new ClassWithFieldsGenerated(i(), l(), i(), l());
-        classWithFieldsGenerated.primitiveFinalField = i();
+        classWithFieldsGenerated.primitiveField = i();
         return classWithFieldsGenerated.primitiveField;
     }
 
-    private int shouldAccessFieldFromSuperClassInOtherPackage_list_identifier() {
+    private int shouldAccessField_list_newClass() {
         return new ClassWithFieldsGenerated(i(), l(), i(), l()).listField.size();
     }
 
-    private int shouldAccessAndModifyFieldFromSuperClassInOtherPackage_list_newClass() {
+    private int shouldAccessAndModifyField_list_identifier() {
         ClassWithFieldsGenerated classWithFieldsGenerated = new ClassWithFieldsGenerated(i(), l(), i(), l());
         classWithFieldsGenerated.listField = l();
         return classWithFieldsGenerated.listField.size();
     }
 
-    private int shouldAccessFieldFromSuperClassInOtherPackage_primitiveFinal_identifier() {
+    private int shouldAccessField_primitiveFinal_newClass() {
         return new ClassWithFieldsGenerated(i(), l(), i(), l()).primitiveField;
     }
 
-    private int shouldAccessFieldFromSuperClassInOtherPackage_primitiveFinal_newClass() {
+    private int shouldAccessField_primitiveFinal_identifier() {
         ClassWithFieldsGenerated classWithFieldsGenerated = new ClassWithFieldsGenerated(i(), l(), i(), l());
         return classWithFieldsGenerated.primitiveField;
     }
 
-    private int shouldAccessFieldFromSuperClassInOtherPackage_listFinal_identifier() {
+    private int shouldAccessField_listFinal_newClass() {
         return new ClassWithFieldsGenerated(i(), l(), i(), l()).listField.size();
     }
 
-    private int shouldAccessFieldFromSuperClassInOtherPackage_listFinal_newClass() {
+    private int shouldAccessField_listFinal_identifier() {
         ClassWithFieldsGenerated classWithFieldsGenerated = new ClassWithFieldsGenerated(i(), l(), i(), l());
         return classWithFieldsGenerated.listField.size();
     }
@@ -68,18 +69,6 @@ public class ExtendingClassInOtherPackage extends ClassWithFieldsGenerated {
 
     private List<Integer> l() {
         return new ArrayList<>();
-    }
-
-    // ### use methods to make methods look like they are used (yellow color instead of grey) ###
-    private void useMethods() {
-        shouldAccessFieldFromSuperClassInOtherPackage_primitive_identifier();
-        shouldAccessAndModifyFieldFromSuperClassInOtherPackage_primitive_newClass();
-        shouldAccessFieldFromSuperClassInOtherPackage_list_identifier();
-        shouldAccessAndModifyFieldFromSuperClassInOtherPackage_list_newClass();
-        shouldAccessFieldFromSuperClassInOtherPackage_primitiveFinal_identifier();
-        shouldAccessFieldFromSuperClassInOtherPackage_primitiveFinal_newClass();
-        shouldAccessFieldFromSuperClassInOtherPackage_listFinal_identifier();
-        shouldAccessFieldFromSuperClassInOtherPackage_listFinal_newClass();
     }
 
 }
