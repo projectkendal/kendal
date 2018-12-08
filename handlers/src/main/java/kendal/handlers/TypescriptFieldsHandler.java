@@ -71,7 +71,8 @@ public abstract class TypescriptFieldsHandler<T extends Annotation> implements K
             if (!existingField.isAddedByHandler()) {
                 throw new DuplicatedElementsException("Auto generated field was already defined manually in this class!");
             }
-            if (existingField.getObject().getModifiers().flags != newVariable.getObject().getModifiers().flags) {
+            if (existingField.getObject().getModifiers().flags != newVariable.getObject().getModifiers().flags
+                    || !existingField.getObject().vartype.type.equals(newVariable.getObject().vartype.type)) {
                 throw new InvalidAnnotationException(String.format("Auto generated field %s in class %s occurred more than once, with inconsistent definition!",
                         existingField.getObject().name.toString(), clazz.getObject().name.toString()));
             }
