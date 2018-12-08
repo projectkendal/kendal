@@ -3,15 +3,17 @@ package kendal.test.positive.tsfields.protectedModifier;
 import java.util.ArrayList;
 import java.util.List;
 
-import kendal.annotations.Public;
+import kendal.annotations.Protected;
 
 @SuppressWarnings("unused")
 public class ClassWithFieldsGenerated {
 
-    public ClassWithFieldsGenerated(@Public(makeFinal = false) int primitiveField,
-            @Public(makeFinal = false) List<Integer> listField,
-            @Public int primitiveFinalField,
-            @Public List<Integer> listFinalField) { }
+    protected int x;
+
+    public ClassWithFieldsGenerated(@Protected(makeFinal = false) int primitiveField,
+            @Protected(makeFinal = false) List<Integer> listField,
+            @Protected int primitiveFinalField,
+            @Protected List<Integer> listFinalField) { }
 
     // ### Test cases ###
 
