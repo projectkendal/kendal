@@ -18,18 +18,22 @@ import com.sun.tools.javac.util.Context;
 import kendal.api.exceptions.KendalRuntimeException;
 import kendal.model.Node;
 import kendal.utils.ForestUtils;
+import kendal.utils.KendalMessager;
 
 public class StringInterpolator {
 
-    private ParserFactory parserFactory;
-    private TreeMaker treeMaker;
+    private final ParserFactory parserFactory;
+    private final TreeMaker treeMaker;
+    private final KendalMessager messager;
 
-    public StringInterpolator(Context context) {
+    public StringInterpolator(Context context, KendalMessager messager) {
         this.parserFactory = ParserFactory.instance(context);
         this.treeMaker = TreeMaker.instance(context);
+        this.messager = messager;
     }
 
     public void interpolate(Set<Node> nodes) {
+        long startTime = System.currentTimeMillis();
         ForestUtils.traverse(nodes, node -> {
             if (node.getObject() instanceof JCUnary
                     && node.getObject().getTag().equals(JCTree.Tag.POS) // unary +
@@ -54,6 +58,7 @@ public class StringInterpolator {
                 }
             }
         });
+        messager.printElapsedTime("String interpolator", startTime);
     }
 
 

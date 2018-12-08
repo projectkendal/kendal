@@ -67,7 +67,7 @@ public class KendalProcessor extends AbstractProcessor {
         registerHandlers(handlers);
         executeHandlers(getHandlerAnnotationsMap(handlers, forest));
 
-        new StringInterpolator(context).interpolate(forest);
+        new StringInterpolator(context, messager).interpolate(forest);
 
         messager.printElapsedTime("Processor", startTime);
         return false;
