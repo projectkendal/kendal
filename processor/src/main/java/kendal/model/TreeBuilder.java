@@ -1,6 +1,5 @@
 package kendal.model;
 
-import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
@@ -263,13 +262,13 @@ public class TreeBuilder {
                 return buildNode((JCBinary) def);
             }
             if (def instanceof JCUnary) {
-                return buildNode((JCUnary)def);
+                return buildNode((JCUnary) def);
             }
             if (def instanceof JCParens) {
                 return buildNode((JCParens) def);
             }
             if (def instanceof JCAnnotation) {
-                return buildNode((JCAnnotation)def);
+                return buildNode((JCAnnotation) def);
             }
             return null;
         }, Collections.singletonList(variableDecl.init), variableDecl.mods.annotations);
@@ -344,19 +343,22 @@ public class TreeBuilder {
                 return buildNode((JCIdent) def);
             }
             if (def instanceof JCLiteral){
-                return buildNode((JCLiteral)def);
+                return buildNode((JCLiteral) def);
             }
             if (def instanceof JCFieldAccess){
-                return buildNode((JCFieldAccess)def);
+                return buildNode((JCFieldAccess) def);
             }
             if (def instanceof JCBinary) {
                 return buildNode((JCBinary) def);
             }
             if (def instanceof JCUnary) {
-                return buildNode((JCUnary)def);
+                return buildNode((JCUnary) def);
             }
             if (def instanceof JCParens) {
                 return buildNode((JCParens) def);
+            }
+            if (def instanceof JCNewClass) {
+                return buildNode((JCNewClass) def);
             }
             return null;
         }, Collections.singletonList(jcExpressionStatement.expr));
@@ -364,24 +366,6 @@ public class TreeBuilder {
 
     private static List<Node> buildChildren(JCTry jcTry) {
         return mapChildren(def -> {
-            if (def instanceof JCIdent) {
-                return buildNode((JCIdent) def);
-            }
-            if (def instanceof JCLiteral) {
-                return buildNode((JCLiteral) def);
-            }
-            if (def instanceof JCMethodInvocation) {
-                return buildNode((JCMethodInvocation) def);
-            }
-            if (def instanceof JCBinary) {
-                return buildNode((JCBinary) def);
-            }
-            if (def instanceof JCUnary) {
-                return buildNode((JCUnary)def);
-            }
-            if (def instanceof JCParens) {
-                return buildNode((JCParens) def);
-            }
             if (def instanceof JCBlock) {
                 return buildNode((JCBlock) def);
             }
@@ -410,13 +394,16 @@ public class TreeBuilder {
                 return buildNode((JCBinary) def);
             }
             if (def instanceof JCUnary) {
-                return buildNode((JCUnary)def);
+                return buildNode((JCUnary) def);
             }
             if (def instanceof JCParens) {
                 return buildNode((JCParens) def);
             }
             if (def instanceof JCFieldAccess) {
                 return buildNode((JCFieldAccess) def);
+            }
+            if (def instanceof JCNewClass) {
+                return buildNode((JCNewClass) def);
             }
             return null;
         }, Collections.singletonList(jcReturn.expr));
@@ -428,7 +415,7 @@ public class TreeBuilder {
                 return buildNode((JCIdent) def);
             }
             if (def instanceof JCLiteral){
-                return buildNode((JCLiteral)def);
+                return buildNode((JCLiteral) def);
             }
             if (def instanceof JCMethodInvocation) {
                 return buildNode((JCMethodInvocation) def);
@@ -437,13 +424,16 @@ public class TreeBuilder {
                 return buildNode((JCBinary) def);
             }
             if (def instanceof JCUnary) {
-                return buildNode((JCUnary)def);
+                return buildNode((JCUnary) def);
             }
             if (def instanceof JCParens){
-                return buildNode((JCParens)def);
+                return buildNode((JCParens) def);
             }
             if (def instanceof JCFieldAccess){
-                return buildNode((JCFieldAccess)def);
+                return buildNode((JCFieldAccess) def);
+            }
+            if (def instanceof JCNewClass) {
+                return buildNode((JCNewClass) def);
             }
             return null;
         }, Collections.singletonList(jcMethodInvocation.meth), jcMethodInvocation.args);
@@ -464,13 +454,16 @@ public class TreeBuilder {
                 return buildNode((JCBinary) def);
             }
             if (def instanceof JCUnary) {
-                return buildNode((JCUnary)def);
+                return buildNode((JCUnary) def);
             }
             if (def instanceof JCParens) {
                 return buildNode((JCParens) def);
             }
             if (def instanceof JCFieldAccess){
-                return buildNode((JCFieldAccess)def);
+                return buildNode((JCFieldAccess) def);
+            }
+            if (def instanceof JCNewClass){
+                return buildNode((JCNewClass) def);
             }
             return null;
         }, Arrays.asList(jcBinary.lhs, jcBinary.rhs));
@@ -491,16 +484,49 @@ public class TreeBuilder {
                 return buildNode((JCBinary) def);
             }
             if (def instanceof JCUnary) {
-                return buildNode((JCUnary)def);
+                return buildNode((JCUnary) def);
             }
             if (def instanceof JCParens) {
                 return buildNode((JCParens) def);
             }
             if (def instanceof JCFieldAccess){
-                return buildNode((JCFieldAccess)def);
+                return buildNode((JCFieldAccess) def);
+            }
+            if (def instanceof JCNewClass){
+                return buildNode((JCNewClass) def);
             }
             return null;
         }, Collections.singletonList(jcParens.expr));
+    }
+
+    private static List<Node> buildChildren(JCNewClass jcNewClass) {
+        return mapChildren(def -> {
+            if (def instanceof JCIdent) {
+                return buildNode((JCIdent) def);
+            }
+            if (def instanceof JCLiteral) {
+                return buildNode((JCLiteral) def);
+            }
+            if (def instanceof JCMethodInvocation) {
+                return buildNode((JCMethodInvocation) def);
+            }
+            if (def instanceof JCBinary) {
+                return buildNode((JCBinary) def);
+            }
+            if (def instanceof JCUnary) {
+                return buildNode((JCUnary) def);
+            }
+            if (def instanceof JCParens) {
+                return buildNode((JCParens) def);
+            }
+            if (def instanceof JCFieldAccess){
+                return buildNode((JCFieldAccess) def);
+            }
+            if (def instanceof JCNewClass){
+                return buildNode((JCNewClass) def);
+            }
+            return null;
+        }, Collections.singletonList(jcNewClass.clazz), jcNewClass.args);
     }
 
     private static List<Node> buildChildren(JCUnary jcUnary) {
@@ -515,13 +541,16 @@ public class TreeBuilder {
                 return buildNode((JCMethodInvocation) def);
             }
             if (def instanceof JCUnary) {
-                return buildNode((JCUnary)def);
+                return buildNode((JCUnary) def);
             }
             if (def instanceof JCParens) {
                 return buildNode((JCParens) def);
             }
             if (def instanceof JCFieldAccess){
-                return buildNode((JCFieldAccess)def);
+                return buildNode((JCFieldAccess) def);
+            }
+            if (def instanceof JCNewClass){
+                return buildNode((JCNewClass) def);
             }
             return null;
         }, Arrays.asList(jcUnary.arg));
@@ -540,27 +569,36 @@ public class TreeBuilder {
     }
 
     private static List<Node> buildChildren(JCCatch jcCatch) {
-        List<Node> children = new ArrayList<>();
-        children.add(buildNode(jcCatch.body));
-        children.add(buildNode(jcCatch.param));
-        return children;
+        return mapChildren(def -> {
+            if (def instanceof JCBlock) {
+                return buildNode((JCBlock) def);
+            }
+            if (def instanceof JCVariableDecl) {
+                return buildNode((JCVariableDecl) def);
+            }
+            return null;
+        }, Arrays.asList(jcCatch.body, jcCatch.param));
     }
 
     private static List<Node> buildChildren(JCThrow jcThrow) {
-        List<Node> children = new ArrayList<>();
-        if (jcThrow.expr instanceof JCNewClass) {
-            children.add(buildNode((JCNewClass) jcThrow.expr));
-        }
-        return children;
-    }
-
-    private static List<Node> buildChildren(JCNewClass jcNewClass) {
         return mapChildren(def -> {
+            if (def instanceof JCNewClass) {
+                return buildNode((JCNewClass) def);
+            }
             if (def instanceof JCIdent) {
                 return buildNode((JCIdent) def);
             }
+            if (def instanceof JCMethodInvocation) {
+                return buildNode((JCMethodInvocation) def);
+            }
+            if (def instanceof JCFieldAccess) {
+                return buildNode((JCFieldAccess) def);
+            }
+            if (def instanceof JCParens) {
+                return buildNode((JCParens) def);
+            }
             return null;
-        }, Collections.singletonList(jcNewClass.clazz), jcNewClass.args);
+        }, Collections.singletonList(jcThrow.expr));
     }
 
     private static List<Node> buildChildren(JCTypeUnion typeUnion) {
@@ -582,6 +620,12 @@ public class TreeBuilder {
             }
             if (def instanceof JCFieldAccess) {
                 return buildNode((JCFieldAccess) def);
+            }
+            if (def instanceof JCNewClass) {
+                return buildNode((JCNewClass) def);
+            }
+            if (def instanceof JCParens) {
+                return buildNode((JCParens) def);
             }
             return null;
         }, Collections.singletonList(fieldAccess.selected));
