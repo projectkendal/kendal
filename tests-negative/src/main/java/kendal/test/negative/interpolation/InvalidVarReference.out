@@ -1,0 +1,2 @@
+InvalidVarReference.java:1:1: compiler.err.cant.resolve.location: kindname.variable, missingVariable, , , (compiler.misc.location: kindname.class, kendal.test.negative.interpolation.InvalidVarReference, null)
+1 error

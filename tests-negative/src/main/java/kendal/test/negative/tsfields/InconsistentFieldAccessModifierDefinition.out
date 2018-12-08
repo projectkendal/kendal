@@ -1,0 +1,2 @@
+- compiler.err.proc.messager: [Kendal] Auto generated field fieldA in class InconsistentFieldAccessModifierDefinition occurred more than once, with inconsistent definition!
+1 error
