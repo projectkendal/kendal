@@ -20,7 +20,9 @@ This project is a part of a Bachelor's diploma thesis in the field of Computer S
 * Diagrams describing javac: https://drive.google.com/file/d/1XBkKvlFzLuCMnuZSCdfivbncTcyaQW7w/view?usp=sharing
 * Thesis document repository: https://bitbucket.org/ArkadyPL/bsc-thesis
 
-## Testing compilation scenarios
+## Manual
+
+### Testing compilation scenarios
 We use [jtreg](https://openjdk.java.net/jtreg/) for testing negative and positive compilation scenarios.
 To set up environment for testing:
 1. Download jtreg from [Downloads page](https://ci.adoptopenjdk.net/view/Dependencies/job/jtreg/)
