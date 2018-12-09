@@ -10,12 +10,12 @@ import kendal.annotations.Public;
 /*
  * @test
  * @build ClassWithFieldsGenerated
- * @compile SubClass.java
+ * @compile Subclass.java
  */
 @SuppressWarnings("unused")
-public class SubClass extends ClassWithFieldsGenerated {
+public class Subclass extends ClassWithFieldsGenerated {
 
-    SubClass(int superField1, List<Integer> superField2, int superField3, List<Integer> superField4,
+    Subclass(int superField1, List<Integer> superField2, int superField3, List<Integer> superField4,
             @Public int publicField, @Protected List protectedField,
             @PackagePrivate(makeFinal = false) int packagePrivateField, @Private(makeFinal = false) List privateField) {
         super(superField1, superField2, superField3, superField4);

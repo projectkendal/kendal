@@ -15,10 +15,10 @@ import kendal.annotations.Clone;
  * @library /positive/utils/
  * @build ValuesGenerator
  * @build TestTransformer
- * @run testng kendal.test.positive.clone.invokeTransformer.TestInvokeTransformer
+ * @run testng kendal.test.positive.clone.invokeTransformer.CloneInvokingTransformer
  */
 @SuppressWarnings("unused")
-public class TestInvokeTransformer {
+public class CloneInvokingTransformer {
 
     @Clone(transformer = TestTransformer.class, methodName = "newMethod")
     int method(int param1, String param2) {
