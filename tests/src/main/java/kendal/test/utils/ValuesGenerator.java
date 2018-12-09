@@ -1,4 +1,4 @@
-package kendal.test.positive.utils;
+package kendal.test.utils;
 
 import java.util.ArrayList;
 import java.util.List;

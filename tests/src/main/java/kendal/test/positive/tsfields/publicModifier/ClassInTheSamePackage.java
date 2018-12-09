@@ -1,11 +1,11 @@
 package kendal.test.positive.tsfields.publicModifier;
 
-import static kendal.test.positive.utils.ValuesGenerator.i;
-import static kendal.test.positive.utils.ValuesGenerator.l;
+import static kendal.test.utils.ValuesGenerator.i;
+import static kendal.test.utils.ValuesGenerator.l;
 
 /*
  * @test
- * @library /positive/utils/
+ * @library /utils/
  * @library ../
  * @build ValuesGenerator
  * @build ClassWithFieldsGenerated

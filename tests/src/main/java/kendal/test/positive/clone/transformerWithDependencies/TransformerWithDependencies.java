@@ -1,6 +1,6 @@
 package kendal.test.positive.clone.transformerWithDependencies;
 
-import static kendal.test.positive.utils.ValuesGenerator.s;
+import static kendal.test.utils.ValuesGenerator.s;
 
 import java.io.Serializable;
 import java.util.ArrayList;

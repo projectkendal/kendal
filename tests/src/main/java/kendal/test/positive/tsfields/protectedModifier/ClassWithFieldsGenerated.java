@@ -1,7 +1,7 @@
 package kendal.test.positive.tsfields.protectedModifier;
 
-import static kendal.test.positive.utils.ValuesGenerator.i;
-import static kendal.test.positive.utils.ValuesGenerator.l;
+import static kendal.test.utils.ValuesGenerator.i;
+import static kendal.test.utils.ValuesGenerator.l;
 
 import java.util.List;
 
@@ -9,7 +9,7 @@ import kendal.annotations.Protected;
 
 /*
  * @test
- * @library /positive/utils/
+ * @library /utils/
  * @build ValuesGenerator
  * @compile ClassWithFieldsGenerated.java
  */

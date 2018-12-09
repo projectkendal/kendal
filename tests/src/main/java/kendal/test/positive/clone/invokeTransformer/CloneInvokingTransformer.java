@@ -1,7 +1,7 @@
 package kendal.test.positive.clone.invokeTransformer;
 
-import static kendal.test.positive.utils.ValuesGenerator.i;
-import static kendal.test.positive.utils.ValuesGenerator.s;
+import static kendal.test.utils.ValuesGenerator.i;
+import static kendal.test.utils.ValuesGenerator.s;
 import static org.testng.Assert.assertEquals;
 
 import java.util.List;
@@ -12,7 +12,7 @@ import kendal.annotations.Clone;
 
 /*
  * @test
- * @library /positive/utils/
+ * @library /utils/
  * @build ValuesGenerator
  * @build TestTransformer
  * @run testng kendal.test.positive.clone.invokeTransformer.CloneInvokingTransformer

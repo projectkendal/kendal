@@ -1,7 +1,7 @@
 package kendal.test.positive.tsfields.publicModifier.otherPackage;
 
-import static kendal.test.positive.utils.ValuesGenerator.i;
-import static kendal.test.positive.utils.ValuesGenerator.l;
+import static kendal.test.utils.ValuesGenerator.i;
+import static kendal.test.utils.ValuesGenerator.l;
 
 import java.util.List;
 
@@ -9,7 +9,7 @@ import kendal.test.positive.tsfields.publicModifier.ClassWithFieldsGenerated;
 
 /*
  * @test
- * @library /positive/utils/
+ * @library /utils/
  * @library ../
  * @build ValuesGenerator
  * @build ClassWithFieldsGenerated

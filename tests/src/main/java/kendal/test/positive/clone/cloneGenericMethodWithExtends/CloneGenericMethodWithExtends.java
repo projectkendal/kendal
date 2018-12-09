@@ -1,7 +1,7 @@
 package kendal.test.positive.clone.cloneGenericMethodWithExtends;
 
-import static kendal.test.positive.utils.ValuesGenerator.i;
-import static kendal.test.positive.utils.ValuesGenerator.s;
+import static kendal.test.utils.ValuesGenerator.i;
+import static kendal.test.utils.ValuesGenerator.s;
 
 import java.util.Collection;
 import java.util.List;
@@ -10,7 +10,7 @@ import kendal.annotations.Clone;
 
 /*
  * @test
- * @library /positive/utils/
+ * @library /utils/
  * @build ValuesGenerator
  * @build TestTransformer
  * @compile CloneGenericMethodWithExtends.java
