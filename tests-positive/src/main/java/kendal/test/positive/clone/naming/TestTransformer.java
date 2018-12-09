@@ -5,7 +5,7 @@ import java.util.List;
 
 import kendal.annotations.Clone;
 
-public class Transformer implements Clone.Transformer<Integer, List<Integer>> {
+class TestTransformer implements Clone.Transformer<Integer, List<Integer>> {
 
     @Override
     public List<Integer> transform(Integer input) {

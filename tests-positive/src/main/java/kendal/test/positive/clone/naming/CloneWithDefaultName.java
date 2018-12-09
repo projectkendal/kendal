@@ -8,9 +8,9 @@ import java.util.List;
 import kendal.annotations.Clone;
 
 @SuppressWarnings("unused")
-public class CloneWithDefaultName {
+class CloneWithDefaultName {
 
-    @Clone(transformer = Transformer.class)
+    @Clone(transformer = TestTransformer.class)
     int method(int param1, String param2) {
         return param1 + param2.length();
     }
