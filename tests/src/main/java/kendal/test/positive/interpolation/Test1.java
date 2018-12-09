@@ -8,7 +8,6 @@ import static org.testng.Assert.assertEquals;
  * @summary check interpolated strings equality with the expected values
  * @run testng kendal.test.positive.interpolation.Test1
  */
-@Test
 public class Test1 {
     private static final int numberField = 45;
     private final String interpolatedField = +"whatever ${numberField}";
@@ -21,6 +20,7 @@ public class Test1 {
         return value;
     }
 
+    @Test
     public void testValuesEqual() {
         assertEquals(interpolatedField, "whatever 45");
         assertEquals(interpolatedReturn(), "value whatever 45");
