@@ -27,6 +27,8 @@ public class CloneGenericMethodWithExtends {
 
     // ### Compilation - Test cases ###
 
+    /* todo: fix adding field in subclasses
+       todo: task - (https://trello.com/c/bmkauaTx/32-clonebug-clone-does-not-work-with-generic-methods) */
     List<Integer> shouldBeAbleToUseGeneratedMethod() {
         return methodClone(i(), s());
     }
