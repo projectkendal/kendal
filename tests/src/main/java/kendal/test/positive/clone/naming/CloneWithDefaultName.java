@@ -21,6 +21,8 @@ class CloneWithDefaultName {
         return param1 + param2.length();
     }
 
+
+
     // ### Compilation - Test cases ###
 
     List<Integer> shouldBeAbleToUseGeneratedMethod() {

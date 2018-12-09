@@ -21,6 +21,9 @@ public class Subclass extends ClassWithFieldsGenerated {
         super(superField1, superField2, superField3, superField4);
     }
 
+
+    // ### Compilation - Test cases ###
+
     /* todo: fix adding field in subclasses
        todo: task - (https://trello.com/c/yP1LaqL5/36-tsfields-bug-fields-generation-in-subclasses-does-not-work) */
     private int shouldAccessGeneratedField() {
