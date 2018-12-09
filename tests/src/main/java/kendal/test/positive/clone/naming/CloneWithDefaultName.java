@@ -6,7 +6,13 @@ import static kendal.test.positive.utils.ValuesGenerator.s;
 import java.util.List;
 
 import kendal.annotations.Clone;
-
+/*
+ * @test
+ * @library /positive/utils/
+ * @build ValuesGenerator
+ * @build TestTransformer
+ * @compile CloneWithDefaultName.java
+ */
 @SuppressWarnings("unused")
 class CloneWithDefaultName {
 

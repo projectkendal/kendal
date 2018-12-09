@@ -7,6 +7,12 @@ import java.util.List;
 
 import kendal.annotations.PackagePrivate;
 
+/*
+ * @test
+ * @library /positive/utils/
+ * @build ValuesGenerator
+ * @compile ClassWithFieldsGenerated.java
+ */
 @SuppressWarnings("unused")
 class ClassWithFieldsGenerated {
 

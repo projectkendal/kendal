@@ -5,6 +5,14 @@ import static kendal.test.positive.utils.ValuesGenerator.l;
 
 import kendal.test.positive.tsfields.publicModifier.ClassWithFieldsGenerated;
 
+/*
+ * @test
+ * @library /positive/utils/
+ * @library ../
+ * @build ValuesGenerator
+ * @build ClassWithFieldsGenerated
+ * @compile ClassInOtherPackage.java
+ */
 @SuppressWarnings("unused")
 public class ClassInOtherPackage {
 

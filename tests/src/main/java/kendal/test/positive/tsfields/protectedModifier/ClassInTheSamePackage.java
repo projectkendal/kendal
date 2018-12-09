@@ -3,6 +3,13 @@ package kendal.test.positive.tsfields.protectedModifier;
 import static kendal.test.positive.utils.ValuesGenerator.i;
 import static kendal.test.positive.utils.ValuesGenerator.l;
 
+/*
+ * @test
+ * @library /positive/utils/
+ * @build ValuesGenerator
+ * @build ClassWithFieldsGenerated
+ * @compile ClassInTheSamePackage.java
+ */
 @SuppressWarnings("unused")
 public class ClassInTheSamePackage {
 

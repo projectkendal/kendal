@@ -7,6 +7,14 @@ import java.util.List;
 
 import kendal.test.positive.tsfields.protectedModifier.ClassWithFieldsGenerated;
 
+/*
+ * @test
+ * @library /positive/utils/
+ * @library ../
+ * @build ValuesGenerator
+ * @build ClassWithFieldsGenerated
+ * @compile ExtendingClassInOtherPackage.java
+ */
 @SuppressWarnings("unused")
 public class ExtendingClassInOtherPackage extends ClassWithFieldsGenerated {
 

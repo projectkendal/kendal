@@ -7,6 +7,13 @@ import java.util.List;
 
 import kendal.annotations.Clone;
 
+/*
+ * @test
+ * @library /positive/utils/
+ * @build ValuesGenerator
+ * @build TestTransformer
+ * @compile CloneWithLiteralAsName.java
+ */
 @SuppressWarnings("unused")
 class CloneWithLiteralAsName {
 
