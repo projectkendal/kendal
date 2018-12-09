@@ -1,0 +1,2 @@
+- compiler.err.proc.messager: [Kendal] Clone method cannot be created because there already exists a method with such declaration!
+1 error
