@@ -21,7 +21,7 @@ class ClassWithFieldsGenerated {
             @Private int primitiveFinalField,
             @Private List<Integer> listFinalField) { }
 
-    // ### Test cases ###
+    // ### Compilation - Test cases ###
 
     private int shouldAccessField_primitive_viaNewClass() {
         return new ClassWithFieldsGenerated(i(), l(), i(), l()).primitiveField;

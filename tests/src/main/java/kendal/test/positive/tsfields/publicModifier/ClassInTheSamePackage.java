@@ -14,7 +14,7 @@ import static kendal.test.positive.utils.ValuesGenerator.l;
 @SuppressWarnings("unused")
 public class ClassInTheSamePackage {
 
-    // ### Test cases ###
+    // ### Compilation - Test cases ###
 
     private int shouldAccessField_primitive_viaNewClass() {
         return new ClassWithFieldsGenerated(i(), l(), i(), l()).primitiveField;

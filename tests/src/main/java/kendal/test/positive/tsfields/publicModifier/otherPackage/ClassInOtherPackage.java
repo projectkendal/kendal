@@ -16,7 +16,7 @@ import kendal.test.positive.tsfields.publicModifier.ClassWithFieldsGenerated;
 @SuppressWarnings("unused")
 public class ClassInOtherPackage {
 
-    // ### Test cases ###
+    // ### Compilation - Test cases ###
 
     private int shouldAccessField_primitive_viaNewClass() {
         return new ClassWithFieldsGenerated(i(), l(), i(), l()).primitiveField;

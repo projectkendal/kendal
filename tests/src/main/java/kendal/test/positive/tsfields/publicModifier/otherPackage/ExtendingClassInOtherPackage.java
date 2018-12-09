@@ -18,7 +18,7 @@ import kendal.test.positive.tsfields.publicModifier.ClassWithFieldsGenerated;
 @SuppressWarnings("unused")
 public class ExtendingClassInOtherPackage extends ClassWithFieldsGenerated {
 
-    // ### Test cases ###
+    // ### Compilation - Test cases ###
 
     // should generate "someNewField" field
     public ExtendingClassInOtherPackage(int primitiveField, List<Integer> listField, int primitiveFinalField,

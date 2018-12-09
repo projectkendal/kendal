@@ -22,7 +22,7 @@ class CloneWithLiteralAsName {
         return param1 + param2.length();
     }
 
-    // ### Test cases ###
+    // ### Compilation - Test cases ###
 
     List<Integer> shouldBeAbleToUseGeneratedMethod() {
         return newMethod(i(), s());
