@@ -8,6 +8,7 @@ import kendal.annotations.Clone;
  * @build TestTransformer
  * @compile/fail/ref=DefaultMethodSignatureNotUnique.out DefaultMethodSignatureNotUnique.java -XDrawDiagnostics
  */
+@SuppressWarnings("unused")
 public class DefaultMethodSignatureNotUnique {
 
     @Clone(transformer = TestTransformer.class)

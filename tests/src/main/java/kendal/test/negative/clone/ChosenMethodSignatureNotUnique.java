@@ -1,9 +1,9 @@
 package kendal.test.negative.clone;
 
-import kendal.annotations.Clone;
-
 import java.util.ArrayList;
 import java.util.List;
+
+import kendal.annotations.Clone;
 
 /*
  * @test
@@ -11,6 +11,7 @@ import java.util.List;
  * @build TestTransformer
  * @compile/fail/ref=ChosenMethodSignatureNotUnique.out ChosenMethodSignatureNotUnique.java -XDrawDiagnostics
  */
+@SuppressWarnings("unused")
 public class ChosenMethodSignatureNotUnique {
 
     @Clone(transformer = TestTransformer.class, methodName = "youWereTheChosenOne")

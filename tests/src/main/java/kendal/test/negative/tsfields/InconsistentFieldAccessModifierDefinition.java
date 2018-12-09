@@ -1,16 +1,17 @@
 package kendal.test.negative.tsfields;
 
-import kendal.annotations.Private;
-import kendal.annotations.Protected;
-
 import java.util.List;
 import java.util.Map;
+
+import kendal.annotations.Private;
+import kendal.annotations.Protected;
 
 /*
  * @test
  * @summary Redefinition of generated field with different access modifier.
  * @compile/fail/ref=InconsistentFieldAccessModifierDefinition.out InconsistentFieldAccessModifierDefinition.java -XDrawDiagnostics
  */
+@SuppressWarnings("unused")
 public class InconsistentFieldAccessModifierDefinition {
 
     InconsistentFieldAccessModifierDefinition(@Private Integer fieldA) {

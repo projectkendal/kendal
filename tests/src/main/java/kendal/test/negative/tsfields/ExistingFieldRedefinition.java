@@ -9,6 +9,7 @@ import kendal.annotations.Private;
  * We signal an error.
  * @compile/fail/ref=ExistingFieldRedefinition.out ExistingFieldRedefinition.java -XDrawDiagnostics
  */
+@SuppressWarnings("unused")
 public class ExistingFieldRedefinition {
 
     Object field;

@@ -8,6 +8,7 @@ import kendal.annotations.Clone;
  * @build TestTransformer
  * @compile/fail/ref=CloneMethodNameInvalid.out CloneMethodNameInvalid.java
  */
+@SuppressWarnings("unused")
 public class CloneMethodNameInvalid {
 
     @Clone(transformer = TestTransformer.class, methodName = "!#@%@#%@%#")
