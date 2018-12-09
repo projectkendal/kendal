@@ -1,11 +1,19 @@
 package kendal.test.positive.clone.naming;
 
-import static kendal.test.positive.utils.ValuesGenerator.i;
-import static kendal.test.positive.utils.ValuesGenerator.s;
 
 import java.util.List;
 
 import kendal.annotations.Clone;
+import static kendal.test.positive.utils.ValuesGenerator.*;
+import kendal.test.positive.clone.naming.TestTransformer;
+
+/*
+ * @test
+ * @library /positive/utils/
+ * @build ValuesGenerator
+ * @build TestTransformer
+ * @compile CloneWithConstantAsName.java
+ */
 
 @SuppressWarnings("unused")
 class CloneWithConstantAsName {
