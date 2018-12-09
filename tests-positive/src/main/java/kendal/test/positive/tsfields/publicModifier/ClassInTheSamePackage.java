@@ -1,7 +1,7 @@
 package kendal.test.positive.tsfields.publicModifier;
 
-import java.util.ArrayList;
-import java.util.List;
+import static kendal.test.positive.utils.ValuesGenerator.i;
+import static kendal.test.positive.utils.ValuesGenerator.l;
 
 @SuppressWarnings("unused")
 public class ClassInTheSamePackage {
@@ -44,17 +44,6 @@ public class ClassInTheSamePackage {
     private int shouldAccessField_listFinal_viaIdentifier() {
         ClassWithFieldsGenerated classWithFieldsGenerated = new ClassWithFieldsGenerated(i(), l(), i(), l());
         return classWithFieldsGenerated.listField.size();
-    }
-
-
-
-    // ### utils ###
-    private int i() {
-        return 1;
-    }
-
-    private List<Integer> l() {
-        return new ArrayList<>();
     }
 
 }

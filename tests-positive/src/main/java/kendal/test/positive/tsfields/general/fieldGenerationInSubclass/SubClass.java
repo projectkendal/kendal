@@ -2,6 +2,7 @@ package kendal.test.positive.tsfields.general.fieldGenerationInSubclass;
 
 import java.util.List;
 
+@SuppressWarnings("unused")
 public class SubClass extends ClassWithFieldsGenerated {
 
     SubClass(int superField1, List<Integer> superField2, int superField3, List<Integer> superField4/*,

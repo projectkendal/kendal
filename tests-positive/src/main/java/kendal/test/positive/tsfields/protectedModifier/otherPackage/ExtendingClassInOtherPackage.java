@@ -1,6 +1,8 @@
 package kendal.test.positive.tsfields.protectedModifier.otherPackage;
 
-import java.util.ArrayList;
+import static kendal.test.positive.utils.ValuesGenerator.i;
+import static kendal.test.positive.utils.ValuesGenerator.l;
+
 import java.util.List;
 
 import kendal.test.positive.tsfields.protectedModifier.ClassWithFieldsGenerated;
@@ -52,17 +54,6 @@ public class ExtendingClassInOtherPackage extends ClassWithFieldsGenerated {
     private int shouldAccessField_listFinal_viaIdentifier() {
         ExtendingClassInOtherPackage ExtendingClassInOtherPackage = new ExtendingClassInOtherPackage(i(), l(), i(), l());
         return ExtendingClassInOtherPackage.listField.size();
-    }
-
-
-
-    // ### utils ###
-    private int i() {
-        return 1;
-    }
-
-    private List<Integer> l() {
-        return new ArrayList<>();
     }
 
 }

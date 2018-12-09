@@ -1,6 +1,8 @@
 package kendal.test.positive.tsfields.protectedModifier;
 
-import java.util.ArrayList;
+import static kendal.test.positive.utils.ValuesGenerator.i;
+import static kendal.test.positive.utils.ValuesGenerator.l;
+
 import java.util.List;
 
 import kendal.annotations.Protected;
@@ -51,17 +53,6 @@ public class ClassWithFieldsGenerated {
     private int shouldAccessField_listFinal_viaIdentifier() {
         ClassWithFieldsGenerated classWithFieldsGenerated = new ClassWithFieldsGenerated(i(), l(), i(), l());
         return classWithFieldsGenerated.listField.size();
-    }
-
-
-
-    // ### utils ###
-    private int i() {
-        return 1;
-    }
-
-    private List<Integer> l() {
-        return new ArrayList<>();
     }
 
 }
