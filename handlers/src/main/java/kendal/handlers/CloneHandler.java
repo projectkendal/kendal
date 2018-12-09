@@ -9,6 +9,7 @@ import java.util.Objects;
 import java.util.Set;
 import java.util.stream.Collectors;
 
+import javax.lang.model.SourceVersion;
 import javax.lang.model.type.MirroredTypeException;
 import javax.lang.model.type.TypeMirror;
 
@@ -37,6 +38,7 @@ import kendal.api.AstNodeBuilder;
 import kendal.api.AstUtils;
 import kendal.api.KendalHandler;
 import kendal.api.exceptions.DuplicatedElementsException;
+import kendal.api.exceptions.InvalidAnnotationParamsException;
 import kendal.api.exceptions.KendalException;
 import kendal.api.exceptions.KendalRuntimeException;
 import kendal.model.Node;
@@ -69,6 +71,9 @@ public class CloneHandler implements KendalHandler<Clone> {
         Node<JCClassDecl> clazz = (Node<JCClassDecl>) initialMethod.getParent();
         JCMethodDecl m = initialMethod.getObject();
         Name newMethodName = getNewMethodName(m.name.toString(), annotationNode.getParent());
+        if(!SourceVersion.isIdentifier(newMethodName.toString())) {
+            throw new InvalidAnnotationParamsException(String.format("%s is not a valid method identifier!", newMethodName.toString()));
+        }
         validateMethodIsUnique(newMethodName, m.params, clazz);
         Node<JCExpression> transformerClassAccessor = getTransformerClassAccessor(initialMethod);
         Node<JCBlock> newMethodBlock = buildNewMethodBody(initialMethod, transformerClassAccessor);
