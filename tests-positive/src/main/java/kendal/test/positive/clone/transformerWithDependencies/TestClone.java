@@ -7,6 +7,7 @@ import java.util.List;
 
 import kendal.annotations.Clone;
 
+@SuppressWarnings("unused")
 public class TestClone {
 
     @Clone(transformer = TransformerWithDependencies.class, methodName = "newMethod")
