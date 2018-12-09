@@ -12,15 +12,9 @@ public class ExtendingClassInOtherPackage extends ClassWithFieldsGenerated {
 
     // should generate "someNewField" field
     public ExtendingClassInOtherPackage(int primitiveField, List<Integer> listField, int primitiveFinalField,
-            List<Integer> listFinalField/*, @Public boolean someNewField */) {
+            List<Integer> listFinalField) {
         super(primitiveField, listField, primitiveFinalField, listFinalField);
     }
-
-    /* todo: fix adding field in subclasses
-       todo: task - (https://trello.com/c/yP1LaqL5/36-tsfields-bug-fields-generation-in-subclasses-does-not-work)
-    private boolean shouldAccessGeneratedField() {
-        return someNewField;
-    } */
 
     private int shouldAccessField_primitive_viaNewClass() {
         return new ClassWithFieldsGenerated(i(), l(), i(), l()).primitiveField;
