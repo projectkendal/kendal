@@ -36,9 +36,8 @@
         <module>processor</module>
         <module>handlers</module>
         <module>testingProject</module>
-        <module>tests-positive</module>
         <!--excluded from compilation-->
-        <!--<module>tests-negative</module>-->
+        <!--<module>tests</module>-->
     </modules>
 
     <dependencies>
