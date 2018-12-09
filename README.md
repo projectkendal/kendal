@@ -39,7 +39,7 @@ make negative-compile-tests
 2. Select directory containing TEST.ROOT file as "Directory"
 3. Add options:
 ```
--cpa:handlers/target/classes:processor/target/classes -javacoption:-Xlint:none -workDir tests-negative/target/JTwork -reportDir tests-negative/target/JTreport
+-cpa:handlers/target/classes:processor/target/classes -javacoption:-Xlint:none -agentvm -workDir tests-negative/target/JTwork -reportDir tests-negative/target/JTreport
 ```
 Configuration will run all tests from selected directory.
 
