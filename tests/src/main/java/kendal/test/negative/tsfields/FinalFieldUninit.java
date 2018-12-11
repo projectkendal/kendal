@@ -14,4 +14,7 @@ public class FinalFieldUninit {
         this.aFinalField = aFinalField;
     }
 
+    void reassignFinalField() {
+        aFinalField = "sda";
+    }
 }
