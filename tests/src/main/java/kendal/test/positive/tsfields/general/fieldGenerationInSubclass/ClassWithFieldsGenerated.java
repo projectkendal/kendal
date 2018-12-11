@@ -7,10 +7,6 @@ import kendal.annotations.Private;
 import kendal.annotations.Protected;
 import kendal.annotations.Public;
 
-/*
- * @test
- * @compile ClassWithFieldsGenerated.java
- */
 @SuppressWarnings("unused")
 class ClassWithFieldsGenerated {
 
