@@ -1,2 +1,2 @@
-FinalFieldUninit.java:14:13: compiler.err.var.might.already.be.assigned: aFinalField
+FinalFieldUninit.java:17:9: compiler.err.cant.assign.val.to.final.var: aFinalField
 1 error

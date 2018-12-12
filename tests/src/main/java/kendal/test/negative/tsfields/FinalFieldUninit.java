@@ -11,7 +11,6 @@ import kendal.annotations.Private;
 public class FinalFieldUninit {
 
     public FinalFieldUninit(@Private String aFinalField) {
-        this.aFinalField = aFinalField;
     }
 
     void reassignFinalField() {
