@@ -1,10 +1,10 @@
-package kendal.utils.interpolation;
+package kendal.handlers;
 
 import java.lang.reflect.Array;
 import java.lang.reflect.Field;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.List;
-import java.util.Set;
 import java.util.stream.Collectors;
 
 import com.sun.tools.javac.parser.ParserFactory;
@@ -12,28 +12,27 @@ import com.sun.tools.javac.tree.JCTree;
 import com.sun.tools.javac.tree.JCTree.JCExpression;
 import com.sun.tools.javac.tree.JCTree.JCLiteral;
 import com.sun.tools.javac.tree.JCTree.JCUnary;
-import com.sun.tools.javac.tree.TreeMaker;
-import com.sun.tools.javac.util.Context;
 
+import kendal.api.AstHelper;
+import kendal.api.AstNodeBuilder;
+import kendal.api.KendalHandler;
 import kendal.api.exceptions.KendalRuntimeException;
 import kendal.model.Node;
 import kendal.utils.ForestUtils;
-import kendal.utils.KendalMessager;
 
-public class StringInterpolator {
+public class StringInterpolationHandler implements KendalHandler {
 
-    private final ParserFactory parserFactory;
-    private final TreeMaker treeMaker;
-    private final KendalMessager messager;
+    private AstNodeBuilder astNodeBuilder;
+    private ParserFactory parserFactory;
 
-    public StringInterpolator(Context context, KendalMessager messager) {
-        this.parserFactory = ParserFactory.instance(context);
-        this.treeMaker = TreeMaker.instance(context);
-        this.messager = messager;
+    @Override
+    public void handle(Collection annotationNodes, AstHelper helper) {
+        this.astNodeBuilder = helper.getAstNodeBuilder();
+        this.parserFactory = ParserFactory.instance(helper.getContext());
+        interpolate(annotationNodes);
     }
 
-    public void interpolate(Set<Node> nodes) {
-        long startTime = System.currentTimeMillis();
+    private void interpolate(Collection<Node> nodes) {
         ForestUtils.traverse(nodes, node -> {
             if (node.getObject() instanceof JCUnary
                     && node.getObject().getTag().equals(JCTree.Tag.POS) // unary +
@@ -47,7 +46,7 @@ public class StringInterpolator {
                 JCExpression result = expressions.get(0);
                 expressions.remove(0);
                 while (!expressions.isEmpty()) {
-                    result = treeMaker.Binary(JCTree.Tag.PLUS, result, expressions.get(0));
+                    result = astNodeBuilder.buildBinary(JCTree.Tag.PLUS, result, expressions.get(0));
                     expressions.remove(0);
                 }
 
@@ -58,7 +57,6 @@ public class StringInterpolator {
                 }
             }
         });
-        messager.printElapsedTime("String interpolator", startTime);
     }
 
 
@@ -124,8 +122,13 @@ public class StringInterpolator {
                 String expr = str.substring(2, str.length() - 1);
                 return parserFactory.newParser(expr, false, true, false).parseExpression();
             } else {
-                return treeMaker.Literal(str);
+                return astNodeBuilder.buildLiteral(str);
             }
         }).collect(Collectors.toList());
+    }
+
+    @Override
+    public Class getHandledAnnotationType() {
+        return null;
     }
 }

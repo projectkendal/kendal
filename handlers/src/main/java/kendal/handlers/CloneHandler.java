@@ -230,7 +230,7 @@ public class CloneHandler implements KendalHandler<Clone> {
         JCModifiers newModifiers = (JCModifiers) methodDecl.mods.clone();
         // Reset annotations
         newModifiers.annotations = astUtils.toJCList(new ArrayList<>());
-        // todo: add annotations based on @Clone annotation parameter
+        // todo: add annotations based on @Clone annotation parameter https://trello.com/c/ec4NE8Eb/30-clone-add-possibility-to-put-annotations-on-newly-created-method
         return newModifiers;
     }
 

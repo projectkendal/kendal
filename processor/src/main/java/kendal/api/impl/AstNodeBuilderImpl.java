@@ -10,12 +10,14 @@ import java.util.List;
 
 import com.sun.tools.javac.code.Type;
 import com.sun.tools.javac.tree.JCTree;
+import com.sun.tools.javac.tree.JCTree.JCBinary;
 import com.sun.tools.javac.tree.JCTree.JCBlock;
 import com.sun.tools.javac.tree.JCTree.JCCatch;
 import com.sun.tools.javac.tree.JCTree.JCExpression;
 import com.sun.tools.javac.tree.JCTree.JCExpressionStatement;
 import com.sun.tools.javac.tree.JCTree.JCFieldAccess;
 import com.sun.tools.javac.tree.JCTree.JCIdent;
+import com.sun.tools.javac.tree.JCTree.JCLiteral;
 import com.sun.tools.javac.tree.JCTree.JCMethodDecl;
 import com.sun.tools.javac.tree.JCTree.JCMethodInvocation;
 import com.sun.tools.javac.tree.JCTree.JCModifiers;
@@ -235,6 +237,21 @@ public class AstNodeBuilderImpl implements AstNodeBuilder {
     }
 
     @Override
+    public JCExpression buildType(Type type) {
+        return treeMaker.Type(type);
+    }
+
+    @Override
+    public JCBinary buildBinary(JCTree.Tag opcode, JCExpression lhs, JCExpression rhs) {
+        return treeMaker.Binary(opcode, lhs, rhs);
+    }
+
+    @Override
+    public JCLiteral buildLiteral(String value) {
+        return treeMaker.Literal(value);
+    }
+
+    @Override
     public <L extends JCExpression, R extends JCExpression> Node<JCExpressionStatement>
     buildAssignmentStatement(Node<L> lhs, Node<R> rhs) throws ImproperNodeTypeException {
         if (!astValidator.isExpression(lhs) || !astValidator.isExpression(rhs)) {
@@ -244,8 +261,4 @@ public class AstNodeBuilderImpl implements AstNodeBuilder {
         return TreeBuilder.buildNode(jcExpressionStatement);
     }
 
-    @Override
-    public JCExpression buildType(Type type) {
-        return treeMaker.Type(type);
-    }
 }

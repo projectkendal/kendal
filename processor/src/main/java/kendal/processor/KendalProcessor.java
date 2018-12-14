@@ -33,7 +33,6 @@ import kendal.model.ForestBuilder;
 import kendal.model.Node;
 import kendal.utils.ForestUtils;
 import kendal.utils.KendalMessager;
-import kendal.utils.interpolation.StringInterpolator;
 
 @SupportedAnnotationTypes("*")
 @SupportedSourceVersion(SourceVersion.RELEASE_8)
@@ -64,10 +63,8 @@ public class KendalProcessor extends AbstractProcessor {
         if (roundEnv.processingOver()) return false;
         Set<Node> forest = forestBuilder.buildForest(roundEnv.getRootElements());
         Set<KendalHandler> handlers = getHandlersFromSPI();
-        registerHandlers(handlers);
-        executeHandlers(getHandlerAnnotationsMap(handlers, forest));
-
-        new StringInterpolator(context, messager).interpolate(forest);
+        displayRegisteredHandlers(handlers);
+        executeHandlers(getHandlerAnnotationsMap(handlers, forest), forest);
 
         messager.printElapsedTime("Processor", startTime);
         return false;
@@ -79,9 +76,10 @@ public class KendalProcessor extends AbstractProcessor {
         ForestUtils.traverse(forest, node -> {
             if(node.getObject() instanceof JCAnnotation) {
                 handlers.forEach(handler -> {
+                    if (handler.getHandledAnnotationType() == null) return;
                     with((JCAnnotation)node.getObject(), jcAnnotation -> {
                         // TODO This will PROBABLY work, but we have to make sure
-                        if(jcAnnotation.type.tsym.getQualifiedName().contentEquals(handler.getHandledAnnotationType().getName())) {
+                        if (jcAnnotation.type.tsym.getQualifiedName().contentEquals(handler.getHandledAnnotationType().getName())) {
                             result.get(handler).add(node);
                             messager.printMessage(Diagnostic.Kind.NOTE, String.format("annotation %s handled by %s", jcAnnotation.toString(), handler.getClass().getName()));
                         }
@@ -100,20 +98,22 @@ public class KendalProcessor extends AbstractProcessor {
                 .collect(Collectors.toSet());
     }
 
-    private void registerHandlers(Set<KendalHandler> handlers) {
+    private void displayRegisteredHandlers(Set<KendalHandler> handlers) {
         messager.printMessage(Diagnostic.Kind.NOTE, "### Handlers' registration ###");
-        handlers.forEach(handler ->
+        handlers.forEach(handler -> {
+            String target = handler.getHandledAnnotationType() != null ? handler.getHandledAnnotationType().toString() : "all nodes";
             messager.printMessage(Diagnostic.Kind.NOTE,
-                    String.format("%s registered as provider for %s", handler.getClass().getName(), handler.getHandledAnnotationType()))
-        );
+                    String.format("%s registered as provider for %s", handler.getClass().getName(), target));
+        });
     }
 
-    private void executeHandlers(Map<KendalHandler, Set<Node>> handlersMap) {
+    private void executeHandlers(Map<KendalHandler, Set<Node>> handlersMap, Set<Node> forest) {
         messager.printMessage(Diagnostic.Kind.NOTE, "### Handlers' execution ###");
         handlersMap.forEach((handler, nodes) -> {
             try {
                 long startTime = System.currentTimeMillis();
-                handler.handle(nodes, astHelper);
+                if (handler.getHandledAnnotationType() != null) handler.handle(nodes, astHelper);
+                else handler.handle(forest, astHelper);
                 messager.printElapsedTime("Handler" + handler.getClass().getName(), startTime);
             } catch (KendalException | KendalRuntimeException e) {
                 messager.printMessage(Diagnostic.Kind.ERROR, e.getMessage());

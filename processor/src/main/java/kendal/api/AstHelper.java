@@ -7,6 +7,7 @@ import com.sun.tools.javac.tree.JCTree.JCClassDecl;
 import com.sun.tools.javac.tree.JCTree.JCExpressionStatement;
 import com.sun.tools.javac.tree.JCTree.JCMethodDecl;
 import com.sun.tools.javac.tree.JCTree.JCVariableDecl;
+import com.sun.tools.javac.util.Context;
 
 import kendal.api.exceptions.ImproperNodeTypeException;
 import kendal.model.Node;
@@ -24,6 +25,7 @@ public interface AstHelper {
     Node<JCVariableDecl> findFieldByNameAndType(Node<JCClassDecl> classDeclNode, Name name);
 
     // SPECIFIC HELPERS
+    Context getContext();
     AstNodeBuilder getAstNodeBuilder();
     AstValidator getAstValidator();
     AstUtils getAstUtils();

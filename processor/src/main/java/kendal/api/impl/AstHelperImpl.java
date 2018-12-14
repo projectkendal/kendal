@@ -75,6 +75,11 @@ public class AstHelperImpl implements AstHelper {
     }
 
     @Override
+    public Context getContext() {
+        return context;
+    }
+
+    @Override
     public AstNodeBuilder getAstNodeBuilder() {
         return astNodeBuilder;
     }
