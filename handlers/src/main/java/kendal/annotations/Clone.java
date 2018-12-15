@@ -5,6 +5,12 @@ import java.lang.annotation.Target;
 
 import javax.annotation.Generated;
 
+/**
+ * Applied to a method creates new method with name from {@link #methodName()} and list of parameters same as original method.
+ * Generated method calls the original method, passes the result to an instance of {@link #transformer()}
+ * and returns transformed value.
+ * Return type of generated method is extracted from declaration of {@link #transformer()} class.
+ */
 @Target({ElementType.METHOD, ElementType.ANNOTATION_TYPE})
 public @interface Clone {
 
@@ -17,7 +23,11 @@ public @interface Clone {
     //TODO maybe just remove the field and handle it anyway during processing?
     Generated[] onMethod() default {};
 
-    String methodName() default ""; //defaults to original methodName + "^Clone[0-9]*$"
+    /**
+     * Name of the generated method.
+     * Defaults to original method name + "Clone" suffix
+     * */
+    String methodName() default "";
 
     interface Transformer<T,R> {
         R transform(T input);
