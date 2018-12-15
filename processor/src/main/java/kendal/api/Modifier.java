@@ -2,7 +2,7 @@ package kendal.api;
 
 import com.sun.tools.javac.code.Flags;
 
-// TODO - do we even need this enum? Why not just let user pass flags?
+// TODO - do we even need this enum? Why not just let user pass flags? https://trello.com/c/L9EAAH6g/45-consider-kendalapimodifier-class-removal
 public enum Modifier {
     PACKAGE_PRIVATE(0),
     PRIVATE(Flags.PRIVATE),

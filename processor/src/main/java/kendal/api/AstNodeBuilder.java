@@ -59,7 +59,7 @@ public interface AstNodeBuilder {
 
     <T extends JCExpression> Node<JCReturn> buildReturnStatement(Node<T> expression);
 
-    // todo: think if we want to move such similar methods to separate like for example "blockBuilder", etc...
+    // todo: think if we want to move such similar methods to separate like for example "blockBuilder", etc... https://trello.com/c/OGWsNTO0/47-astnodebuilder-consider-split-into-smaller-builders
     <T extends JCStatement> Node<JCBlock> buildBlock(List<Node<T>> statements);
     <T extends JCStatement> Node<JCBlock> buildBlock(Node<T> statement);
     <T extends JCStatement> Node<JCBlock> buildBlock(com.sun.tools.javac.util.List<T> statements);
