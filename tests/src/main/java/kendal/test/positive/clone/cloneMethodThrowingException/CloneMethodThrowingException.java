@@ -9,6 +9,8 @@ import kendal.annotations.Clone;
 
 /*
  * @test
+ * @library /utils/
+ * @build ValuesGenerator
  * @build TestTransformer
  * @compile CloneMethodThrowingException.java
  */
@@ -25,9 +27,7 @@ public class CloneMethodThrowingException {
 
     // ### Compilation - Test cases ###
 
-    /* todo: fix clone method throwing exception
-       todo: task - (https://trello.com/c/6CwfuLUH/46-astnodebuilder-typarams-and-thrown-support) */
-    List<Integer> shouldBeAbleToUseGeneratedMethod() {
+    List<Integer> shouldBeAbleToUseGeneratedMethod() throws Exception {
         return methodClone(i(), s());
     }
 }

@@ -87,16 +87,17 @@ public class AstNodeBuilderImpl implements AstNodeBuilder {
 
     @Override
     public Node<JCMethodDecl> buildMethodDecl(JCModifiers modifiers, Name name, JCExpression resType,
-            com.sun.tools.javac.util.List<JCVariableDecl> params, Node<JCBlock> body) {
-        return buildMethodDecl(modifiers, name, resType, params, body.getObject());
+            com.sun.tools.javac.util.List<JCVariableDecl> params, com.sun.tools.javac.util.List<JCExpression> thrown,
+            Node<JCBlock> body) {
+        return buildMethodDecl(modifiers, name, resType, params, thrown, body.getObject());
     }
 
     @Override
     public Node<JCMethodDecl> buildMethodDecl(JCModifiers jcModifiers, Name name, JCExpression resType,
-            com.sun.tools.javac.util.List<JCVariableDecl> params, JCBlock body) {
+            com.sun.tools.javac.util.List<JCVariableDecl> params, com.sun.tools.javac.util.List<JCExpression> thrown,
+            JCBlock body) {
         // todo: add support for typarams and thrown https://trello.com/c/6CwfuLUH/46-astnodebuilder-typarams-and-thrown-support
         com.sun.tools.javac.util.List<JCTypeParameter> typarams = astUtils.toJCList(new ArrayList<>());
-        com.sun.tools.javac.util.List<JCExpression> thrown = astUtils.toJCList(new ArrayList<>());
         JCMethodDecl jcMethodDecl = treeMaker.MethodDef(jcModifiers, name, resType, typarams, params, thrown,
                 body, null);
         return TreeBuilder.buildNode(jcMethodDecl);

@@ -36,9 +36,11 @@ public interface AstNodeBuilder {
             Node<K> source);
 
     Node<JCMethodDecl> buildMethodDecl(JCModifiers modifiers, Name name, JCExpression resType,
-            com.sun.tools.javac.util.List<JCVariableDecl> params, Node<JCBlock> body);
+            com.sun.tools.javac.util.List<JCVariableDecl> params, com.sun.tools.javac.util.List<JCExpression> thrown,
+            Node<JCBlock> body);
     Node<JCMethodDecl> buildMethodDecl(JCModifiers modifiers, Name name, JCExpression resType,
-            com.sun.tools.javac.util.List<JCVariableDecl> params, JCBlock body);
+            com.sun.tools.javac.util.List<JCVariableDecl> params, com.sun.tools.javac.util.List<JCExpression> thrown,
+            JCBlock body);
 
     <T extends JCExpression>Node<JCMethodInvocation> buildMethodInvocation(Node<T> method);
     <T extends JCExpression, P extends JCExpression> Node<JCMethodInvocation> buildMethodInvocation(Node<T> method,
