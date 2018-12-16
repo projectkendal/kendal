@@ -4,12 +4,15 @@ import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
 
+import kendal.annotations.Public;
+
 public class ExtendingClass extends TestClass implements Serializable {
     public ExtendingClass(int a, List<Integer> b, Object meineFinale) {
         super(a, b, meineFinale);
+        lol = 15;
     }
 
-    public ExtendingClass(Object meineFinale) {
+    public ExtendingClass(Object meineFinale, @Public int lol) {
         super(meineFinale);
     }
 
