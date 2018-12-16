@@ -81,7 +81,7 @@ public class CloneHandler implements KendalHandler<Clone> {
         JCExpression transformerReturnType = getTransformMethodReturnType(initialMethod);
         Node<JCMethodDecl> newMethod = astNodeBuilder.buildMethodDecl(modifiers, newMethodName, transformerReturnType,
                 m.params, newMethodBlock);
-        helper.addElementToClass(clazz, newMethod, Mode.APPEND);
+        helper.addElementToClass(clazz, newMethod, Mode.APPEND, 0);
     }
 
     private Node<JCBlock> buildNewMethodBody(Node<JCMethodDecl> initialMethod, Node<JCExpression> transformerClassAccessor) {

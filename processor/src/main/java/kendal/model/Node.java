@@ -7,6 +7,7 @@ import java.util.stream.Collectors;
 
 import com.sun.tools.javac.tree.JCTree;
 
+import kendal.api.AstHelper;
 import kendal.utils.ForestUtils;
 
 public class Node <T extends JCTree> {
@@ -61,13 +62,11 @@ public class Node <T extends JCTree> {
         return addedByHandler;
     }
 
-    public void addChild(Node newChild) {
-        children.add(newChild);
-        newChild.parent = this;
-    }
-
-    public void addChild(int index, Node newChild) {
-        children.add(index, newChild);
+    public void addChild(Node newChild, AstHelper.Mode mode, int offset) {
+        if (AstHelper.Mode.APPEND.equals(mode)) {
+            offset = this.children.size() - offset;
+        }
+        children.add(offset, newChild);
         newChild.parent = this;
     }
 

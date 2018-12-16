@@ -24,8 +24,6 @@ public class Subclass extends ClassWithFieldsGenerated {
 
     // ### Compilation - Test cases ###
 
-    /* todo: fix adding field in subclasses
-       todo: task - (https://trello.com/c/yP1LaqL5/36-tsfields-bug-fields-generation-in-subclasses-does-not-work) */
     private int shouldAccessGeneratedField() {
         return publicField + protectedField.size() + packagePrivateField + privateField.size();
     }

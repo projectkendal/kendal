@@ -18,9 +18,16 @@ import kendal.model.Node;
  */
 public interface AstHelper {
     // MODIFICATION METHODS
-    <T extends JCTree> void addElementToClass(Node<JCClassDecl> clazz, Node<T> element, Mode mode) throws ImproperNodeTypeException;
+    <T extends JCTree> void addElementToClass(Node<JCClassDecl> clazz, Node<T> element, Mode mode, int offset)
+            throws ImproperNodeTypeException;
     <T extends JCExpressionStatement> void addExpressionStatementToMethod(Node<JCMethodDecl> method,
-            Node<T> expressionStatement, Mode mode) throws ImproperNodeTypeException;
+            Node<T> expressionStatement, Mode mode, int offset);
+    /**
+     * Does the same as {@link AstHelper#addExpressionStatementToMethod(Node, Node, Mode, int)} but takes into account
+     * presence of super() invocation. If present and PREPEND mode is selected, expression statement is added after it.
+     */
+    <T extends JCExpressionStatement> void addExpressionStatementToConstructor(Node<JCMethodDecl> method,
+            Node<T> expressionStatement, Mode mode, int offset) throws ImproperNodeTypeException;
 
     Node<JCVariableDecl> findFieldByNameAndType(Node<JCClassDecl> classDeclNode, Name name);
 

@@ -66,7 +66,7 @@ public abstract class TypescriptFieldsHandler<T extends Annotation> implements K
                 ((JCVariableDecl) annotationNode.getParent().getObject()).vartype, name, annotationNode);
 
         if (existingField == null) {
-            helper.addElementToClass(clazz, newVariable, Mode.APPEND);
+            helper.addElementToClass(clazz, newVariable, Mode.APPEND, 0);
         } else {
             if (!existingField.isAddedByHandler()) {
                 throw new DuplicatedElementsException("Auto generated field was already defined manually in this class!");
@@ -88,7 +88,7 @@ public abstract class TypescriptFieldsHandler<T extends Annotation> implements K
         Node<JCFieldAccess> fieldAccess = astNodeBuilder.buildFieldAccess(objectRef, variable.getObject().name);
         Node<JCIdent> newVariableRef = astNodeBuilder.buildIdentifier(variable.getObject().name);
         Node<JCExpressionStatement> assignment = astNodeBuilder.buildAssignmentStatement(fieldAccess, newVariableRef);
-        helper.addExpressionStatementToMethod(constructor, assignment, Mode.PREPEND);
+        helper.addExpressionStatementToConstructor(constructor, assignment, Mode.PREPEND, 0);
     }
 
     private List<Modifier> getModifiers(boolean finalParamValue) {
