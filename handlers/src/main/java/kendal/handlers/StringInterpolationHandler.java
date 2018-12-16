@@ -127,8 +127,4 @@ public class StringInterpolationHandler implements KendalHandler {
         }).collect(Collectors.toList());
     }
 
-    @Override
-    public Class getHandledAnnotationType() {
-        return null;
-    }
 }

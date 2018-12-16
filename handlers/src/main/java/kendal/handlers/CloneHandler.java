@@ -233,9 +233,4 @@ public class CloneHandler implements KendalHandler<Clone> {
         // todo: add annotations based on @Clone annotation parameter https://trello.com/c/ec4NE8Eb/30-clone-add-possibility-to-put-annotations-on-newly-created-method
         return newModifiers;
     }
-
-    @Override
-    public Class<Clone> getHandledAnnotationType() {
-        return Clone.class;
-    }
 }

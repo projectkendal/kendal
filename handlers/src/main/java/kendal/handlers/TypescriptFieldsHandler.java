@@ -111,10 +111,6 @@ public abstract class TypescriptFieldsHandler<T extends Annotation> implements K
     
     public static class PrivateHandler extends TypescriptFieldsHandler<Private> {
 
-        @Override
-        public Class<Private> getHandledAnnotationType() {
-            return Private.class;
-        }
 
         @Override
         protected boolean getMakeFinalValue(Private annotation) {
@@ -129,10 +125,6 @@ public abstract class TypescriptFieldsHandler<T extends Annotation> implements K
 
     public static class ProtectedHandler extends TypescriptFieldsHandler<Protected> {
 
-        @Override
-        public Class<Protected> getHandledAnnotationType() {
-            return Protected.class;
-        }
 
         @Override
         protected boolean getMakeFinalValue(Protected annotation) {
@@ -148,11 +140,6 @@ public abstract class TypescriptFieldsHandler<T extends Annotation> implements K
     public static class PackagePrivateHandler extends TypescriptFieldsHandler<PackagePrivate> {
 
         @Override
-        public Class<PackagePrivate> getHandledAnnotationType() {
-            return PackagePrivate.class;
-        }
-
-        @Override
         protected boolean getMakeFinalValue(PackagePrivate annotation) {
             return annotation.makeFinal();
         }
@@ -164,11 +151,6 @@ public abstract class TypescriptFieldsHandler<T extends Annotation> implements K
     }
 
     public static class PublicHandler extends TypescriptFieldsHandler<Public> {
-
-        @Override
-        public Class<Public> getHandledAnnotationType() {
-            return Public.class;
-        }
 
         @Override
         protected boolean getMakeFinalValue(Public annotation) {
