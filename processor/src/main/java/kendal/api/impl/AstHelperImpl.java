@@ -2,6 +2,8 @@ package kendal.api.impl;
 
 import static kendal.utils.Utils.with;
 
+import java.lang.reflect.Array;
+import java.lang.reflect.Field;
 import java.util.stream.Collectors;
 import java.util.stream.StreamSupport;
 
@@ -22,6 +24,8 @@ import kendal.api.AstNodeBuilder;
 import kendal.api.AstUtils;
 import kendal.api.AstValidator;
 import kendal.api.exceptions.ImproperNodeTypeException;
+import kendal.api.exceptions.InvalidArgumentException;
+import kendal.api.exceptions.KendalRuntimeException;
 import kendal.model.Node;
 
 public class AstHelperImpl implements AstHelper {
@@ -51,6 +55,51 @@ public class AstHelperImpl implements AstHelper {
         JCTree elementDecl = element.getObject();
         if (mode == Mode.APPEND) classDecl.defs = append(classDecl.defs, elementDecl, 0);
         else classDecl.defs = prepend(classDecl.defs, elementDecl, 0);
+    }
+
+    public void replaceNode(Node<? extends JCTree> parent,
+                            Node<? extends JCTree> oldNode,
+                            Node<? extends JCTree> newNode) {
+        // Update Kendal AST
+        if(!parent.getChildren().remove(oldNode)) {
+            throw new InvalidArgumentException("oldNode does not belong to children collection!");
+        }
+        parent.getChildren().add(newNode);
+
+        // Update javac AST
+        try {
+            for (Field field : parent.getObject().getClass().getFields()) {
+                field.setAccessible(true);
+                Object obj = field.get(parent.getObject());
+                if (obj == null) {
+                    continue;
+                }
+                if (obj == oldNode.getObject()) {
+                    field.set(parent.getObject(), newNode.getObject());
+                    return;
+                }
+                if (obj.getClass().isArray()) {
+                    for (int i = 0; i < Array.getLength(obj); i++) {
+                        if (Array.get(obj, i) == oldNode.getObject()) {
+                            Array.set(obj, i, newNode.getObject());
+                            return;
+                        }
+                    }
+                } else if (obj instanceof com.sun.tools.javac.util.List) {
+                    Object[] array = ((com.sun.tools.javac.util.List) obj).toArray();
+                    for (int i = 0; i < array.length; i++) {
+                        if (array[i] == oldNode.getObject()) {
+                            array[i] = newNode.getObject();
+                            field.set(parent.getObject(), com.sun.tools.javac.util.List.from(array));
+                            return;
+                        }
+                    }
+                }
+            }
+        } catch (IllegalAccessException e) {
+            e.printStackTrace();
+        }
+        throw new KendalRuntimeException(String.format("Failed to replace child %s of %s", oldNode.getObject(), parent.getObject()));
     }
 
     @Override

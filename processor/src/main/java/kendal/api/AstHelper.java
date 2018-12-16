@@ -10,6 +10,7 @@ import com.sun.tools.javac.tree.JCTree.JCVariableDecl;
 import com.sun.tools.javac.util.Context;
 
 import kendal.api.exceptions.ImproperNodeTypeException;
+import kendal.api.exceptions.InvalidArgumentException;
 import kendal.model.Node;
 
 /**
@@ -28,6 +29,10 @@ public interface AstHelper {
      */
     <T extends JCExpressionStatement> void addExpressionStatementToConstructor(Node<JCMethodDecl> method,
             Node<T> expressionStatement, Mode mode, int offset) throws ImproperNodeTypeException;
+
+    void replaceNode(Node<? extends JCTree> parent,
+                     Node<? extends JCTree> oldNode,
+                     Node<? extends JCTree> newNode);
 
     Node<JCVariableDecl> findFieldByNameAndType(Node<JCClassDecl> classDeclNode, Name name);
 

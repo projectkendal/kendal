@@ -18,78 +18,46 @@ import kendal.api.AstNodeBuilder;
 import kendal.api.KendalHandler;
 import kendal.api.exceptions.KendalRuntimeException;
 import kendal.model.Node;
+import kendal.model.TreeBuilder;
 import kendal.utils.ForestUtils;
 
 public class StringInterpolationHandler implements KendalHandler {
 
     private AstNodeBuilder astNodeBuilder;
     private ParserFactory parserFactory;
+    private AstHelper astHelper;
 
     @Override
     public void handle(Collection annotationNodes, AstHelper helper) {
         this.astNodeBuilder = helper.getAstNodeBuilder();
         this.parserFactory = ParserFactory.instance(helper.getContext());
+        this.astHelper = helper;
         interpolate(annotationNodes);
     }
 
     private void interpolate(Collection<Node> nodes) {
+        List<Node<? extends JCTree>> interpolationTargets = new ArrayList<>();
         ForestUtils.traverse(nodes, node -> {
             if (node.getObject() instanceof JCUnary
                     && node.getObject().getTag().equals(JCTree.Tag.POS) // unary +
                     && ((JCUnary) node.getObject()).arg instanceof JCLiteral
                     && ((JCLiteral) ((JCUnary) node.getObject()).arg).value instanceof String) {
-
-                String literal = (String) ((JCLiteral) ((JCUnary) node.getObject()).arg).value;
-                List<String> split = splitLiteral(literal);
-                List<JCExpression> expressions = buildExpressions(split);
-
-                JCExpression result = expressions.get(0);
-                expressions.remove(0);
-                while (!expressions.isEmpty()) {
-                    result = astNodeBuilder.buildBinary(JCTree.Tag.PLUS, result, expressions.get(0));
-                    expressions.remove(0);
-                }
-
-                try {
-                    replaceJCTree(node.getParent().getObject(), node.getObject(), result);
-                } catch (IllegalAccessException e) {
-                    e.printStackTrace();
-                }
+                interpolationTargets.add(node);
             }
         });
-    }
+        interpolationTargets.forEach(node -> {
+            String literal = (String) ((JCLiteral) ((JCUnary) node.getObject()).arg).value;
+            List<String> split = splitLiteral(literal);
+            List<JCExpression> expressions = buildExpressions(split);
 
+            JCExpression result = astNodeBuilder.buildLiteral("");
+            while (!expressions.isEmpty()) {
+                result = astNodeBuilder.buildBinary(JCTree.Tag.PLUS, result, expressions.get(0));
+                expressions.remove(0);
+            }
 
-    private static void replaceJCTree(JCTree parent, JCTree oldNode, JCTree newNode) throws IllegalAccessException {
-        for (Field field : parent.getClass().getFields()) {
-            field.setAccessible(true);
-            Object obj = field.get(parent);
-            if (obj == null) {
-                continue;
-            }
-            if (obj == oldNode) {
-                field.set(parent, newNode);
-                return;
-            }
-            if (obj.getClass().isArray()) {
-                for (int i = 0; i < Array.getLength(obj); i++) {
-                    if (Array.get(obj, i) == oldNode) {
-                        Array.set(obj, i, newNode);
-                        return;
-                    }
-                }
-            } else if (obj instanceof com.sun.tools.javac.util.List) {
-                Object[] array = ((com.sun.tools.javac.util.List) obj).toArray();
-                for (int i = 0; i < array.length; i++) {
-                    if (array[i] == oldNode) {
-                        array[i] = newNode;
-                        field.set(parent, com.sun.tools.javac.util.List.from(array));
-                        return;
-                    }
-                }
-            }
-        }
-        throw new KendalRuntimeException(String.format("Failed to replace child %s of %s", oldNode, parent));
+            astHelper.replaceNode(node.getParent(), node, TreeBuilder.buildNode((JCTree.JCBinary) result));
+        });
     }
 
     private List<String> splitLiteral(String literal) {
