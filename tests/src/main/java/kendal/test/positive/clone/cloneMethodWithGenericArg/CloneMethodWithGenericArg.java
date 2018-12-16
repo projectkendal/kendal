@@ -1,9 +1,8 @@
-package kendal.test.positive.clone.cloneGenericMethodWithExtends;
+package kendal.test.positive.clone.cloneMethodWithGenericArg;
 
 import static kendal.test.utils.ValuesGenerator.i;
 import static kendal.test.utils.ValuesGenerator.s;
 
-import java.util.Collection;
 import java.util.List;
 
 import kendal.annotations.Clone;
@@ -13,22 +12,20 @@ import kendal.annotations.Clone;
  * @library /utils/
  * @build ValuesGenerator
  * @build TestTransformer
- * @compile CloneGenericMethodWithExtends.java
+ * @compile CloneMethodWithGenericArg.java
  */
 @SuppressWarnings("unused")
-public class CloneGenericMethodWithExtends {
+public class CloneMethodWithGenericArg {
 
     @Clone(transformer = TestTransformer.class)
-    <T extends Collection> int method(T param1, String param2) {
-        return param1.size() + param2.length();
+    <T> int method(T param1, String param2) {
+        return param1.toString().length() + param2.length();
     }
 
 
 
     // ### Compilation - Test cases ###
 
-    /* todo: fix clone generic method with extends
-       todo: task - (https://trello.com/c/bmkauaTx/32-clonebug-clone-does-not-work-with-generic-methods) */
     List<Integer> shouldBeAbleToUseGeneratedMethod() {
         return methodClone(i(), s());
     }

@@ -5,7 +5,7 @@ import java.util.List;
 
 public class MainClass {
 
-    public static void main(String[] args) {
+    public static void main(String[] args) throws Exception {
         TestClass testClass = new TestClass(69, new ArrayList<>(), null);
         CloneTest cloneTest = new CloneTest();
         List var = testClass.b;

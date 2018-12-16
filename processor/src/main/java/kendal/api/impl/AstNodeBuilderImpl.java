@@ -2,7 +2,6 @@ package kendal.api.impl;
 
 import static kendal.utils.Utils.map;
 
-import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.LinkedList;
@@ -87,17 +86,17 @@ public class AstNodeBuilderImpl implements AstNodeBuilder {
 
     @Override
     public Node<JCMethodDecl> buildMethodDecl(JCModifiers modifiers, Name name, JCExpression resType,
+            com.sun.tools.javac.util.List<JCTypeParameter> typarams,
             com.sun.tools.javac.util.List<JCVariableDecl> params, com.sun.tools.javac.util.List<JCExpression> thrown,
             Node<JCBlock> body) {
-        return buildMethodDecl(modifiers, name, resType, params, thrown, body.getObject());
+        return buildMethodDecl(modifiers, name, resType, typarams, params, thrown, body.getObject());
     }
 
     @Override
     public Node<JCMethodDecl> buildMethodDecl(JCModifiers jcModifiers, Name name, JCExpression resType,
+            com.sun.tools.javac.util.List<JCTypeParameter> typarams,
             com.sun.tools.javac.util.List<JCVariableDecl> params, com.sun.tools.javac.util.List<JCExpression> thrown,
             JCBlock body) {
-        // todo: add support for typarams and thrown https://trello.com/c/6CwfuLUH/46-astnodebuilder-typarams-and-thrown-support
-        com.sun.tools.javac.util.List<JCTypeParameter> typarams = astUtils.toJCList(new ArrayList<>());
         JCMethodDecl jcMethodDecl = treeMaker.MethodDef(jcModifiers, name, resType, typarams, params, thrown,
                 body, null);
         return TreeBuilder.buildNode(jcMethodDecl);
