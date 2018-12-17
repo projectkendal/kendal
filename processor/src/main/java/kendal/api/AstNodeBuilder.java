@@ -14,13 +14,13 @@ import com.sun.tools.javac.tree.JCTree.JCIdent;
 import com.sun.tools.javac.tree.JCTree.JCLiteral;
 import com.sun.tools.javac.tree.JCTree.JCNewClass;
 import com.sun.tools.javac.tree.JCTree.JCReturn;
-import com.sun.tools.javac.tree.JCTree.JCStatement;
 import com.sun.tools.javac.tree.JCTree.JCThrow;
 import com.sun.tools.javac.tree.JCTree.JCTry;
 import com.sun.tools.javac.tree.JCTree.JCTypeUnion;
 import com.sun.tools.javac.tree.JCTree.JCVariableDecl;
 import com.sun.tools.javac.util.Name;
 
+import kendal.api.builders.BlockBuilder;
 import kendal.api.builders.FieldAccessBuilder;
 import kendal.api.builders.MethodDeclBuilder;
 import kendal.api.builders.MethodInvocationBuilder;
@@ -34,6 +34,7 @@ public interface AstNodeBuilder {
     MethodDeclBuilder methodDecl();
     MethodInvocationBuilder methodInvocation();
     FieldAccessBuilder fieldAccess();
+    BlockBuilder block();
 
     /**
      * Constructs field accessor for more complex expressions (the ones using dots).
@@ -42,11 +43,6 @@ public interface AstNodeBuilder {
     Node<JCExpression> getAccessor(String fullName);
 
     <T extends JCExpression> Node<JCReturn> buildReturnStatement(Node<T> expression);
-
-    // todo: think if we want to move such similar methods to separate like for example "blockBuilder", etc... https://trello.com/c/OGWsNTO0/47-astnodebuilder-consider-split-into-smaller-builders
-    <T extends JCStatement> Node<JCBlock> buildBlock(List<Node<T>> statements);
-    <T extends JCStatement> Node<JCBlock> buildBlock(Node<T> statement);
-    <T extends JCStatement> Node<JCBlock> buildBlock(com.sun.tools.javac.util.List<T> statements);
 
     Node<JCIdent> buildIdentifier(String name);
     Node<JCIdent> buildIdentifier(Name name);

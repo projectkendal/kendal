@@ -45,9 +45,6 @@ import kendal.model.Node;
 
 public class CloneHandler implements KendalHandler<Clone> {
 
-    private static final String TRANSFORM_RETURN_TYPE_NOT_FOUND = "Return type for cloned method is undefined!" +
-     "This should never happen because transformer parameter, extending Clone.Transformer class is required for @Clone annotation!";
-
     private AstNodeBuilder astNodeBuilder;
     private AstUtils astUtils;
 
@@ -88,7 +85,7 @@ public class CloneHandler implements KendalHandler<Clone> {
         Node<JCBlock> tryBody = buildTryBody(initialMethod, transformerClassAccessor);
         Node<JCCatch> catcher = buildCatcher(initialMethod);
         Node<JCTry> tryStatement = astNodeBuilder.buildTry(tryBody, catcher);
-        return astNodeBuilder.buildBlock(tryStatement);
+        return astNodeBuilder.block().build(tryStatement);
     }
 
     /**
@@ -165,7 +162,7 @@ public class CloneHandler implements KendalHandler<Clone> {
         Node<JCMethodInvocation> transformerMethodInvocation = astNodeBuilder.methodInvocation().build(
                 transformFieldAccess, methodInvocation);
         Node<JCReturn> returnStatement = astNodeBuilder.buildReturnStatement(transformerMethodInvocation);
-        return astNodeBuilder.buildBlock(returnStatement);
+        return astNodeBuilder.block().build(returnStatement);
     }
 
     private Node<JCCatch> buildCatcher(Node<JCMethodDecl> initialMethod) {
@@ -187,7 +184,7 @@ public class CloneHandler implements KendalHandler<Clone> {
         Node<JCIdent> clazzIdentifier = astNodeBuilder.buildIdentifier("RuntimeException");
         Node<JCNewClass> newClassStatement = astNodeBuilder.buildNewClass(clazzIdentifier, parameterIdentifier);
         Node<JCThrow> throwStatement = astNodeBuilder.buildThrow(newClassStatement);
-        return astNodeBuilder.buildBlock(throwStatement);
+        return astNodeBuilder.block().build(throwStatement);
     }
 
     private Name getNewMethodName(String originMethodName, Node<JCMethodDecl> newdMethod) {

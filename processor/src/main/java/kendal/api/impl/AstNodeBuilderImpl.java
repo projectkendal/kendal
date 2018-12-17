@@ -15,7 +15,6 @@ import com.sun.tools.javac.tree.JCTree.JCIdent;
 import com.sun.tools.javac.tree.JCTree.JCLiteral;
 import com.sun.tools.javac.tree.JCTree.JCNewClass;
 import com.sun.tools.javac.tree.JCTree.JCReturn;
-import com.sun.tools.javac.tree.JCTree.JCStatement;
 import com.sun.tools.javac.tree.JCTree.JCThrow;
 import com.sun.tools.javac.tree.JCTree.JCTry;
 import com.sun.tools.javac.tree.JCTree.JCTypeUnion;
@@ -27,11 +26,13 @@ import com.sun.tools.javac.util.Name;
 import kendal.api.AstNodeBuilder;
 import kendal.api.AstUtils;
 import kendal.api.AstValidator;
+import kendal.api.builders.BlockBuilder;
 import kendal.api.builders.FieldAccessBuilder;
 import kendal.api.builders.MethodDeclBuilder;
 import kendal.api.builders.MethodInvocationBuilder;
 import kendal.api.builders.VariableDeclBuilder;
 import kendal.api.exceptions.ImproperNodeTypeException;
+import kendal.api.impl.builders.BlockBuilderImpl;
 import kendal.api.impl.builders.FieldAccessBuilderImpl;
 import kendal.api.impl.builders.MethodDeclBuilderImpl;
 import kendal.api.impl.builders.MethodInvocationBuilderImpl;
@@ -50,6 +51,7 @@ public class AstNodeBuilderImpl implements AstNodeBuilder {
     private final MethodDeclBuilder methodDeclBuilder;
     private final MethodInvocationBuilder methodInvocationBuilder;
     private final FieldAccessBuilder fieldAccessBuilder;
+    private final BlockBuilder blockBuilder;
 
     AstNodeBuilderImpl(Context context, AstUtils astUtils, AstValidator astValidator) {
         this.treeMaker = TreeMaker.instance(context);
@@ -61,6 +63,7 @@ public class AstNodeBuilderImpl implements AstNodeBuilder {
         this.methodDeclBuilder = new MethodDeclBuilderImpl(astUtils, treeMaker);
         this.methodInvocationBuilder = new MethodInvocationBuilderImpl(astUtils, treeMaker);
         this.fieldAccessBuilder = new FieldAccessBuilderImpl(astUtils, treeMaker);
+        this.blockBuilder = new BlockBuilderImpl(astUtils, treeMaker);
     }
 
     @Override
@@ -83,6 +86,11 @@ public class AstNodeBuilderImpl implements AstNodeBuilder {
         return fieldAccessBuilder;
     }
 
+    @Override
+    public BlockBuilder block() {
+        return blockBuilder;
+    }
+
     public Node<JCExpression> getAccessor(String fullName) {
         List<String> elements = Arrays.asList(fullName.split("\\."));
 
@@ -98,22 +106,6 @@ public class AstNodeBuilderImpl implements AstNodeBuilder {
     public <T extends JCExpression> Node<JCReturn> buildReturnStatement(Node<T> expression) {
         JCReturn jcReturn = treeMaker.Return(expression.getObject());
         return TreeBuilder.buildNode(jcReturn);
-    }
-
-    @Override
-    public <T extends JCStatement> Node<JCBlock> buildBlock(List<Node<T>> statements) {
-        return buildBlock(astUtils.mapNodesToJCListOfObjects(statements));
-    }
-
-    @Override
-    public <T extends JCStatement> Node<JCBlock> buildBlock(Node<T> statement) {
-        return buildBlock(Collections.singletonList(statement));
-    }
-
-    @Override
-    public <T extends JCStatement> Node<JCBlock> buildBlock(com.sun.tools.javac.util.List<T> statements) {
-        JCBlock jcBlock = treeMaker.Block(0, (com.sun.tools.javac.util.List<JCStatement>) statements);
-        return TreeBuilder.buildNode(jcBlock);
     }
 
     @Override
