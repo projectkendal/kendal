@@ -11,7 +11,10 @@ public class InterpolateTest {
     public static void main(String[] args) {
         System.out.println(+"field + 29 = ${new InterpolateTest().field + 29}");
         System.out.println(+"someNumber + 723 = ${someNumber() + 723}");
+    }
 
+    private static String meth(Object lol) {
+        return lol.toString();
     }
 
     private static int someNumber() {
@@ -31,7 +34,8 @@ public class InterpolateTest {
     }
 
     private boolean methodWithStringArg(String arg) {
-
+        arg.compareToIgnoreCase(+"It will not be equal but whatever... ${interpolated}");
+        meth(+"It will not be equal but whatever... ${interpolated}");
         return arg.equals(+"It will not be equal but whatever... ${interpolated}");
     }
 }

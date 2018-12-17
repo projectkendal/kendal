@@ -16,7 +16,7 @@ public class Test1 {
         return +"value ${interpolatedField}";
     }
 
-    private String identity(String value) {
+    private String identity(boolean i, String value, int l) {
         return value;
     }
 
@@ -24,6 +24,6 @@ public class Test1 {
     public void testValuesEqual() {
         assertEquals(interpolatedField, "whatever 45");
         assertEquals(interpolatedReturn(), "value whatever 45");
-        assertEquals(identity(+"value ${interpolatedField}"), "value whatever 45" );
+        assertEquals(identity(true, +"value ${interpolatedField}", 90), "value whatever 45");
     }
 }
