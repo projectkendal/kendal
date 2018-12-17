@@ -12,7 +12,6 @@ import com.sun.tools.javac.tree.JCTree.JCExpressionStatement;
 import com.sun.tools.javac.tree.JCTree.JCFieldAccess;
 import com.sun.tools.javac.tree.JCTree.JCIdent;
 import com.sun.tools.javac.tree.JCTree.JCLiteral;
-import com.sun.tools.javac.tree.JCTree.JCNewClass;
 import com.sun.tools.javac.tree.JCTree.JCReturn;
 import com.sun.tools.javac.tree.JCTree.JCThrow;
 import com.sun.tools.javac.tree.JCTree.JCTypeUnion;
@@ -23,6 +22,7 @@ import kendal.api.builders.FieldAccessBuilder;
 import kendal.api.builders.IdentifierBuilder;
 import kendal.api.builders.MethodDeclBuilder;
 import kendal.api.builders.MethodInvocationBuilder;
+import kendal.api.builders.NewClassBuilder;
 import kendal.api.builders.TryBuilder;
 import kendal.api.builders.VariableDeclBuilder;
 import kendal.api.exceptions.ImproperNodeTypeException;
@@ -37,6 +37,7 @@ public interface AstNodeBuilder {
     BlockBuilder block();
     IdentifierBuilder identifier();
     TryBuilder tryBlock();
+    NewClassBuilder newClass();
 
     /**
      * Constructs field accessor for more complex expressions (the ones using dots).
@@ -49,9 +50,6 @@ public interface AstNodeBuilder {
     Node<JCCatch> buildCatch(Node<JCVariableDecl> param, Node<JCBlock> body);
 
     <T extends JCExpression> Node<JCThrow> buildThrow(Node<T> expression);
-
-    <T extends JCExpression> Node<JCNewClass> buildNewClass(Node<JCIdent> clazz, Node<T> arg);
-    <T extends JCExpression> Node<JCNewClass> buildNewClass(Node<JCIdent> clazz, List<Node<T>> args);
 
     <T extends JCExpression> Node<JCTypeUnion> buildTypeUnion(List<Node<T>> components);
 

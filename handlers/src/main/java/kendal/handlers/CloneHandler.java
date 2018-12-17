@@ -182,7 +182,7 @@ public class CloneHandler implements KendalHandler<Clone> {
     private Node<JCBlock> buildCatcherBody(String parameterName) {
         Node<JCIdent> parameterIdentifier = astNodeBuilder.identifier().build(parameterName);
         Node<JCIdent> clazzIdentifier = astNodeBuilder.identifier().build("RuntimeException");
-        Node<JCNewClass> newClassStatement = astNodeBuilder.buildNewClass(clazzIdentifier, parameterIdentifier);
+        Node<JCNewClass> newClassStatement = astNodeBuilder.newClass().build(clazzIdentifier, parameterIdentifier);
         Node<JCThrow> throwStatement = astNodeBuilder.buildThrow(newClassStatement);
         return astNodeBuilder.block().build(throwStatement);
     }
