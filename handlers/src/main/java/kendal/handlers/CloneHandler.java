@@ -84,7 +84,7 @@ public class CloneHandler implements KendalHandler<Clone> {
     private Node<JCBlock> buildNewMethodBody(Node<JCMethodDecl> initialMethod, Node<JCExpression> transformerClassAccessor) {
         Node<JCBlock> tryBody = buildTryBody(initialMethod, transformerClassAccessor);
         Node<JCCatch> catcher = buildCatcher(initialMethod);
-        Node<JCTry> tryStatement = astNodeBuilder.buildTry(tryBody, catcher);
+        Node<JCTry> tryStatement = astNodeBuilder.tryBlock().build(tryBody, catcher);
         return astNodeBuilder.block().build(tryStatement);
     }
 
