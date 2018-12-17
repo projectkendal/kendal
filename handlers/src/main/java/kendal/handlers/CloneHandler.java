@@ -156,11 +156,12 @@ public class CloneHandler implements KendalHandler<Clone> {
 
     private Node<JCBlock> buildTryBody(Node<JCMethodDecl> initialMethod, Node<JCExpression> transformerClassAccessor) {
         Node<JCMethodInvocation> methodInvocation = buildInitialMethodInvocation(initialMethod);
-        Node<JCFieldAccess> classFieldAccess = astNodeBuilder.buildFieldAccess(transformerClassAccessor, "class");
-        Node<JCFieldAccess> newInstanceFieldAccess = astNodeBuilder.buildFieldAccess(classFieldAccess, "newInstance");
+        Node<JCFieldAccess> classFieldAccess = astNodeBuilder.fieldAccess().build(transformerClassAccessor, "class");
+        Node<JCFieldAccess> newInstanceFieldAccess = astNodeBuilder.fieldAccess().build(classFieldAccess, "newInstance");
         Node<JCMethodInvocation> transformerNewInstanceMethodInvocation = astNodeBuilder.methodInvocation().build(
                 newInstanceFieldAccess);
-        Node<JCFieldAccess> transformFieldAccess = astNodeBuilder.buildFieldAccess(transformerNewInstanceMethodInvocation, "transform");
+        Node<JCFieldAccess> transformFieldAccess = astNodeBuilder.fieldAccess()
+                .build(transformerNewInstanceMethodInvocation, "transform");
         Node<JCMethodInvocation> transformerMethodInvocation = astNodeBuilder.methodInvocation().build(
                 transformFieldAccess, methodInvocation);
         Node<JCReturn> returnStatement = astNodeBuilder.buildReturnStatement(transformerMethodInvocation);

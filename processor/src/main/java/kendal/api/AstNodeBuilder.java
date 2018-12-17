@@ -21,6 +21,7 @@ import com.sun.tools.javac.tree.JCTree.JCTypeUnion;
 import com.sun.tools.javac.tree.JCTree.JCVariableDecl;
 import com.sun.tools.javac.util.Name;
 
+import kendal.api.builders.FieldAccessBuilder;
 import kendal.api.builders.MethodDeclBuilder;
 import kendal.api.builders.MethodInvocationBuilder;
 import kendal.api.builders.VariableDeclBuilder;
@@ -32,9 +33,7 @@ public interface AstNodeBuilder {
     VariableDeclBuilder variableDecl();
     MethodDeclBuilder methodDecl();
     MethodInvocationBuilder methodInvocation();
-
-    <T extends JCExpression> Node<JCFieldAccess> buildFieldAccess(Node<T> objectRef, String fieldName);
-    <T extends JCExpression> Node<JCFieldAccess> buildFieldAccess(Node<T> objectRef, Name fieldName);
+    FieldAccessBuilder fieldAccess();
 
     /**
      * Constructs field accessor for more complex expressions (the ones using dots).
