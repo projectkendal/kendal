@@ -62,7 +62,7 @@ public abstract class TypescriptFieldsHandler<T extends Annotation> implements K
 
         Node<JCVariableDecl> existingField = helper.findFieldByNameAndType(clazz, name);
 
-        Node<JCVariableDecl> newVariable = astNodeBuilder.buildVariableDecl(modifiers,
+        Node<JCVariableDecl> newVariable = astNodeBuilder.variableDecl().build(modifiers,
                 ((JCVariableDecl) annotationNode.getParent().getObject()).vartype, name, annotationNode);
 
         if (existingField == null) {
@@ -84,9 +84,9 @@ public abstract class TypescriptFieldsHandler<T extends Annotation> implements K
 
     private void addVariableAssignmentStatementToConstructor(Node<JCMethodDecl> constructor, Node<JCVariableDecl> variable)
             throws ImproperNodeTypeException {
-        Node<JCIdent> objectRef = astNodeBuilder.buildIdentifier("this");
-        Node<JCFieldAccess> fieldAccess = astNodeBuilder.buildFieldAccess(objectRef, variable.getObject().name);
-        Node<JCIdent> newVariableRef = astNodeBuilder.buildIdentifier(variable.getObject().name);
+        Node<JCIdent> objectRef = astNodeBuilder.identifier().build("this");
+        Node<JCFieldAccess> fieldAccess = astNodeBuilder.fieldAccess().build(objectRef, variable.getObject().name);
+        Node<JCIdent> newVariableRef = astNodeBuilder.identifier().build(variable.getObject().name);
         Node<JCExpressionStatement> assignment = astNodeBuilder.buildAssignmentStatement(fieldAccess, newVariableRef);
         helper.addExpressionStatementToConstructor(constructor, assignment, Mode.PREPEND, 0);
     }
