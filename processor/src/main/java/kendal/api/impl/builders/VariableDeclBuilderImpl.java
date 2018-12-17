@@ -14,18 +14,18 @@ import com.sun.tools.javac.util.Name;
 
 import kendal.api.AstUtils;
 import kendal.api.Modifier;
-import kendal.api.builders.VariableDecl;
+import kendal.api.builders.VariableDeclBuilder;
 import kendal.model.Node;
 import kendal.model.TreeBuilder;
 
-public class VariableDeclImpl implements VariableDecl {
+public class VariableDeclBuilderImpl implements VariableDeclBuilder {
 
     private static final JCExpression NO_VALUE = null;
 
     private final TreeMaker treeMaker;
     private final AstUtils astUtils;
 
-    public VariableDeclImpl(AstUtils astUtils, TreeMaker treeMaker) {
+    public VariableDeclBuilderImpl(AstUtils astUtils, TreeMaker treeMaker) {
         this.astUtils = astUtils;
         this.treeMaker = treeMaker;
     }

@@ -14,15 +14,12 @@ import com.sun.tools.javac.tree.JCTree.JCExpressionStatement;
 import com.sun.tools.javac.tree.JCTree.JCFieldAccess;
 import com.sun.tools.javac.tree.JCTree.JCIdent;
 import com.sun.tools.javac.tree.JCTree.JCLiteral;
-import com.sun.tools.javac.tree.JCTree.JCMethodDecl;
 import com.sun.tools.javac.tree.JCTree.JCMethodInvocation;
-import com.sun.tools.javac.tree.JCTree.JCModifiers;
 import com.sun.tools.javac.tree.JCTree.JCNewClass;
 import com.sun.tools.javac.tree.JCTree.JCReturn;
 import com.sun.tools.javac.tree.JCTree.JCStatement;
 import com.sun.tools.javac.tree.JCTree.JCThrow;
 import com.sun.tools.javac.tree.JCTree.JCTry;
-import com.sun.tools.javac.tree.JCTree.JCTypeParameter;
 import com.sun.tools.javac.tree.JCTree.JCTypeUnion;
 import com.sun.tools.javac.tree.JCTree.JCVariableDecl;
 import com.sun.tools.javac.tree.TreeMaker;
@@ -32,9 +29,11 @@ import com.sun.tools.javac.util.Name;
 import kendal.api.AstNodeBuilder;
 import kendal.api.AstUtils;
 import kendal.api.AstValidator;
-import kendal.api.builders.VariableDecl;
+import kendal.api.builders.MethodDeclBuilder;
+import kendal.api.builders.VariableDeclBuilder;
 import kendal.api.exceptions.ImproperNodeTypeException;
-import kendal.api.impl.builders.VariableDeclImpl;
+import kendal.api.impl.builders.MethodDeclBuilderImpl;
+import kendal.api.impl.builders.VariableDeclBuilderImpl;
 import kendal.model.Node;
 import kendal.model.TreeBuilder;
 
@@ -45,7 +44,8 @@ public class AstNodeBuilderImpl implements AstNodeBuilder {
     private final AstUtils astUtils;
 
     // builders
-    private final VariableDecl variableDeclBuilder;
+    private final VariableDeclBuilder variableDeclBuilder;
+    private final MethodDeclBuilder methodDeclBuilder;
 
     AstNodeBuilderImpl(Context context, AstUtils astUtils, AstValidator astValidator) {
         this.treeMaker = TreeMaker.instance(context);
@@ -53,30 +53,18 @@ public class AstNodeBuilderImpl implements AstNodeBuilder {
         this.astUtils = astUtils;
 
         // builders
-        this.variableDeclBuilder = new VariableDeclImpl(astUtils, treeMaker);
+        this.variableDeclBuilder = new VariableDeclBuilderImpl(astUtils, treeMaker);
+        this.methodDeclBuilder = new MethodDeclBuilderImpl(astUtils, treeMaker);
     }
 
     @Override
-    public VariableDecl variableDecl() {
+    public VariableDeclBuilder variableDecl() {
         return variableDeclBuilder;
     }
 
     @Override
-    public Node<JCMethodDecl> buildMethodDecl(JCModifiers modifiers, Name name, JCExpression resType,
-            com.sun.tools.javac.util.List<JCTypeParameter> typarams,
-            com.sun.tools.javac.util.List<JCVariableDecl> params, com.sun.tools.javac.util.List<JCExpression> thrown,
-            Node<JCBlock> body) {
-        return buildMethodDecl(modifiers, name, resType, typarams, params, thrown, body.getObject());
-    }
-
-    @Override
-    public Node<JCMethodDecl> buildMethodDecl(JCModifiers jcModifiers, Name name, JCExpression resType,
-            com.sun.tools.javac.util.List<JCTypeParameter> typarams,
-            com.sun.tools.javac.util.List<JCVariableDecl> params, com.sun.tools.javac.util.List<JCExpression> thrown,
-            JCBlock body) {
-        JCMethodDecl jcMethodDecl = treeMaker.MethodDef(jcModifiers, name, resType, typarams, params, thrown,
-                body, null);
-        return TreeBuilder.buildNode(jcMethodDecl);
+    public MethodDeclBuilder methodDecl() {
+        return methodDeclBuilder;
     }
 
     @Override

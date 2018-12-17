@@ -10,7 +10,7 @@ import com.sun.tools.javac.util.Name;
 import kendal.api.Modifier;
 import kendal.model.Node;
 
-public interface VariableDecl {
+public interface VariableDeclBuilder {
     <T extends JCExpression> Node<JCVariableDecl> build(Node<T> type, String name);
 
     <T extends JCExpression> Node<JCVariableDecl> build(Node<T> type, Name name);
