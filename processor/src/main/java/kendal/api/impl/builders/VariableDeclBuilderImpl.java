@@ -18,16 +18,12 @@ import kendal.api.builders.VariableDeclBuilder;
 import kendal.model.Node;
 import kendal.model.TreeBuilder;
 
-public class VariableDeclBuilderImpl implements VariableDeclBuilder {
+public class VariableDeclBuilderImpl extends AbstractBuilder implements VariableDeclBuilder {
 
     private static final JCExpression NO_VALUE = null;
 
-    private final TreeMaker treeMaker;
-    private final AstUtils astUtils;
-
     public VariableDeclBuilderImpl(AstUtils astUtils, TreeMaker treeMaker) {
-        this.astUtils = astUtils;
-        this.treeMaker = treeMaker;
+        super(astUtils, treeMaker);
     }
 
     @Override

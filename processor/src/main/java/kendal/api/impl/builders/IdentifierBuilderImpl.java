@@ -9,14 +9,10 @@ import kendal.api.builders.IdentifierBuilder;
 import kendal.model.Node;
 import kendal.model.TreeBuilder;
 
-public class IdentifierBuilderImpl implements IdentifierBuilder {
-
-    private final AstUtils astUtils;
-    private final TreeMaker treeMaker;
+public class IdentifierBuilderImpl extends AbstractBuilder implements IdentifierBuilder {
 
     public IdentifierBuilderImpl(AstUtils astUtils, TreeMaker treeMaker) {
-        this.astUtils = astUtils;
-        this.treeMaker = treeMaker;
+        super(astUtils, treeMaker);
     }
 
     @Override

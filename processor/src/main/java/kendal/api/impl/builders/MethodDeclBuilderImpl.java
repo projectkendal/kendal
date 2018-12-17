@@ -15,14 +15,10 @@ import kendal.api.builders.MethodDeclBuilder;
 import kendal.model.Node;
 import kendal.model.TreeBuilder;
 
-public class MethodDeclBuilderImpl implements MethodDeclBuilder {
-
-    private final AstUtils astUtils;
-    private final TreeMaker treeMaker;
+public class MethodDeclBuilderImpl extends AbstractBuilder implements MethodDeclBuilder {
 
     public MethodDeclBuilderImpl(AstUtils astUtils, TreeMaker treeMaker) {
-        this.astUtils = astUtils;
-        this.treeMaker = treeMaker;
+        super(astUtils, treeMaker);
     }
 
     @Override

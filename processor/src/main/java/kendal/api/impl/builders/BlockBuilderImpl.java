@@ -12,14 +12,10 @@ import kendal.api.builders.BlockBuilder;
 import kendal.model.Node;
 import kendal.model.TreeBuilder;
 
-public class BlockBuilderImpl implements BlockBuilder {
-
-    private final AstUtils astUtils;
-    private final TreeMaker treeMaker;
+public class BlockBuilderImpl extends AbstractBuilder implements BlockBuilder {
 
     public BlockBuilderImpl(AstUtils astUtils, TreeMaker treeMaker) {
-        this.astUtils = astUtils;
-        this.treeMaker = treeMaker;
+        super(astUtils, treeMaker);
     }
 
     @Override

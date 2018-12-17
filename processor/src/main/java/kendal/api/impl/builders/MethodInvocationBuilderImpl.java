@@ -12,14 +12,10 @@ import kendal.api.builders.MethodInvocationBuilder;
 import kendal.model.Node;
 import kendal.model.TreeBuilder;
 
-public class MethodInvocationBuilderImpl implements MethodInvocationBuilder {
-
-    private final AstUtils astUtils;
-    private final TreeMaker treeMaker;
+public class MethodInvocationBuilderImpl extends AbstractBuilder implements MethodInvocationBuilder {
 
     public MethodInvocationBuilderImpl(AstUtils astUtils, TreeMaker treeMaker) {
-        this.astUtils = astUtils;
-        this.treeMaker = treeMaker;
+        super(astUtils, treeMaker);
     }
 
     @Override

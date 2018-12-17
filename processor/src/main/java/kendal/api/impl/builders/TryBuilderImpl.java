@@ -13,14 +13,10 @@ import kendal.api.builders.TryBuilder;
 import kendal.model.Node;
 import kendal.model.TreeBuilder;
 
-public class TryBuilderImpl implements TryBuilder {
-
-    private final AstUtils astUtils;
-    private final TreeMaker treeMaker;
+public class TryBuilderImpl extends AbstractBuilder implements TryBuilder {
 
     public TryBuilderImpl(AstUtils astUtils, TreeMaker treeMaker) {
-        this.astUtils = astUtils;
-        this.treeMaker = treeMaker;
+        super(astUtils, treeMaker);
     }
 
     @Override

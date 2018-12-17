@@ -11,14 +11,10 @@ import kendal.api.builders.FieldAccessBuilder;
 import kendal.model.Node;
 import kendal.model.TreeBuilder;
 
-public class FieldAccessBuilderImpl implements FieldAccessBuilder {
-
-    private final AstUtils astUtils;
-    private final TreeMaker treeMaker;
+public class FieldAccessBuilderImpl extends AbstractBuilder implements FieldAccessBuilder {
 
     public FieldAccessBuilderImpl(AstUtils astUtils, TreeMaker treeMaker) {
-        this.astUtils = astUtils;
-        this.treeMaker = treeMaker;
+        super(astUtils, treeMaker);
     }
 
     @Override

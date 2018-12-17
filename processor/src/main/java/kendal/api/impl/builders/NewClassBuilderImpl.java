@@ -13,14 +13,10 @@ import kendal.api.builders.NewClassBuilder;
 import kendal.model.Node;
 import kendal.model.TreeBuilder;
 
-public class NewClassBuilderImpl implements NewClassBuilder {
-
-    private final AstUtils astUtils;
-    private final TreeMaker treeMaker;
+public class NewClassBuilderImpl extends AbstractBuilder implements NewClassBuilder {
 
     public NewClassBuilderImpl(AstUtils astUtils, TreeMaker treeMaker) {
-        this.astUtils = astUtils;
-        this.treeMaker = treeMaker;
+        super(astUtils, treeMaker);
     }
 
     @Override
