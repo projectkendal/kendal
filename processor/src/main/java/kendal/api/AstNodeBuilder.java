@@ -12,7 +12,6 @@ import com.sun.tools.javac.tree.JCTree.JCExpressionStatement;
 import com.sun.tools.javac.tree.JCTree.JCFieldAccess;
 import com.sun.tools.javac.tree.JCTree.JCIdent;
 import com.sun.tools.javac.tree.JCTree.JCLiteral;
-import com.sun.tools.javac.tree.JCTree.JCMethodInvocation;
 import com.sun.tools.javac.tree.JCTree.JCNewClass;
 import com.sun.tools.javac.tree.JCTree.JCReturn;
 import com.sun.tools.javac.tree.JCTree.JCStatement;
@@ -23,6 +22,7 @@ import com.sun.tools.javac.tree.JCTree.JCVariableDecl;
 import com.sun.tools.javac.util.Name;
 
 import kendal.api.builders.MethodDeclBuilder;
+import kendal.api.builders.MethodInvocationBuilder;
 import kendal.api.builders.VariableDeclBuilder;
 import kendal.api.exceptions.ImproperNodeTypeException;
 import kendal.model.Node;
@@ -31,14 +31,7 @@ public interface AstNodeBuilder {
 
     VariableDeclBuilder variableDecl();
     MethodDeclBuilder methodDecl();
-
-    <T extends JCExpression>Node<JCMethodInvocation> buildMethodInvocation(Node<T> method);
-    <T extends JCExpression, P extends JCExpression> Node<JCMethodInvocation> buildMethodInvocation(Node<T> method,
-            List<Node<P>> parameters);
-    <T extends JCExpression, P extends JCExpression> Node<JCMethodInvocation> buildMethodInvocation(Node<T> method,
-            Node<P> parameter);
-    <T extends JCExpression, P extends JCExpression> Node<JCMethodInvocation> buildMethodInvocation(Node<T> method,
-            com.sun.tools.javac.util.List<P> parameters);
+    MethodInvocationBuilder methodInvocation();
 
     <T extends JCExpression> Node<JCFieldAccess> buildFieldAccess(Node<T> objectRef, String fieldName);
     <T extends JCExpression> Node<JCFieldAccess> buildFieldAccess(Node<T> objectRef, Name fieldName);

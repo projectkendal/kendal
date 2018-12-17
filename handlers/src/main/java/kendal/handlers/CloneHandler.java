@@ -100,7 +100,7 @@ public class CloneHandler implements KendalHandler<Clone> {
         methodIdentifier.getObject().setType(initialMethod.getObject().getReturnType().type);
         List<Node<JCIdent>> parametersIdentifiers = new LinkedList<>();
         initialMethod.getObject().params.forEach(param -> parametersIdentifiers.add(astNodeBuilder.buildIdentifier(param.name)));
-        return astNodeBuilder.buildMethodInvocation(methodIdentifier, parametersIdentifiers);
+        return astNodeBuilder.methodInvocation().build(methodIdentifier, parametersIdentifiers);
     }
 
     /**
@@ -158,10 +158,10 @@ public class CloneHandler implements KendalHandler<Clone> {
         Node<JCMethodInvocation> methodInvocation = buildInitialMethodInvocation(initialMethod);
         Node<JCFieldAccess> classFieldAccess = astNodeBuilder.buildFieldAccess(transformerClassAccessor, "class");
         Node<JCFieldAccess> newInstanceFieldAccess = astNodeBuilder.buildFieldAccess(classFieldAccess, "newInstance");
-        Node<JCMethodInvocation> transformerNewInstanceMethodInvocation = astNodeBuilder.buildMethodInvocation(
+        Node<JCMethodInvocation> transformerNewInstanceMethodInvocation = astNodeBuilder.methodInvocation().build(
                 newInstanceFieldAccess);
         Node<JCFieldAccess> transformFieldAccess = astNodeBuilder.buildFieldAccess(transformerNewInstanceMethodInvocation, "transform");
-        Node<JCMethodInvocation> transformerMethodInvocation = astNodeBuilder.buildMethodInvocation(
+        Node<JCMethodInvocation> transformerMethodInvocation = astNodeBuilder.methodInvocation().build(
                 transformFieldAccess, methodInvocation);
         Node<JCReturn> returnStatement = astNodeBuilder.buildReturnStatement(transformerMethodInvocation);
         return astNodeBuilder.buildBlock(returnStatement);

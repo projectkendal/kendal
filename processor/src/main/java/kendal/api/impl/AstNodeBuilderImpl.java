@@ -14,7 +14,6 @@ import com.sun.tools.javac.tree.JCTree.JCExpressionStatement;
 import com.sun.tools.javac.tree.JCTree.JCFieldAccess;
 import com.sun.tools.javac.tree.JCTree.JCIdent;
 import com.sun.tools.javac.tree.JCTree.JCLiteral;
-import com.sun.tools.javac.tree.JCTree.JCMethodInvocation;
 import com.sun.tools.javac.tree.JCTree.JCNewClass;
 import com.sun.tools.javac.tree.JCTree.JCReturn;
 import com.sun.tools.javac.tree.JCTree.JCStatement;
@@ -30,9 +29,11 @@ import kendal.api.AstNodeBuilder;
 import kendal.api.AstUtils;
 import kendal.api.AstValidator;
 import kendal.api.builders.MethodDeclBuilder;
+import kendal.api.builders.MethodInvocationBuilder;
 import kendal.api.builders.VariableDeclBuilder;
 import kendal.api.exceptions.ImproperNodeTypeException;
 import kendal.api.impl.builders.MethodDeclBuilderImpl;
+import kendal.api.impl.builders.MethodInvocationBuilderImpl;
 import kendal.api.impl.builders.VariableDeclBuilderImpl;
 import kendal.model.Node;
 import kendal.model.TreeBuilder;
@@ -46,6 +47,7 @@ public class AstNodeBuilderImpl implements AstNodeBuilder {
     // builders
     private final VariableDeclBuilder variableDeclBuilder;
     private final MethodDeclBuilder methodDeclBuilder;
+    private final MethodInvocationBuilder methodInvocationBuilder;
 
     AstNodeBuilderImpl(Context context, AstUtils astUtils, AstValidator astValidator) {
         this.treeMaker = TreeMaker.instance(context);
@@ -55,6 +57,7 @@ public class AstNodeBuilderImpl implements AstNodeBuilder {
         // builders
         this.variableDeclBuilder = new VariableDeclBuilderImpl(astUtils, treeMaker);
         this.methodDeclBuilder = new MethodDeclBuilderImpl(astUtils, treeMaker);
+        this.methodInvocationBuilder = new MethodInvocationBuilderImpl(astUtils, treeMaker);
     }
 
     @Override
@@ -68,33 +71,8 @@ public class AstNodeBuilderImpl implements AstNodeBuilder {
     }
 
     @Override
-    public <T extends JCExpression> Node<JCMethodInvocation> buildMethodInvocation(Node<T> method) {
-        return buildMethodInvocation(method, com.sun.tools.javac.util.List.<JCExpression>nil());
-    }
-
-    @Override
-    public <T extends JCExpression, P extends JCExpression> Node<JCMethodInvocation>
-    buildMethodInvocation(Node<T> method, List<Node<P>> parameters) {
-        return buildMethodInvocation(method, astUtils.mapNodesToJCListOfObjects(parameters));
-    }
-
-    @Override
-    public <T extends JCExpression, P extends JCExpression> Node<JCMethodInvocation> buildMethodInvocation(
-            Node<T> method, Node<P> parameter) {
-        return buildMethodInvocation(method, Collections.singletonList(parameter));
-    }
-
-    @Override
-    public <T extends JCExpression, P extends JCExpression> Node<JCMethodInvocation> buildMethodInvocation(Node<T> method,
-            com.sun.tools.javac.util.List<P> parameters) {
-        try {
-            JCMethodInvocation jcMethodInvocation = treeMaker.App(method.getObject(),
-                    (com.sun.tools.javac.util.List<JCExpression>) parameters);
-            return TreeBuilder.buildNode(jcMethodInvocation);
-        } catch (RuntimeException ex) {
-            ex.printStackTrace();
-            throw ex;
-        }
+    public MethodInvocationBuilder methodInvocation() {
+        return methodInvocationBuilder;
     }
 
     @Override
