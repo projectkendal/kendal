@@ -178,7 +178,7 @@ public class CloneHandler implements KendalHandler<Clone> {
         Node<JCIdent> type1 = astNodeBuilder.buildIdentifier("InstantiationException");
         Node<JCIdent> type2 = astNodeBuilder.buildIdentifier("IllegalAccessException");
         Node<JCTypeUnion> typeUnion = astNodeBuilder.buildTypeUnion(Arrays.asList(type1, type2));
-        return astNodeBuilder.buildVariableDecl(typeUnion, parameterName, initialMethod);
+        return astNodeBuilder.variableDecl().build(typeUnion, parameterName, initialMethod);
     }
 
     private Node<JCBlock> buildCatcherBody(String parameterName) {

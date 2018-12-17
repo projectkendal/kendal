@@ -24,16 +24,13 @@ import com.sun.tools.javac.tree.JCTree.JCTypeUnion;
 import com.sun.tools.javac.tree.JCTree.JCVariableDecl;
 import com.sun.tools.javac.util.Name;
 
+import kendal.api.builders.VariableDecl;
 import kendal.api.exceptions.ImproperNodeTypeException;
 import kendal.model.Node;
 
 public interface AstNodeBuilder {
 
-    <T extends JCExpression> Node<JCVariableDecl> buildVariableDecl(Node<T> type, String name);
-    <T extends JCExpression> Node<JCVariableDecl> buildVariableDecl(Node<T> type, Name name);
-    <T extends JCExpression, K extends JCTree> Node<JCVariableDecl> buildVariableDecl(Node<T> type, String name, Node<K> source);
-    <T extends JCExpression, K extends JCTree> Node<JCVariableDecl> buildVariableDecl(List<Modifier> modifiers, T type, Name name,
-            Node<K> source);
+    VariableDecl variableDecl();
 
     Node<JCMethodDecl> buildMethodDecl(JCModifiers modifiers, Name name, JCExpression resType,
             com.sun.tools.javac.util.List<JCTree.JCTypeParameter> typarams,

@@ -62,7 +62,7 @@ public abstract class TypescriptFieldsHandler<T extends Annotation> implements K
 
         Node<JCVariableDecl> existingField = helper.findFieldByNameAndType(clazz, name);
 
-        Node<JCVariableDecl> newVariable = astNodeBuilder.buildVariableDecl(modifiers,
+        Node<JCVariableDecl> newVariable = astNodeBuilder.variableDecl().build(modifiers,
                 ((JCVariableDecl) annotationNode.getParent().getObject()).vartype, name, annotationNode);
 
         if (existingField == null) {
