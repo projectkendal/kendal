@@ -18,10 +18,10 @@ import com.sun.tools.javac.tree.JCTree.JCThrow;
 import com.sun.tools.javac.tree.JCTree.JCTry;
 import com.sun.tools.javac.tree.JCTree.JCTypeUnion;
 import com.sun.tools.javac.tree.JCTree.JCVariableDecl;
-import com.sun.tools.javac.util.Name;
 
 import kendal.api.builders.BlockBuilder;
 import kendal.api.builders.FieldAccessBuilder;
+import kendal.api.builders.IdentifierBuilder;
 import kendal.api.builders.MethodDeclBuilder;
 import kendal.api.builders.MethodInvocationBuilder;
 import kendal.api.builders.VariableDeclBuilder;
@@ -35,6 +35,7 @@ public interface AstNodeBuilder {
     MethodInvocationBuilder methodInvocation();
     FieldAccessBuilder fieldAccess();
     BlockBuilder block();
+    IdentifierBuilder identifier();
 
     /**
      * Constructs field accessor for more complex expressions (the ones using dots).
@@ -43,9 +44,6 @@ public interface AstNodeBuilder {
     Node<JCExpression> getAccessor(String fullName);
 
     <T extends JCExpression> Node<JCReturn> buildReturnStatement(Node<T> expression);
-
-    Node<JCIdent> buildIdentifier(String name);
-    Node<JCIdent> buildIdentifier(Name name);
 
     Node<JCTry> buildTry(Node<JCBlock> body, Node<JCCatch> catchers);
     Node<JCTry> buildTry(Node<JCBlock> body, List<Node<JCCatch>> catchers);

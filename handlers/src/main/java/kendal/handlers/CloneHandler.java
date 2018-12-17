@@ -93,10 +93,10 @@ public class CloneHandler implements KendalHandler<Clone> {
      * {@link Clone.Transformer#transform(Object)} ()} method invocation.
      */
     private Node<JCMethodInvocation> buildInitialMethodInvocation(Node<JCMethodDecl> initialMethod) {
-        Node<JCIdent> methodIdentifier = astNodeBuilder.buildIdentifier(initialMethod.getObject().name);
+        Node<JCIdent> methodIdentifier = astNodeBuilder.identifier().build(initialMethod.getObject().name);
         methodIdentifier.getObject().setType(initialMethod.getObject().getReturnType().type);
         List<Node<JCIdent>> parametersIdentifiers = new LinkedList<>();
-        initialMethod.getObject().params.forEach(param -> parametersIdentifiers.add(astNodeBuilder.buildIdentifier(param.name)));
+        initialMethod.getObject().params.forEach(param -> parametersIdentifiers.add(astNodeBuilder.identifier().build(param.name)));
         return astNodeBuilder.methodInvocation().build(methodIdentifier, parametersIdentifiers);
     }
 
@@ -173,15 +173,15 @@ public class CloneHandler implements KendalHandler<Clone> {
     }
 
     private Node<JCVariableDecl> buildCatcherParameter(String parameterName, Node<JCMethodDecl> initialMethod) {
-        Node<JCIdent> type1 = astNodeBuilder.buildIdentifier("InstantiationException");
-        Node<JCIdent> type2 = astNodeBuilder.buildIdentifier("IllegalAccessException");
+        Node<JCIdent> type1 = astNodeBuilder.identifier().build("InstantiationException");
+        Node<JCIdent> type2 = astNodeBuilder.identifier().build("IllegalAccessException");
         Node<JCTypeUnion> typeUnion = astNodeBuilder.buildTypeUnion(Arrays.asList(type1, type2));
         return astNodeBuilder.variableDecl().build(typeUnion, parameterName, initialMethod);
     }
 
     private Node<JCBlock> buildCatcherBody(String parameterName) {
-        Node<JCIdent> parameterIdentifier = astNodeBuilder.buildIdentifier(parameterName);
-        Node<JCIdent> clazzIdentifier = astNodeBuilder.buildIdentifier("RuntimeException");
+        Node<JCIdent> parameterIdentifier = astNodeBuilder.identifier().build(parameterName);
+        Node<JCIdent> clazzIdentifier = astNodeBuilder.identifier().build("RuntimeException");
         Node<JCNewClass> newClassStatement = astNodeBuilder.buildNewClass(clazzIdentifier, parameterIdentifier);
         Node<JCThrow> throwStatement = astNodeBuilder.buildThrow(newClassStatement);
         return astNodeBuilder.block().build(throwStatement);
