@@ -8,12 +8,14 @@ import java.util.List;
 import java.util.Objects;
 import java.util.Set;
 import java.util.stream.Collectors;
+import java.util.stream.StreamSupport;
 
 import javax.lang.model.SourceVersion;
 import javax.lang.model.type.MirroredTypeException;
 import javax.lang.model.type.TypeMirror;
 
 import com.sun.tools.javac.code.Type;
+import com.sun.tools.javac.tree.JCTree;
 import com.sun.tools.javac.tree.JCTree.JCBlock;
 import com.sun.tools.javac.tree.JCTree.JCCatch;
 import com.sun.tools.javac.tree.JCTree.JCClassDecl;
@@ -74,11 +76,19 @@ public class CloneHandler implements KendalHandler<Clone> {
         validateMethodIsUnique(newMethodName, m.params, clazz);
         Node<JCExpression> transformerClassAccessor = getTransformerClassAccessor(initialMethod);
         Node<JCBlock> newMethodBlock = buildNewMethodBody(initialMethod, transformerClassAccessor);
-        JCModifiers modifiers = getModifiersForNewMethod(m);
+        JCModifiers modifiers = getModifiersForNewMethod(m, (JCTree.JCAnnotation) annotationNode.getObject());
+        eraseAnnotationParameters(annotationNode);
         JCExpression transformerReturnType = getTransformMethodReturnType(initialMethod);
         Node<JCMethodDecl> newMethod = astNodeBuilder.methodDecl().build(modifiers, newMethodName, transformerReturnType,
                 m.typarams, m.params, m.thrown, newMethodBlock);
         helper.addElementToClass(clazz, newMethod, Mode.APPEND, 0);
+    }
+
+    private void eraseAnnotationParameters(Node annotationNode) {
+        JCTree.JCAnnotation annotation = (JCTree.JCAnnotation) annotationNode.getObject();
+        annotation.args = astUtils.toJCList(StreamSupport.stream(annotation.args.spliterator(), false)
+                .filter(arg -> !((JCIdent) ((JCTree.JCAssign) arg).lhs).name.contentEquals("onMethod"))
+                .collect(Collectors.toList()));
     }
 
     private Node<JCBlock> buildNewMethodBody(Node<JCMethodDecl> initialMethod, Node<JCExpression> transformerClassAccessor) {
@@ -224,10 +234,19 @@ public class CloneHandler implements KendalHandler<Clone> {
      * Creates modifiers definition for new method to be created. Those modifiers are the same as for the source
      * method except for annotations.
      */
-    private JCModifiers getModifiersForNewMethod(JCMethodDecl methodDecl) {
+    private JCModifiers getModifiersForNewMethod(JCMethodDecl methodDecl, JCTree.JCAnnotation cloneAnnotation) {
         JCModifiers newModifiers = (JCModifiers) methodDecl.mods.clone();
         // Reset annotations
         newModifiers.annotations = astUtils.toJCList(new ArrayList<>());
+        JCExpression value = StreamSupport.stream(cloneAnnotation.getArguments().spliterator(), false)
+                .filter(arg -> arg instanceof JCTree.JCAssign && ((JCIdent) ((JCTree.JCAssign) arg).lhs).name.contentEquals("onMethod"))
+                .findFirst().map(jcAssign -> (((JCTree.JCAssign) jcAssign).rhs)).orElse(null);
+        if(value != null) {
+            if(value instanceof JCTree.JCNewArray) {
+                newModifiers.annotations = astUtils.toJCList(StreamSupport.stream(((JCTree.JCNewArray) value).elems.spliterator(), false)
+                        .map(annotation -> (JCTree.JCAnnotation) annotation).collect(Collectors.toList()));
+            }
+        }
         // todo: add annotations based on @Clone annotation parameter https://trello.com/c/ec4NE8Eb/30-clone-add-possibility-to-put-annotations-on-newly-created-method
         return newModifiers;
     }
