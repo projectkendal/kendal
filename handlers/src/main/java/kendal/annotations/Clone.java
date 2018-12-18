@@ -17,11 +17,11 @@ public @interface Clone {
     Class<? extends Transformer> transformer();
 
     /**
-    * Java does not allow putting {@link java.lang.annotation.Annotation}, which is the base type for all annotations, as annotation member.
-    * Let's just put here a placeholder and handle any type during Annotation Processing
-    */
-    //TODO maybe just remove the field and handle it anyway during processing? https://trello.com/c/ec4NE8Eb/30-clone-add-possibility-to-put-annotations-on-newly-created-method
-    Generated[] onMethod() default {};
+     * Java does not allow putting {@link java.lang.annotation.Annotation}, which is the base type for all annotations, as annotation member.
+     * Let's just use this field as if it was defined.
+     * We remove onMethod parameter from AST after processing @Clone usage.
+     * /
+//    Annotation[] onMethod() default {};
 
     /**
      * Name of the generated method.
