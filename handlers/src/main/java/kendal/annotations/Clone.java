@@ -21,7 +21,6 @@ public @interface Clone {
      * Let's just use this field as if it was defined.
      * We remove onMethod parameter from AST after processing @Clone usage.
      * /
-    //https://trello.com/c/ec4NE8Eb/30-clone-add-possibility-to-put-annotations-on-newly-created-method
 //    Annotation[] onMethod() default {};
 
     /**
