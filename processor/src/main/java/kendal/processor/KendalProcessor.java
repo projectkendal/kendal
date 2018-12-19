@@ -78,7 +78,6 @@ public class KendalProcessor extends AbstractProcessor {
                 handlers.forEach(handler -> {
                     if (handler.getHandledAnnotationType() == null) return;
                     with((JCAnnotation)node.getObject(), jcAnnotation -> {
-                        // TODO This will PROBABLY work, but we have to make sure https://trello.com/c/pjk7uhrN/53-make-sure-it-works
                         if (jcAnnotation.type.tsym.getQualifiedName().contentEquals(handler.getHandledAnnotationType().getName())) {
                             result.get(handler).add(node);
                             messager.printMessage(Diagnostic.Kind.NOTE, String.format("annotation %s handled by %s", jcAnnotation.toString(), handler.getClass().getName()));
