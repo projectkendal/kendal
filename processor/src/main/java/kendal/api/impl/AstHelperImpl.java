@@ -133,7 +133,7 @@ public class AstHelperImpl implements AstHelper {
     }
 
     private boolean bodyContainsSuperInvocation(Node<JCBlock> body) {
-        if (!body.getChildren().isEmpty() && body.getChildren().get(0).getObject() instanceof JCExpressionStatement) {
+        if (!body.getChildren().isEmpty() && body.getChildren().get(0).is(JCExpressionStatement.class)) {
             JCExpressionStatement firstLineExpStat = (JCExpressionStatement) body.getChildren().get(0).getObject();
             if (firstLineExpStat.expr instanceof JCMethodInvocation) {
                 JCMethodInvocation methodInv = (JCMethodInvocation) firstLineExpStat.expr;
@@ -147,8 +147,7 @@ public class AstHelperImpl implements AstHelper {
     @Override
     public Node<JCVariableDecl> findFieldByNameAndType(Node<JCClassDecl> classDeclNode, Name name) {
         return classDeclNode.getChildren().stream()
-                .filter(node -> node.getObject() instanceof JCVariableDecl
-                        && ((JCVariableDecl) node.getObject()).name.equals(name))
+                .filter(node -> node.is(JCVariableDecl.class) && ((JCVariableDecl) node.getObject()).name.equals(name))
                 .map(node -> (Node<JCVariableDecl>) node)
                 .findAny().orElse(null);
     }

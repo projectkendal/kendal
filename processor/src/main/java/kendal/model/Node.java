@@ -70,6 +70,10 @@ public class Node <T extends JCTree> {
         newChild.parent = this;
     }
 
+    public boolean is(Class clazz) {
+        return clazz.isInstance(object);
+    }
+
     static void finishInitialPhase() {
         isInitialPhase = false;
     }
