@@ -1,12 +1,6 @@
 package kendal.handlers;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collection;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Objects;
-import java.util.Set;
+import java.util.*;
 import java.util.stream.Collectors;
 import java.util.stream.StreamSupport;
 
@@ -47,6 +41,8 @@ import kendal.api.exceptions.KendalException;
 import kendal.api.exceptions.KendalRuntimeException;
 import kendal.model.Node;
 
+import static kendal.utils.AnnotationUtils.isPutOnAnnotation;
+
 public class CloneHandler implements KendalHandler<Clone> {
 
     private AstNodeBuilder astNodeBuilder;
@@ -56,9 +52,11 @@ public class CloneHandler implements KendalHandler<Clone> {
     public void handle(Collection<Node> annotationNodes, AstHelper helper) throws KendalException {
         astNodeBuilder = helper.getAstNodeBuilder();
         astUtils = helper.getAstUtils();
+        Map<Node, Node> indirectToSource = helper.getAnnotationSourceMap(annotationNodes, getHandledAnnotationType().getName());
         for (Node annotationNode : annotationNodes) {
-            handleNode(annotationNode, helper);
+            handleNode(annotationNode, indirectToSource.get(annotationNode), helper);
         }
+        eraseAnnotationParameters(annotationNodes);
     }
 
     /**
@@ -67,11 +65,15 @@ public class CloneHandler implements KendalHandler<Clone> {
      * Such an expression requires try-catch block around it so it is also added here.
      * When method creation is done, its added to the class where the initial method lies.
      */
-    private void handleNode(Node annotationNode, AstHelper helper) throws KendalException {
+    private void handleNode(Node annotationNode, Node sourceAnnotationNode, AstHelper helper) throws KendalException {
+        if(isPutOnAnnotation(annotationNode)) {
+            return; // because there is nothing to handle in such case
+        }
+
         Node<JCMethodDecl> initialMethod = (Node<JCMethodDecl>) annotationNode.getParent();
         Node<JCClassDecl> clazz = (Node<JCClassDecl>) initialMethod.getParent();
         JCMethodDecl m = initialMethod.getObject();
-        Clone cloneAnnotation = getCloneAnnotation(annotationNode);
+        Clone cloneAnnotation = getCloneAnnotation(sourceAnnotationNode);
         Name newMethodName = getNewMethodName(m.name.toString(), cloneAnnotation);
         if (!SourceVersion.isIdentifier(newMethodName.toString())) {
             throw new InvalidAnnotationParamsException(String.format("%s is not a valid method identifier!", newMethodName.toString()));
@@ -80,7 +82,6 @@ public class CloneHandler implements KendalHandler<Clone> {
         Node<JCExpression> transformerClassAccessor = getTransformerClassAccessor(cloneAnnotation);
         Node<JCBlock> newMethodBlock = buildNewMethodBody(initialMethod, transformerClassAccessor);
         JCModifiers modifiers = getModifiersForNewMethod(m, (JCAnnotation) annotationNode.getObject());
-        eraseAnnotationParameters(annotationNode);
         JCExpression transformerReturnType = getTransformMethodReturnType(cloneAnnotation);
         Node<JCMethodDecl> newMethod = astNodeBuilder.methodDecl().build(modifiers, newMethodName, transformerReturnType,
                 m.typarams, m.params, m.thrown, newMethodBlock);
@@ -88,19 +89,23 @@ public class CloneHandler implements KendalHandler<Clone> {
     }
 
     private Clone getCloneAnnotation(Node<JCAnnotation> annotationNode) {
-        if ("kendal.annotations.Clone".equals(annotationNode.getObject().type.toString())) {
+        if(annotationNode.getParent().is(JCMethodDecl.class)) {
             return ((JCMethodDecl) annotationNode.getParent().getObject()).sym.getAnnotation(Clone.class);
         } else {
-            return (annotationNode.getObject()).getAnnotationType().type.tsym.getAnnotation(Clone.class);
+            return ((JCClassDecl) annotationNode.getParent().getObject()).sym.getAnnotation(Clone.class);
         }
     }
 
-    private void eraseAnnotationParameters(Node<JCAnnotation> annotationNode) {
-        JCAnnotation annotation = annotationNode.getObject();
-        List<JCExpression> annotationArgsWithoutOnMethod = StreamSupport.stream(annotation.args.spliterator(), false)
-                .filter(arg -> !((JCIdent) ((JCAssign) arg).lhs).name.contentEquals("onMethod"))
-                .collect(Collectors.toList());
-        annotation.args = astUtils.toJCList(annotationArgsWithoutOnMethod);
+    private void eraseAnnotationParameters(Collection<Node> annotationNodes) {
+        annotationNodes.stream()
+                .filter(node -> node.getObject().type.tsym.getQualifiedName().contentEquals(getHandledAnnotationType().getName()))
+                .forEach(annotationNode -> {
+            JCAnnotation annotation = (JCAnnotation) annotationNode.getObject();
+            List<JCExpression> annotationArgsWithoutOnMethod = StreamSupport.stream(annotation.args.spliterator(), false)
+                    .filter(arg -> !((JCIdent) ((JCAssign) arg).lhs).name.contentEquals("onMethod"))
+                    .collect(Collectors.toList());
+            annotation.args = astUtils.toJCList(annotationArgsWithoutOnMethod);
+        });
     }
 
     private Node<JCBlock> buildNewMethodBody(Node<JCMethodDecl> initialMethod, Node<JCExpression> transformerClassAccessor) {

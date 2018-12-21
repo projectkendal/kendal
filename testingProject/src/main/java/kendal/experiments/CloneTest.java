@@ -28,6 +28,11 @@ public class CloneTest {
         return param1.toString() + param2;
     }
 
+    @EvenMoreIndirectClone
+    public <T> String someMethod4(T param1, int param2) {
+        return param1.toString() + param2;
+    }
+
     @NamedIndirectClone
     public String someMethod3(String param1, int param2) {
         return param1 + param2;
@@ -40,10 +45,16 @@ public class CloneTest {
         boolean someFlag() default true;
     }
 
-    @Target(ElementType.METHOD)
+    @Target({ElementType.METHOD, ElementType.ANNOTATION_TYPE})
     @Retention(RetentionPolicy.RUNTIME)
     @Clone(transformer = TestClassTransformer.class/* todo: fix this -> , onMethod={@TestAnnotation(value = "OPS")}*/)
     @interface IndirectClone {
+    }
+
+    @Target(ElementType.METHOD)
+    @Retention(RetentionPolicy.RUNTIME)
+    @IndirectClone
+    @interface EvenMoreIndirectClone {
     }
 
     @Target(ElementType.METHOD)

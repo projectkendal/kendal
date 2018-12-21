@@ -1,21 +1,19 @@
 package kendal.api.impl;
 
+import static kendal.utils.AnnotationUtils.isPutOnAnnotation;
 import static kendal.utils.Utils.with;
 
 import java.lang.reflect.Array;
 import java.lang.reflect.Field;
+import java.util.*;
+import java.util.function.Function;
 import java.util.stream.Collectors;
 import java.util.stream.StreamSupport;
 
 import javax.lang.model.element.Name;
 
 import com.sun.tools.javac.tree.JCTree;
-import com.sun.tools.javac.tree.JCTree.JCBlock;
-import com.sun.tools.javac.tree.JCTree.JCClassDecl;
-import com.sun.tools.javac.tree.JCTree.JCExpressionStatement;
-import com.sun.tools.javac.tree.JCTree.JCMethodDecl;
-import com.sun.tools.javac.tree.JCTree.JCMethodInvocation;
-import com.sun.tools.javac.tree.JCTree.JCVariableDecl;
+import com.sun.tools.javac.tree.JCTree.*;
 import com.sun.tools.javac.util.Context;
 import com.sun.tools.javac.util.List;
 
@@ -170,6 +168,61 @@ public class AstHelperImpl implements AstHelper {
     @Override
     public AstUtils getAstUtils() {
         return astUtils;
+    }
+
+    @Override
+    public Map<Node, Node> getAnnotationSourceMap(Collection<Node> annotationNodes, String sourceQualifiedName) {
+        Map<Node, Node> annotationToSourceMap = annotationNodes.stream()
+                .map(node -> ((Node<JCAnnotation>) node))
+                .collect(HashMap::new, (m,v) -> {
+                    if(v.getObject().type.tsym.getQualifiedName().contentEquals(sourceQualifiedName)) {
+                        m.put(v, v);
+                    } else {
+                        m.put(v, null);
+                    }
+                }, HashMap::putAll);
+        Map<String, Node<JCClassDecl>> annotationTypesMap = new HashMap<>();
+        annotationNodes.forEach(node -> {
+            if(isPutOnAnnotation(node)) {
+                annotationTypesMap.put(((JCClassDecl) node.getParent().getObject()).sym.type.tsym.getQualifiedName().toString(), node.getParent());
+            }
+        });
+
+        Map<String, Node<JCAnnotation>> typesToSource = new HashMap<>();
+
+        Set<Node> nodesWithoutSource = annotationToSourceMap.entrySet()
+                .stream()
+                .filter(entry -> entry.getValue() == null).map(Map.Entry::getKey)
+                .collect(Collectors.toSet());
+        while (!nodesWithoutSource.isEmpty()) {
+            Set<Node> assignedNodes = new HashSet<>();
+            nodesWithoutSource.forEach(node -> {
+                String indirectAnnotationName = node.getObject().type.tsym.getQualifiedName().toString();
+                if(annotationTypesMap.containsKey(indirectAnnotationName)) {
+                    Node<JCClassDecl> indirectAnnotationType = annotationTypesMap.get(indirectAnnotationName);
+                    indirectAnnotationType.getChildren().stream()
+                            .filter(n -> n.is(JCAnnotation.class))
+                            .forEach(jcAnnotationNode -> {
+                        String annotationName = jcAnnotationNode.getObject().type.tsym.getQualifiedName().toString();
+                        if(annotationName.equals(sourceQualifiedName)) {
+                            annotationToSourceMap.put(node, jcAnnotationNode);
+                            assignedNodes.add(node);
+                            typesToSource.put(node.getObject().type.tsym.getQualifiedName().toString(), jcAnnotationNode);
+                        } else if(typesToSource.containsKey(annotationName)) {
+                            annotationToSourceMap.put(node, typesToSource.get(annotationName));
+                            assignedNodes.add(node);
+                            typesToSource.put(node.getObject().type.tsym.getQualifiedName().toString(), jcAnnotationNode);
+                        }
+                    });
+                } else {
+                    throw new KendalRuntimeException("Chujowo!");
+                }
+            });
+            nodesWithoutSource.removeAll(assignedNodes);
+            assignedNodes.clear();
+        }
+
+        return annotationToSourceMap;
     }
 
     private <T extends JCTree> List<T> append(List<T> defs, T element, int offset) {

@@ -1,11 +1,6 @@
 package kendal.processor;
 
-import java.util.HashSet;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Map;
-import java.util.ServiceLoader;
-import java.util.Set;
+import java.util.*;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 import java.util.stream.StreamSupport;
@@ -36,6 +31,9 @@ import kendal.model.ForestBuilder;
 import kendal.model.Node;
 import kendal.utils.ForestUtils;
 import kendal.utils.KendalMessager;
+
+import static kendal.utils.AnnotationUtils.annotationNameMatches;
+import static kendal.utils.AnnotationUtils.isPutOnAnnotation;
 
 @SupportedAnnotationTypes("*")
 @SupportedSourceVersion(SourceVersion.RELEASE_8)
@@ -77,49 +75,33 @@ public class KendalProcessor extends AbstractProcessor {
         long startTime = System.currentTimeMillis();
         Map<KendalHandler, Set<Node>> handlersWithNodes = handlers.stream()
                 .collect(Collectors.toMap(Function.identity(), h -> new HashSet<>()));
-        // map of annotations that were annotated by a handled annotation as a key with this annotation added as a value
-        List<WrapperAnnotation> wrapperAnnotations = new LinkedList<>();
-        ForestUtils.traverse(forest, node -> {
-            if (node.is(JCAnnotation.class)) {
-                handlers.forEach(handler -> {
-                    if (handler.getHandledAnnotationType() == null) return;
-                    if (isAnnotationHandledByHandler(node, handler)) {
-                        if (isPutOnAnnotation(node)) {
-                            wrapperAnnotations.add(new WrapperAnnotation(node.getParent(), handler));
-                        }
-                        else {
+
+        Map<String, KendalHandler> handlerAnnotationMap = handlers.stream()
+                .filter(kendalHandler -> kendalHandler.getHandledAnnotationType() != null)
+                .collect(Collectors.toMap(h -> h.getHandledAnnotationType().getName(), Function.identity()));
+
+        while(handlerAnnotationMap.size() > 0) {
+            Map<String, KendalHandler> newHandlerAnnotationMap = new HashMap<>();
+            Map<String, KendalHandler> finalHandlerAnnotationMap = handlerAnnotationMap;
+            ForestUtils.traverse(forest, node -> {
+                if (node.is(JCAnnotation.class)) {
+                    finalHandlerAnnotationMap.forEach((annotationName, handler) ->  {
+                        if (annotationNameMatches(node, annotationName)) {
+                            if (isPutOnAnnotation(node)) {
+                                newHandlerAnnotationMap.put(((JCClassDecl) node.getParent().getObject()).sym.type.tsym.getQualifiedName().toString(), handler);
+                            }
                             handlersWithNodes.get(handler).add(node);
                             messager.printMessage(Diagnostic.Kind.NOTE, String.format("annotation %s handled by %s",
                                     node.getObject().toString(), handler.getClass().getName()));
                         }
-                    }
-                });
-            }
-        });
-
-        ForestUtils.traverse(forest, node -> {
-            if (node.is(JCAnnotation.class)) {
-                wrapperAnnotations.forEach(wrapperAnnotation -> {
-                    if (node.getObject().type.tsym == wrapperAnnotation.annotation.getObject().sym) {
-                        handlersWithNodes.get(wrapperAnnotation.handler).add(node);
-                        messager.printMessage(Diagnostic.Kind.NOTE, String.format("annotation %s handled by %s",
-                                node.getObject().toString(), wrapperAnnotation.handler.getClass().getName()));
-                    }
-                });
-            }
-        });
+                    });
+                }
+            });
+            handlerAnnotationMap = newHandlerAnnotationMap;
+        }
 
         messager.printElapsedTime("Annotations' scanner", startTime);
         return handlersWithNodes;
-    }
-
-    private boolean isAnnotationHandledByHandler(Node<JCAnnotation> annotationNode, KendalHandler handler) {
-        return annotationNode.getObject().type.tsym.getQualifiedName().contentEquals(handler.getHandledAnnotationType().getName());
-    }
-
-    private boolean isPutOnAnnotation(Node<JCAnnotation> annotationNode) {
-        JCTree parent = annotationNode.getParent().getObject();
-        return parent instanceof JCClassDecl && (((JCClassDecl) parent).mods.flags & Flags.ANNOTATION) != 0;
     }
 
     private Set<KendalHandler> getHandlersFromSPI() {
@@ -149,18 +131,5 @@ public class KendalProcessor extends AbstractProcessor {
                 messager.printMessage(Diagnostic.Kind.ERROR, e.getMessage());
             }
         });
-    }
-
-    /**
-     * Represents annotation which is used as a wrapper for original annotation that is handled by some handler.
-     */
-    private class WrapperAnnotation {
-        final Node<JCClassDecl> annotation;
-        final KendalHandler handler;
-
-        WrapperAnnotation(Node<JCClassDecl> annotation, KendalHandler handler) {
-            this.annotation = annotation;
-            this.handler = handler;
-        }
     }
 }
