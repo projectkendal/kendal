@@ -47,7 +47,7 @@ public class CloneTest {
 
     @Target({ElementType.METHOD, ElementType.ANNOTATION_TYPE})
     @Retention(RetentionPolicy.RUNTIME)
-    @Clone(transformer = TestClassTransformer.class/* todo: fix this -> , onMethod={@TestAnnotation(value = "OPS")}*/)
+    @Clone(transformer = TestClassTransformer.class, onMethod={@TestAnnotation(value = "OPS")})
     @interface IndirectClone {
     }
 

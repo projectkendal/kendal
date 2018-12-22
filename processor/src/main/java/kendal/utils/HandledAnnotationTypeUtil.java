@@ -1,23 +1,23 @@
 package kendal.utils;
 
-import kendal.api.KendalHandler;
-
 import java.lang.annotation.Annotation;
 import java.lang.reflect.ParameterizedType;
 import java.lang.reflect.Type;
 import java.util.HashMap;
 import java.util.Map;
 
+import kendal.api.KendalHandler;
+
 public class HandledAnnotationTypeUtil {
 
     private static Map<Class<? extends KendalHandler>, Class<? extends Annotation>> cache = new HashMap();
 
     public static Class<? extends Annotation> getAnnotationType(Class<? extends KendalHandler> handlerClass) {
-        if(cache.containsKey(handlerClass)) {
+        if (cache.containsKey(handlerClass)) {
             return cache.get(handlerClass);
         }
 
-        if(KendalHandler.class.equals(handlerClass) || Object.class.equals(handlerClass)) {
+        if (KendalHandler.class.equals(handlerClass) || Object.class.equals(handlerClass)) {
             return null;
         }
         Class<? extends Annotation> annotationType = extractFromInterface(handlerClass.getGenericSuperclass());

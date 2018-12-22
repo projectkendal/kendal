@@ -5,15 +5,24 @@ import static kendal.utils.Utils.with;
 
 import java.lang.reflect.Array;
 import java.lang.reflect.Field;
-import java.util.*;
-import java.util.function.Function;
+import java.util.Collection;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.Map;
+import java.util.Set;
 import java.util.stream.Collectors;
 import java.util.stream.StreamSupport;
 
 import javax.lang.model.element.Name;
 
 import com.sun.tools.javac.tree.JCTree;
-import com.sun.tools.javac.tree.JCTree.*;
+import com.sun.tools.javac.tree.JCTree.JCAnnotation;
+import com.sun.tools.javac.tree.JCTree.JCBlock;
+import com.sun.tools.javac.tree.JCTree.JCClassDecl;
+import com.sun.tools.javac.tree.JCTree.JCExpressionStatement;
+import com.sun.tools.javac.tree.JCTree.JCMethodDecl;
+import com.sun.tools.javac.tree.JCTree.JCMethodInvocation;
+import com.sun.tools.javac.tree.JCTree.JCVariableDecl;
 import com.sun.tools.javac.util.Context;
 import com.sun.tools.javac.util.List;
 
@@ -59,7 +68,7 @@ public class AstHelperImpl implements AstHelper {
                             Node<? extends JCTree> oldNode,
                             Node<? extends JCTree> newNode) {
         // Update Kendal AST
-        if(!parent.getChildren().remove(oldNode)) {
+        if (!parent.getChildren().remove(oldNode)) {
             throw new InvalidArgumentException("oldNode does not belong to children collection!");
         }
         parent.getChildren().add(newNode);
@@ -176,7 +185,7 @@ public class AstHelperImpl implements AstHelper {
         Map<Node, Node> annotationToSourceMap = annotationNodes.stream()
                 .map(node -> ((Node<JCAnnotation>) node))
                 .collect(HashMap::new, (m,v) -> {
-                    if(v.getObject().type.tsym.getQualifiedName().contentEquals(sourceQualifiedName)) {
+                    if (v.getObject().type.tsym.getQualifiedName().contentEquals(sourceQualifiedName)) {
                         m.put(v, v);
                     } else {
                         m.put(v, null);
@@ -185,7 +194,7 @@ public class AstHelperImpl implements AstHelper {
         // annotation name -> annotation JCClassDecl
         Map<String, Node<JCClassDecl>> annotationTypesMap = new HashMap<>();
         annotationNodes.forEach(node -> {
-            if(isPutOnAnnotation(node)) {
+            if (isPutOnAnnotation(node)) {
                 annotationTypesMap.put(((JCClassDecl) node.getParent().getObject()).sym.type.tsym.getQualifiedName().toString(), node.getParent());
             }
         });
@@ -206,7 +215,7 @@ public class AstHelperImpl implements AstHelper {
                         .filter(n -> n.is(JCAnnotation.class))
                         .forEach(jcAnnotationNode -> {
                     String annotationName = jcAnnotationNode.getObject().type.tsym.getQualifiedName().toString();
-                    if(annotationName.equals(sourceQualifiedName)) {
+                    if (annotationName.equals(sourceQualifiedName)) {
                         annotationToSourceMap.put(node, jcAnnotationNode);
                         assignedNodes.add(node);
                         typesToSource.put(node.getObject().type.tsym.getQualifiedName().toString(), jcAnnotationNode);

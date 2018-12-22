@@ -7,7 +7,7 @@ import java.util.stream.Stream;
 public class Utils {
 
     public static <T> void ifNotNull(T object, Consumer<T> consumer) {
-        if(object != null) {
+        if (object != null) {
             consumer.accept(object);
         }
     }

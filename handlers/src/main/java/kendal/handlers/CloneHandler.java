@@ -1,6 +1,15 @@
 package kendal.handlers;
 
-import java.util.*;
+import static kendal.utils.AnnotationUtils.isPutOnAnnotation;
+
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collection;
+import java.util.LinkedList;
+import java.util.List;
+import java.util.Map;
+import java.util.Objects;
+import java.util.Set;
 import java.util.stream.Collectors;
 import java.util.stream.StreamSupport;
 
@@ -41,8 +50,6 @@ import kendal.api.exceptions.KendalException;
 import kendal.api.exceptions.KendalRuntimeException;
 import kendal.model.Node;
 
-import static kendal.utils.AnnotationUtils.isPutOnAnnotation;
-
 public class CloneHandler implements KendalHandler<Clone> {
 
     private AstNodeBuilder astNodeBuilder;
@@ -66,7 +73,7 @@ public class CloneHandler implements KendalHandler<Clone> {
      * When method creation is done, its added to the class where the initial method lies.
      */
     private void handleNode(Node annotationNode, Node sourceAnnotationNode, AstHelper helper) throws KendalException {
-        if(isPutOnAnnotation(annotationNode)) {
+        if (isPutOnAnnotation(annotationNode)) {
             return; // because there is nothing to handle in such case
         }
 
@@ -89,7 +96,7 @@ public class CloneHandler implements KendalHandler<Clone> {
     }
 
     private Clone getCloneAnnotation(Node<JCAnnotation> annotationNode) {
-        if(annotationNode.getParent().is(JCMethodDecl.class)) {
+        if (annotationNode.getParent().is(JCMethodDecl.class)) {
             return ((JCMethodDecl) annotationNode.getParent().getObject()).sym.getAnnotation(Clone.class);
         } else {
             return ((JCClassDecl) annotationNode.getParent().getObject()).sym.getAnnotation(Clone.class);
@@ -258,8 +265,8 @@ public class CloneHandler implements KendalHandler<Clone> {
         JCExpression value = StreamSupport.stream(cloneAnnotation.getArguments().spliterator(), false)
                 .filter(arg -> arg instanceof JCTree.JCAssign && ((JCIdent) ((JCTree.JCAssign) arg).lhs).name.contentEquals("onMethod"))
                 .findFirst().map(jcAssign -> (((JCTree.JCAssign) jcAssign).rhs)).orElse(null);
-        if(value != null) {
-            if(value instanceof JCTree.JCNewArray) {
+        if (value != null) {
+            if (value instanceof JCTree.JCNewArray) {
                 newModifiers.annotations = astUtils.toJCList(StreamSupport.stream(((JCTree.JCNewArray) value).elems.spliterator(), false)
                         .map(annotation -> (JCTree.JCAnnotation) annotation).collect(Collectors.toList()));
             }
