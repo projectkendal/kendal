@@ -5,6 +5,6 @@ class TestTransformer implements Clone.Transformer<String, StringBuilder> {
 
     @Override
     public StringBuilder transform(String input) {
-        return new StringBuilder(input);
+        return new StringBuilder(input).append("postfix");
     }
 }
