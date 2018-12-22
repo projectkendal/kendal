@@ -40,8 +40,13 @@ make compilation-tests
 1. Add jtreg run configuration
 2. Select directory containing TEST.ROOT file as "Directory"
 3. Add options:
+#####On linux:
 ```
 -cpa:handlers/target/classes:processor/target/classes -javacoption:-Xlint:none -agentvm -workDir tests/target/JTwork -reportDir tests/target/JTreport
+```
+#####On windows:
+```
+-cpa:handlers/target/classes;processor/target/classes -javacoption:-Xlint:none -agentvm -workDir tests/target/JTwork -reportDir tests/target/JTreport
 ```
 Configuration will run all tests from selected directory.
 

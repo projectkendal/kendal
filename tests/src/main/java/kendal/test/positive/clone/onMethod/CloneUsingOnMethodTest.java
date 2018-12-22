@@ -52,7 +52,7 @@ public class CloneUsingOnMethodTest {
         assertEqualsNoOrder(annotation.classArray(),
                 new Class[] {Class.class, CloneUsingOnMethodTest.class},
                 "classArray not equal to what it should be!");
-        StringBuilder stringBuilder = (StringBuilder) method.invoke(this,param1, param2);
+        StringBuilder stringBuilder = (StringBuilder) method.invoke(this, param1, param2);
         assertEquals(stringBuilder.toString(), "params: " + param1 + " " + param2 + "postfix");
     }
 }
