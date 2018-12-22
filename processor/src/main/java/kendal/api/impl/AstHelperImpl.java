@@ -198,25 +198,21 @@ public class AstHelperImpl implements AstHelper {
             Set<Node> assignedNodes = new HashSet<>();
             nodesWithoutSource.forEach(node -> {
                 String indirectAnnotationName = node.getObject().type.tsym.getQualifiedName().toString();
-                if(annotationTypesMap.containsKey(indirectAnnotationName)) {
-                    Node<JCClassDecl> indirectAnnotationType = annotationTypesMap.get(indirectAnnotationName);
-                    indirectAnnotationType.getChildren().stream()
-                            .filter(n -> n.is(JCAnnotation.class))
-                            .forEach(jcAnnotationNode -> {
-                        String annotationName = jcAnnotationNode.getObject().type.tsym.getQualifiedName().toString();
-                        if(annotationName.equals(sourceQualifiedName)) {
-                            annotationToSourceMap.put(node, jcAnnotationNode);
-                            assignedNodes.add(node);
-                            typesToSource.put(node.getObject().type.tsym.getQualifiedName().toString(), jcAnnotationNode);
-                        } else if(typesToSource.containsKey(annotationName)) {
-                            annotationToSourceMap.put(node, typesToSource.get(annotationName));
-                            assignedNodes.add(node);
-                            typesToSource.put(node.getObject().type.tsym.getQualifiedName().toString(), jcAnnotationNode);
-                        }
-                    });
-                } else {
-                    throw new KendalRuntimeException("Chujowo!");
-                }
+                Node<JCClassDecl> indirectAnnotationType = annotationTypesMap.get(indirectAnnotationName);
+                indirectAnnotationType.getChildren().stream()
+                        .filter(n -> n.is(JCAnnotation.class))
+                        .forEach(jcAnnotationNode -> {
+                    String annotationName = jcAnnotationNode.getObject().type.tsym.getQualifiedName().toString();
+                    if(annotationName.equals(sourceQualifiedName)) {
+                        annotationToSourceMap.put(node, jcAnnotationNode);
+                        assignedNodes.add(node);
+                        typesToSource.put(node.getObject().type.tsym.getQualifiedName().toString(), jcAnnotationNode);
+                    } else if(typesToSource.containsKey(annotationName)) {
+                        annotationToSourceMap.put(node, typesToSource.get(annotationName));
+                        assignedNodes.add(node);
+                        typesToSource.put(node.getObject().type.tsym.getQualifiedName().toString(), jcAnnotationNode);
+                    }
+                });
             });
             nodesWithoutSource.removeAll(assignedNodes);
             assignedNodes.clear();
