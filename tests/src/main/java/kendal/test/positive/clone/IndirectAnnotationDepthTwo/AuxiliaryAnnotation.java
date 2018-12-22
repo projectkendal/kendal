@@ -7,7 +7,7 @@ import java.lang.annotation.Target;
 
 @Target(ElementType.METHOD)
 @Retention(RetentionPolicy.RUNTIME)
-public @interface AuxiliaryAnnotation {
+@interface AuxiliaryAnnotation {
 
     String value();
     boolean someFlag() default true;

@@ -5,5 +5,5 @@ import java.lang.annotation.Target;
 
 @Target(ElementType.METHOD)
 @IndirectAnnotationDepthOne
-public @interface IndirectAnnotationDepthTwo {
+@interface IndirectAnnotationDepthTwo {
 }
