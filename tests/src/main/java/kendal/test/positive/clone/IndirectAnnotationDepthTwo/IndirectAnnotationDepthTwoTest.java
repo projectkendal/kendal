@@ -1,4 +1,4 @@
-package kendal.test.positive.clone.indirectAnnotation;
+package kendal.test.positive.clone.IndirectAnnotationDepthTwo;
 
 import static kendal.test.utils.ValuesGenerator.i;
 import static kendal.test.utils.ValuesGenerator.s;
@@ -9,12 +9,12 @@ import static kendal.test.utils.ValuesGenerator.s;
  * @build ValuesGenerator
  * @build TestTransformer
  * @build AuxiliaryAnnotation
- * @compile IndirectAnnotation.java IndirectAnnotationTest.java
+ * @compile IndirectAnnotationDepthOne.java IndirectAnnotationDepthTwo.java IndirectAnnotationDepthTwoTest.java
  */
 @SuppressWarnings("unused")
-public class IndirectAnnotationTest {
+public class IndirectAnnotationDepthTwoTest {
 
-    @IndirectAnnotation
+    @IndirectAnnotationDepthTwo
     public String aMethod(String param, int anotherParam) {
         return "params: " + param + " " + anotherParam;
     }
