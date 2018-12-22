@@ -13,6 +13,9 @@ import kendal.api.exceptions.ImproperNodeTypeException;
 import kendal.api.exceptions.InvalidArgumentException;
 import kendal.model.Node;
 
+import java.util.Collection;
+import java.util.Map;
+
 /**
  * Interface for AST modification helper class
  * Instance of AstHelper is passed to implementations of {@link kendal.api.KendalHandler}
@@ -41,6 +44,8 @@ public interface AstHelper {
     AstNodeBuilder getAstNodeBuilder();
     AstValidator getAstValidator();
     AstUtils getAstUtils();
+
+    Map<Node, Node> getAnnotationSourceMap(Collection<Node> annotationNodes, String sourceQualifiedName);
 
     enum Mode {
         APPEND, PREPEND

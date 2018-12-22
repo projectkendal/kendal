@@ -1,10 +1,13 @@
 package kendal.handlers;
 
+import static kendal.utils.AnnotationUtils.isPutOnAnnotation;
+
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Map;
 import java.util.Objects;
 import java.util.Set;
 import java.util.stream.Collectors;
@@ -16,6 +19,8 @@ import javax.lang.model.type.TypeMirror;
 
 import com.sun.tools.javac.code.Type;
 import com.sun.tools.javac.tree.JCTree;
+import com.sun.tools.javac.tree.JCTree.JCAnnotation;
+import com.sun.tools.javac.tree.JCTree.JCAssign;
 import com.sun.tools.javac.tree.JCTree.JCBlock;
 import com.sun.tools.javac.tree.JCTree.JCCatch;
 import com.sun.tools.javac.tree.JCTree.JCClassDecl;
@@ -54,9 +59,11 @@ public class CloneHandler implements KendalHandler<Clone> {
     public void handle(Collection<Node> annotationNodes, AstHelper helper) throws KendalException {
         astNodeBuilder = helper.getAstNodeBuilder();
         astUtils = helper.getAstUtils();
+        Map<Node, Node> indirectToSource = helper.getAnnotationSourceMap(annotationNodes, getHandledAnnotationType().getName());
         for (Node annotationNode : annotationNodes) {
-            handleNode(annotationNode, helper);
+            handleNode(annotationNode, indirectToSource.get(annotationNode), helper);
         }
+        eraseAnnotationParameters(annotationNodes);
     }
 
     /**
@@ -65,30 +72,47 @@ public class CloneHandler implements KendalHandler<Clone> {
      * Such an expression requires try-catch block around it so it is also added here.
      * When method creation is done, its added to the class where the initial method lies.
      */
-    private void handleNode(Node annotationNode, AstHelper helper) throws KendalException {
+    private void handleNode(Node annotationNode, Node sourceAnnotationNode, AstHelper helper) throws KendalException {
+        if (isPutOnAnnotation(annotationNode)) {
+            return; // because there is nothing to handle in such case
+        }
+
         Node<JCMethodDecl> initialMethod = (Node<JCMethodDecl>) annotationNode.getParent();
         Node<JCClassDecl> clazz = (Node<JCClassDecl>) initialMethod.getParent();
         JCMethodDecl m = initialMethod.getObject();
-        Name newMethodName = getNewMethodName(m.name.toString(), annotationNode.getParent());
-        if(!SourceVersion.isIdentifier(newMethodName.toString())) {
+        Clone cloneAnnotation = getCloneAnnotation(sourceAnnotationNode);
+        Name newMethodName = getNewMethodName(m.name.toString(), cloneAnnotation);
+        if (!SourceVersion.isIdentifier(newMethodName.toString())) {
             throw new InvalidAnnotationParamsException(String.format("%s is not a valid method identifier!", newMethodName.toString()));
         }
         validateMethodIsUnique(newMethodName, m.params, clazz);
-        Node<JCExpression> transformerClassAccessor = getTransformerClassAccessor(initialMethod);
+        Node<JCExpression> transformerClassAccessor = getTransformerClassAccessor(cloneAnnotation);
         Node<JCBlock> newMethodBlock = buildNewMethodBody(initialMethod, transformerClassAccessor);
-        JCModifiers modifiers = getModifiersForNewMethod(m, (JCTree.JCAnnotation) annotationNode.getObject());
-        eraseAnnotationParameters(annotationNode);
-        JCExpression transformerReturnType = getTransformMethodReturnType(initialMethod);
+        JCModifiers modifiers = getModifiersForNewMethod(m, (JCAnnotation) annotationNode.getObject());
+        JCExpression transformerReturnType = getTransformMethodReturnType(cloneAnnotation);
         Node<JCMethodDecl> newMethod = astNodeBuilder.methodDecl().build(modifiers, newMethodName, transformerReturnType,
                 m.typarams, m.params, m.thrown, newMethodBlock);
         helper.addElementToClass(clazz, newMethod, Mode.APPEND, 0);
     }
 
-    private void eraseAnnotationParameters(Node annotationNode) {
-        JCTree.JCAnnotation annotation = (JCTree.JCAnnotation) annotationNode.getObject();
-        annotation.args = astUtils.toJCList(StreamSupport.stream(annotation.args.spliterator(), false)
-                .filter(arg -> !((JCIdent) ((JCTree.JCAssign) arg).lhs).name.contentEquals("onMethod"))
-                .collect(Collectors.toList()));
+    private Clone getCloneAnnotation(Node<JCAnnotation> annotationNode) {
+        if (annotationNode.getParent().is(JCMethodDecl.class)) {
+            return ((JCMethodDecl) annotationNode.getParent().getObject()).sym.getAnnotation(Clone.class);
+        } else {
+            return ((JCClassDecl) annotationNode.getParent().getObject()).sym.getAnnotation(Clone.class);
+        }
+    }
+
+    private void eraseAnnotationParameters(Collection<Node> annotationNodes) {
+        annotationNodes.stream()
+                .filter(node -> node.getObject().type.tsym.getQualifiedName().contentEquals(getHandledAnnotationType().getName()))
+                .forEach(annotationNode -> {
+            JCAnnotation annotation = (JCAnnotation) annotationNode.getObject();
+            List<JCExpression> annotationArgsWithoutOnMethod = StreamSupport.stream(annotation.args.spliterator(), false)
+                    .filter(arg -> !((JCIdent) ((JCAssign) arg).lhs).name.contentEquals("onMethod"))
+                    .collect(Collectors.toList());
+            annotation.args = astUtils.toJCList(annotationArgsWithoutOnMethod);
+        });
     }
 
     private Node<JCBlock> buildNewMethodBody(Node<JCMethodDecl> initialMethod, Node<JCExpression> transformerClassAccessor) {
@@ -114,9 +138,9 @@ public class CloneHandler implements KendalHandler<Clone> {
      * Returns declared return type of method {@link Clone.Transformer#transform(Object)} defined by class specified
      * as {@link Clone#transformer()} for the method that is to be cloned.
      */
-    private JCExpression getTransformMethodReturnType(Node<JCMethodDecl> initialMethod) {
+    private JCExpression getTransformMethodReturnType(Clone cloneAnnotation) {
         try {
-            initialMethod.getObject().sym.getAnnotation(Clone.class).transformer();
+            cloneAnnotation.transformer();
         }
         catch (MirroredTypeException e) {
             Type.ClassType transformerClassType = (Type.ClassType) e.getTypeMirror();
@@ -150,9 +174,9 @@ public class CloneHandler implements KendalHandler<Clone> {
      * class specified as its argument. This method here finds this class and returns accessor to that class.
      * Accessor can be of type either {@link Node<JCIdent>} or {@link Node<JCFieldAccess>}.
      */
-    private Node<JCExpression> getTransformerClassAccessor(Node<JCMethodDecl> initialMethod) {
+    private Node<JCExpression> getTransformerClassAccessor(Clone cloneAnnotation) {
         try {
-            initialMethod.getObject().sym.getAnnotation(Clone.class).transformer();
+            cloneAnnotation.transformer();
         }
         catch (MirroredTypeException e) {
             TypeMirror transformerClassType = e.getTypeMirror();
@@ -197,8 +221,8 @@ public class CloneHandler implements KendalHandler<Clone> {
         return astNodeBuilder.block().build(throwStatement);
     }
 
-    private Name getNewMethodName(String originMethodName, Node<JCMethodDecl> newdMethod) {
-        String proposedName = newdMethod.getObject().sym.getAnnotation(Clone.class).methodName();
+    private Name getNewMethodName(String originMethodName, Clone cloneAnnotation) {
+        String proposedName = cloneAnnotation.methodName();
         String newMethodName = !Objects.equals("", proposedName) ? proposedName : originMethodName + "Clone";
         return astUtils.nameFromString(newMethodName);
     }
@@ -241,8 +265,8 @@ public class CloneHandler implements KendalHandler<Clone> {
         JCExpression value = StreamSupport.stream(cloneAnnotation.getArguments().spliterator(), false)
                 .filter(arg -> arg instanceof JCTree.JCAssign && ((JCIdent) ((JCTree.JCAssign) arg).lhs).name.contentEquals("onMethod"))
                 .findFirst().map(jcAssign -> (((JCTree.JCAssign) jcAssign).rhs)).orElse(null);
-        if(value != null) {
-            if(value instanceof JCTree.JCNewArray) {
+        if (value != null) {
+            if (value instanceof JCTree.JCNewArray) {
                 newModifiers.annotations = astUtils.toJCList(StreamSupport.stream(((JCTree.JCNewArray) value).elems.spliterator(), false)
                         .map(annotation -> (JCTree.JCAnnotation) annotation).collect(Collectors.toList()));
             }

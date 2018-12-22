@@ -22,32 +22,32 @@ public class AstValidatorImpl implements AstValidator {
 
     @Override
     public boolean isClass(Node node) {
-        return Utils.ifNotNull(node, n -> n.getObject() instanceof JCClassDecl, false);
+        return Utils.ifNotNull(node, n -> n.is(JCClassDecl.class), false);
     }
 
     @Override
     public boolean isVariable(Node node) {
-        return Utils.ifNotNull(node, n -> n.getObject() instanceof JCVariableDecl, false);
+        return Utils.ifNotNull(node, n -> n.is(JCVariableDecl.class), false);
     }
 
     @Override
     public boolean isExpression(Node node) {
-        return Utils.ifNotNull(node, n -> n.getObject() instanceof JCExpression, false);
+        return Utils.ifNotNull(node, n -> n.is(JCExpression.class), false);
     }
 
     @Override
     public boolean isIdent(Node node) {
-        return Utils.ifNotNull(node, n -> n.getObject() instanceof JCIdent, false);
+        return Utils.ifNotNull(node, n -> n.is(JCIdent.class), false);
     }
 
     @Override
     public boolean isExpressionStatement(Node node) {
-        return Utils.ifNotNull(node, n -> n.getObject() instanceof JCExpressionStatement, false);
+        return Utils.ifNotNull(node, n -> n.is(JCExpressionStatement.class), false);
     }
 
     @Override
     public boolean isMethod(Node node) {
-        return Utils.ifNotNull(node, n -> n.getObject() instanceof JCMethodDecl, false);
+        return Utils.ifNotNull(node, n -> n.is(JCMethodDecl.class), false);
     }
 
     @Override

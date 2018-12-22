@@ -1,11 +1,6 @@
 package kendal.processor;
 
-import static kendal.utils.Utils.with;
-
-import java.util.HashSet;
-import java.util.Map;
-import java.util.ServiceLoader;
-import java.util.Set;
+import java.util.*;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 import java.util.stream.StreamSupport;
@@ -20,8 +15,11 @@ import javax.lang.model.element.TypeElement;
 import javax.tools.Diagnostic;
 
 import com.sun.source.util.Trees;
+import com.sun.tools.javac.code.Flags;
 import com.sun.tools.javac.processing.JavacProcessingEnvironment;
+import com.sun.tools.javac.tree.JCTree;
 import com.sun.tools.javac.tree.JCTree.JCAnnotation;
+import com.sun.tools.javac.tree.JCTree.JCClassDecl;
 import com.sun.tools.javac.util.Context;
 
 import kendal.api.AstHelper;
@@ -33,6 +31,9 @@ import kendal.model.ForestBuilder;
 import kendal.model.Node;
 import kendal.utils.ForestUtils;
 import kendal.utils.KendalMessager;
+
+import static kendal.utils.AnnotationUtils.annotationNameMatches;
+import static kendal.utils.AnnotationUtils.isPutOnAnnotation;
 
 @SupportedAnnotationTypes("*")
 @SupportedSourceVersion(SourceVersion.RELEASE_8)
@@ -72,23 +73,35 @@ public class KendalProcessor extends AbstractProcessor {
 
     private Map<KendalHandler, Set<Node>> getHandlerAnnotationsMap(Set<KendalHandler> handlers, Set<Node> forest) {
         long startTime = System.currentTimeMillis();
-        Map<KendalHandler, Set<Node>> result = handlers.stream().collect(Collectors.toMap(Function.identity(), h -> new HashSet<>()));
-        ForestUtils.traverse(forest, node -> {
-            if (node.getObject() instanceof JCAnnotation) {
-                handlers.forEach(handler -> {
-                    if (handler.getHandledAnnotationType() == null) return;
-                    with((JCAnnotation)node.getObject(), jcAnnotation -> {
-                        if (jcAnnotation.type.tsym.getQualifiedName().contentEquals(handler.getHandledAnnotationType().getName())) {
-                            result.get(handler).add(node);
-                            messager.printMessage(Diagnostic.Kind.NOTE, String.format("annotation %s handled by %s", jcAnnotation.toString(), handler.getClass().getName()));
+        Map<KendalHandler, Set<Node>> handlersWithNodes = handlers.stream()
+                .collect(Collectors.toMap(Function.identity(), h -> new HashSet<>()));
+
+        Map<String, KendalHandler> handlerAnnotationMap = handlers.stream()
+                .filter(kendalHandler -> kendalHandler.getHandledAnnotationType() != null)
+                .collect(Collectors.toMap(h -> h.getHandledAnnotationType().getName(), Function.identity()));
+
+        while(handlerAnnotationMap.size() > 0) {
+            Map<String, KendalHandler> newHandlerAnnotationMap = new HashMap<>();
+            Map<String, KendalHandler> finalHandlerAnnotationMap = handlerAnnotationMap;
+            ForestUtils.traverse(forest, node -> {
+                if (node.is(JCAnnotation.class)) {
+                    finalHandlerAnnotationMap.forEach((annotationName, handler) ->  {
+                        if (annotationNameMatches(node, annotationName)) {
+                            if (isPutOnAnnotation(node)) {
+                                newHandlerAnnotationMap.put(((JCClassDecl) node.getParent().getObject()).sym.type.tsym.getQualifiedName().toString(), handler);
+                            }
+                            handlersWithNodes.get(handler).add(node);
+                            messager.printMessage(Diagnostic.Kind.NOTE, String.format("annotation %s handled by %s",
+                                    node.getObject().toString(), handler.getClass().getName()));
                         }
                     });
-                });
-            }
-        });
+                }
+            });
+            handlerAnnotationMap = newHandlerAnnotationMap;
+        }
 
         messager.printElapsedTime("Annotations' scanner", startTime);
-        return result;
+        return handlersWithNodes;
     }
 
     private Set<KendalHandler> getHandlersFromSPI() {
@@ -108,10 +121,10 @@ public class KendalProcessor extends AbstractProcessor {
 
     private void executeHandlers(Map<KendalHandler, Set<Node>> handlersMap, Set<Node> forest) {
         messager.printMessage(Diagnostic.Kind.NOTE, "### Handlers' execution ###");
-        handlersMap.forEach((handler, nodes) -> {
+        handlersMap.forEach((handler, annotationNodes) -> {
             try {
                 long startTime = System.currentTimeMillis();
-                if (handler.getHandledAnnotationType() != null) handler.handle(nodes, astHelper);
+                if (handler.getHandledAnnotationType() != null) handler.handle(annotationNodes, astHelper);
                 else handler.handle(forest, astHelper);
                 messager.printElapsedTime("Handler" + handler.getClass().getName(), startTime);
             } catch (KendalException | KendalRuntimeException e) {
@@ -119,5 +132,4 @@ public class KendalProcessor extends AbstractProcessor {
             }
         });
     }
-
 }

@@ -1,7 +1,5 @@
 package kendal.handlers;
 
-import java.lang.reflect.Array;
-import java.lang.reflect.Field;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
@@ -16,7 +14,6 @@ import com.sun.tools.javac.tree.JCTree.JCUnary;
 import kendal.api.AstHelper;
 import kendal.api.AstNodeBuilder;
 import kendal.api.KendalHandler;
-import kendal.api.exceptions.KendalRuntimeException;
 import kendal.model.Node;
 import kendal.model.TreeBuilder;
 import kendal.utils.ForestUtils;
@@ -38,7 +35,7 @@ public class StringInterpolationHandler implements KendalHandler {
     private void interpolate(Collection<Node> nodes) {
         List<Node<? extends JCTree>> interpolationTargets = new ArrayList<>();
         ForestUtils.traverse(nodes, node -> {
-            if (node.getObject() instanceof JCUnary
+            if (node.is(JCUnary.class)
                     && node.getObject().getTag().equals(JCTree.Tag.POS) // unary +
                     && ((JCUnary) node.getObject()).arg instanceof JCLiteral
                     && ((JCLiteral) ((JCUnary) node.getObject()).arg).value instanceof String) {

@@ -3,6 +3,7 @@ package kendal.model;
 import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Objects;
 import java.util.stream.Collectors;
 
 import com.sun.tools.javac.tree.JCTree;
@@ -70,8 +71,24 @@ public class Node <T extends JCTree> {
         newChild.parent = this;
     }
 
+    public boolean is(Class clazz) {
+        return clazz.isInstance(object);
+    }
+
     static void finishInitialPhase() {
         isInitialPhase = false;
     }
 
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        Node<?> node = (Node<?>) o;
+        return Objects.equals(object, node.object);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(object);
+    }
 }

@@ -1,11 +1,11 @@
 package kendal.utils;
 
-import kendal.model.Node;
-
 import java.util.Collection;
 import java.util.HashSet;
 import java.util.Set;
 import java.util.function.Consumer;
+
+import kendal.model.Node;
 
 public class ForestUtils {
 
@@ -34,7 +34,7 @@ public class ForestUtils {
         }
 
         private void traverse(Node<?> node) {
-            if(!visited.contains(node)) {
+            if (!visited.contains(node)) {
                 visited.add(node);
                 consumer.accept(node);
                 node.getChildren().forEach(this::traverse);

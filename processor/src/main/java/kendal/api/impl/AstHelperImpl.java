@@ -1,15 +1,22 @@
 package kendal.api.impl;
 
+import static kendal.utils.AnnotationUtils.isPutOnAnnotation;
 import static kendal.utils.Utils.with;
 
 import java.lang.reflect.Array;
 import java.lang.reflect.Field;
+import java.util.Collection;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.Map;
+import java.util.Set;
 import java.util.stream.Collectors;
 import java.util.stream.StreamSupport;
 
 import javax.lang.model.element.Name;
 
 import com.sun.tools.javac.tree.JCTree;
+import com.sun.tools.javac.tree.JCTree.JCAnnotation;
 import com.sun.tools.javac.tree.JCTree.JCBlock;
 import com.sun.tools.javac.tree.JCTree.JCClassDecl;
 import com.sun.tools.javac.tree.JCTree.JCExpressionStatement;
@@ -61,7 +68,7 @@ public class AstHelperImpl implements AstHelper {
                             Node<? extends JCTree> oldNode,
                             Node<? extends JCTree> newNode) {
         // Update Kendal AST
-        if(!parent.getChildren().remove(oldNode)) {
+        if (!parent.getChildren().remove(oldNode)) {
             throw new InvalidArgumentException("oldNode does not belong to children collection!");
         }
         parent.getChildren().add(newNode);
@@ -133,7 +140,7 @@ public class AstHelperImpl implements AstHelper {
     }
 
     private boolean bodyContainsSuperInvocation(Node<JCBlock> body) {
-        if (!body.getChildren().isEmpty() && body.getChildren().get(0).getObject() instanceof JCExpressionStatement) {
+        if (!body.getChildren().isEmpty() && body.getChildren().get(0).is(JCExpressionStatement.class)) {
             JCExpressionStatement firstLineExpStat = (JCExpressionStatement) body.getChildren().get(0).getObject();
             if (firstLineExpStat.expr instanceof JCMethodInvocation) {
                 JCMethodInvocation methodInv = (JCMethodInvocation) firstLineExpStat.expr;
@@ -147,8 +154,7 @@ public class AstHelperImpl implements AstHelper {
     @Override
     public Node<JCVariableDecl> findFieldByNameAndType(Node<JCClassDecl> classDeclNode, Name name) {
         return classDeclNode.getChildren().stream()
-                .filter(node -> node.getObject() instanceof JCVariableDecl
-                        && ((JCVariableDecl) node.getObject()).name.equals(name))
+                .filter(node -> node.is(JCVariableDecl.class) && ((JCVariableDecl) node.getObject()).name.equals(name))
                 .map(node -> (Node<JCVariableDecl>) node)
                 .findAny().orElse(null);
     }
@@ -171,6 +177,60 @@ public class AstHelperImpl implements AstHelper {
     @Override
     public AstUtils getAstUtils() {
         return astUtils;
+    }
+
+    @Override
+    public Map<Node, Node> getAnnotationSourceMap(Collection<Node> annotationNodes, String sourceQualifiedName) {
+        // annotation node -> base annotation node
+        Map<Node, Node> annotationToSourceMap = annotationNodes.stream()
+                .map(node -> ((Node<JCAnnotation>) node))
+                .collect(HashMap::new, (m,v) -> {
+                    if (v.getObject().type.tsym.getQualifiedName().contentEquals(sourceQualifiedName)) {
+                        m.put(v, v);
+                    } else {
+                        m.put(v, null);
+                    }
+                }, HashMap::putAll);
+        // annotation name -> annotation JCClassDecl
+        Map<String, Node<JCClassDecl>> annotationTypesMap = new HashMap<>();
+        annotationNodes.forEach(node -> {
+            if (isPutOnAnnotation(node)) {
+                annotationTypesMap.put(((JCClassDecl) node.getParent().getObject()).sym.type.tsym.getQualifiedName().toString(), node.getParent());
+            }
+        });
+
+        // indirect annotation name -> source annotation node
+        Map<String, Node<JCAnnotation>> typesToSource = new HashMap<>();
+
+        Set<Node> nodesWithoutSource = annotationToSourceMap.entrySet()
+                .stream()
+                .filter(entry -> entry.getValue() == null).map(Map.Entry::getKey)
+                .collect(Collectors.toSet());
+        while (!nodesWithoutSource.isEmpty()) {
+            Set<Node> assignedNodes = new HashSet<>();
+            nodesWithoutSource.forEach(node -> {
+                String indirectAnnotationName = node.getObject().type.tsym.getQualifiedName().toString();
+                Node<JCClassDecl> indirectAnnotationType = annotationTypesMap.get(indirectAnnotationName);
+                indirectAnnotationType.getChildren().stream()
+                        .filter(n -> n.is(JCAnnotation.class))
+                        .forEach(jcAnnotationNode -> {
+                    String annotationName = jcAnnotationNode.getObject().type.tsym.getQualifiedName().toString();
+                    if (annotationName.equals(sourceQualifiedName)) {
+                        annotationToSourceMap.put(node, jcAnnotationNode);
+                        assignedNodes.add(node);
+                        typesToSource.put(node.getObject().type.tsym.getQualifiedName().toString(), jcAnnotationNode);
+                    } else if(typesToSource.containsKey(annotationName)) {
+                        annotationToSourceMap.put(node, typesToSource.get(annotationName));
+                        assignedNodes.add(node);
+                        typesToSource.put(node.getObject().type.tsym.getQualifiedName().toString(), jcAnnotationNode);
+                    }
+                });
+            });
+            nodesWithoutSource.removeAll(assignedNodes);
+            assignedNodes.clear();
+        }
+
+        return annotationToSourceMap;
     }
 
     private <T extends JCTree> List<T> append(List<T> defs, T element, int offset) {
