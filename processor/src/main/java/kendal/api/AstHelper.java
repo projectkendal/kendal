@@ -1,5 +1,8 @@
 package kendal.api;
 
+import java.util.Collection;
+import java.util.Map;
+
 import javax.lang.model.element.Name;
 
 import com.sun.tools.javac.tree.JCTree;
@@ -10,11 +13,7 @@ import com.sun.tools.javac.tree.JCTree.JCVariableDecl;
 import com.sun.tools.javac.util.Context;
 
 import kendal.api.exceptions.ImproperNodeTypeException;
-import kendal.api.exceptions.InvalidArgumentException;
 import kendal.model.Node;
-
-import java.util.Collection;
-import java.util.Map;
 
 /**
  * Interface for AST modification helper class

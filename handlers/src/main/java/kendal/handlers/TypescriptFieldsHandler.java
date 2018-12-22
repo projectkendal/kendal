@@ -1,11 +1,14 @@
 package kendal.handlers;
 
+import static kendal.utils.AnnotationUtils.isPutOnAnnotation;
+
 import java.lang.annotation.Annotation;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
+import java.util.Map;
 
-import com.sun.tools.javac.tree.JCTree;
+import com.sun.tools.javac.code.Symbol;
 import com.sun.tools.javac.tree.JCTree.JCAnnotation;
 import com.sun.tools.javac.tree.JCTree.JCClassDecl;
 import com.sun.tools.javac.tree.JCTree.JCExpressionStatement;
@@ -43,19 +46,24 @@ public abstract class TypescriptFieldsHandler<T extends Annotation> implements K
     public void handle(Collection<Node> annotationNodes, AstHelper helper) throws KendalException {
         this.helper = helper;
         astNodeBuilder = helper.getAstNodeBuilder();
+        Map<Node, Node> indirectToSource = helper.getAnnotationSourceMap(annotationNodes, getHandledAnnotationType().getName());
         for (Node annotationNode : annotationNodes) {
-            handleNode(annotationNode);
+            handleNode(annotationNode, indirectToSource.get(annotationNode));
         }
     }
 
-    private void handleNode(Node<JCAnnotation> annotationNode) throws KendalException {
+    private void handleNode(Node<JCAnnotation> annotationNode, Node<JCAnnotation> sourceAnnotationNode) throws KendalException {
+        if (isPutOnAnnotation(annotationNode)) {
+            return; // because there is nothing to handle in such case
+        }
+
         Node<JCMethodDecl> constructor = (Node<JCMethodDecl>) annotationNode.getParent().getParent();
         if (!helper.getAstValidator().isConstructor(constructor)) {
             throw new InvalidAnnotationException(
                     String.format("%s Annotated element must be parameter of a constructor!", annotationNode.getObject().toString()));
         }
 
-        List<Modifier> modifiers = getModifiers(getFinalParamValue(annotationNode));
+        List<Modifier> modifiers = getModifiers(getFinalParamValue(sourceAnnotationNode));
 
         Node<JCClassDecl> clazz = (Node<JCClassDecl>) constructor.getParent();
         Name name = ((JCVariableDecl)annotationNode.getParent().getObject()).name;
@@ -100,9 +108,14 @@ public abstract class TypescriptFieldsHandler<T extends Annotation> implements K
         return list;
     }
 
-    private boolean getFinalParamValue(Node<JCTree.JCAnnotation> annotationNode) {
-        T annotation = ((JCVariableDecl) annotationNode.getParent().getObject()).sym.getAnnotation(getHandledAnnotationType());
-        return getMakeFinalValue(annotation);
+    private boolean getFinalParamValue(Node<JCAnnotation> sourceAnnotationNode) {
+        Symbol symbol;
+        if (sourceAnnotationNode.getParent().is(JCVariableDecl.class)) {
+            symbol = ((JCVariableDecl) sourceAnnotationNode.getParent().getObject()).sym;
+        } else {
+            symbol = ((JCClassDecl) sourceAnnotationNode.getParent().getObject()).sym;
+        }
+        return getMakeFinalValue(symbol.getAnnotation(getHandledAnnotationType()));
     }
 
     protected abstract boolean getMakeFinalValue(T annotation);

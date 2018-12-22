@@ -53,15 +53,17 @@ import kendal.model.Node;
 public class CloneHandler implements KendalHandler<Clone> {
 
     private AstNodeBuilder astNodeBuilder;
+    private AstHelper helper;
     private AstUtils astUtils;
 
     @Override
     public void handle(Collection<Node> annotationNodes, AstHelper helper) throws KendalException {
+        this.helper = helper;
         astNodeBuilder = helper.getAstNodeBuilder();
         astUtils = helper.getAstUtils();
         Map<Node, Node> indirectToSource = helper.getAnnotationSourceMap(annotationNodes, getHandledAnnotationType().getName());
         for (Node annotationNode : annotationNodes) {
-            handleNode(annotationNode, indirectToSource.get(annotationNode), helper);
+            handleNode(annotationNode, indirectToSource.get(annotationNode));
         }
         eraseAnnotationParameters(annotationNodes);
     }
@@ -72,7 +74,7 @@ public class CloneHandler implements KendalHandler<Clone> {
      * Such an expression requires try-catch block around it so it is also added here.
      * When method creation is done, its added to the class where the initial method lies.
      */
-    private void handleNode(Node annotationNode, Node sourceAnnotationNode, AstHelper helper) throws KendalException {
+    private void handleNode(Node<JCAnnotation> annotationNode, Node<JCAnnotation> sourceAnnotationNode) throws KendalException {
         if (isPutOnAnnotation(annotationNode)) {
             return; // because there is nothing to handle in such case
         }
@@ -88,7 +90,7 @@ public class CloneHandler implements KendalHandler<Clone> {
         validateMethodIsUnique(newMethodName, m.params, clazz);
         Node<JCExpression> transformerClassAccessor = getTransformerClassAccessor(cloneAnnotation);
         Node<JCBlock> newMethodBlock = buildNewMethodBody(initialMethod, transformerClassAccessor);
-        JCModifiers modifiers = getModifiersForNewMethod(m, (JCAnnotation) annotationNode.getObject());
+        JCModifiers modifiers = getModifiersForNewMethod(m, annotationNode.getObject());
         JCExpression transformerReturnType = getTransformMethodReturnType(cloneAnnotation);
         Node<JCMethodDecl> newMethod = astNodeBuilder.methodDecl().build(modifiers, newMethodName, transformerReturnType,
                 m.typarams, m.params, m.thrown, newMethodBlock);

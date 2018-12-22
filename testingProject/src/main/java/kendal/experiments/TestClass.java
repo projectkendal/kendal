@@ -8,7 +8,7 @@ import kendal.annotations.Public;
 public class TestClass {
     protected int x;
 
-    public TestClass(@Public(makeFinal = false) int a, @Public(makeFinal = false) List<Integer> b, @Protected Object meineFinale) {
+    public TestClass(@NotFinalPublic int a, @Public(makeFinal = false) List<Integer> b, @Protected Object meineFinale) {
         this.x = a;
         System.out.println("Let's have here some expression statement");
     }
@@ -22,4 +22,7 @@ public class TestClass {
         a = 15;
         return a;
     }
+
+    @Public(makeFinal = false)
+    private @interface NotFinalPublic { }
 }
