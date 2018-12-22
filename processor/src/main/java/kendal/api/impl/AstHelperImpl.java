@@ -172,6 +172,7 @@ public class AstHelperImpl implements AstHelper {
 
     @Override
     public Map<Node, Node> getAnnotationSourceMap(Collection<Node> annotationNodes, String sourceQualifiedName) {
+        // annotation node -> base annotation node
         Map<Node, Node> annotationToSourceMap = annotationNodes.stream()
                 .map(node -> ((Node<JCAnnotation>) node))
                 .collect(HashMap::new, (m,v) -> {
@@ -181,6 +182,7 @@ public class AstHelperImpl implements AstHelper {
                         m.put(v, null);
                     }
                 }, HashMap::putAll);
+        // annotation name -> annotation JCClassDecl
         Map<String, Node<JCClassDecl>> annotationTypesMap = new HashMap<>();
         annotationNodes.forEach(node -> {
             if(isPutOnAnnotation(node)) {
@@ -188,6 +190,7 @@ public class AstHelperImpl implements AstHelper {
             }
         });
 
+        // indirect annotation name -> source annotation node
         Map<String, Node<JCAnnotation>> typesToSource = new HashMap<>();
 
         Set<Node> nodesWithoutSource = annotationToSourceMap.entrySet()
