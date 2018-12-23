@@ -1,6 +1,7 @@
 package kendal.test.positive.interpolation;
 
 import static kendal.test.utils.ValuesGenerator.i;
+import static kendal.test.utils.ValuesGenerator.s;
 import static org.testng.Assert.assertEquals;
 
 import org.testng.annotations.Test;
@@ -57,6 +58,88 @@ public class StringInterpolation_differentContexts {
         assertEquals(result, expected);
     }
 
+    @Test
+    public void shouldInterpolate_stringConcatenationWithStringLHS() {
+        // GIVEN
+        String someString = s();
+        int someNumber = i();
+
+        // WHEN
+        String result = +"Variable value is: ${someNumber}" + someString;
+
+        // THEN
+        String expected = ("Variable value is: " + someNumber) + someString;
+        assertEquals(result, expected);
+    }
+
+    @Test
+    public void shouldInterpolate_stringConcatenationWithStringRHS() {
+        // GIVEN
+        String someString = s();
+        int someNumber = i();
+
+        // WHEN
+        String result = someString + +"Variable value is: ${someNumber}";
+
+        // THEN
+        String expected = someString + "Variable value is: " + someNumber;
+        assertEquals(result, expected);
+    }
+
+    @Test
+    public void shouldInterpolate_stringConcatenationWithIntLHS() {
+        // GIVEN
+        int someNumber1 = i();
+        int someNumber2 = i();
+
+        // WHEN
+        String result = +"Variable value is: ${someNumber1}" + someNumber2;
+
+        // THEN
+        String expected = ("Variable value is: " + someNumber1) + someNumber2;
+        assertEquals(result, expected);
+    }
+
+    @Test
+    public void shouldInterpolate_stringConcatenationWithIntRHS() {
+        // GIVEN
+        int someNumber1 = i();
+        int someNumber2 = i();
+
+        // WHEN
+        String result = someNumber2 + +"Variable value is: ${someNumber1}";
+
+        // THEN
+        String expected = someNumber2 + "Variable value is: " + someNumber1;
+        assertEquals(result, expected);
+    }
+
+    @Test
+    public void shouldInterpolate_parenthesis() {
+        // GIVEN
+        int someNumber = i();
+
+        // WHEN
+        String result = (+"Variable value is: ${someNumber}");
+
+        // THEN
+        String expected = "Variable value is: " + someNumber;
+        assertEquals(result, expected);
+    }
+
+    @Test
+    public void shouldInterpolate_return() {
+        // GIVEN
+        int someNumber = i();
+
+        // WHEN
+        String result = methodReturningInterpolatedString(someNumber);
+
+        // THEN
+        String expected = "Variable value is: " + someNumber;
+        assertEquals(result, expected);
+    }
+
 
 
     // Auxiliary stuff:
@@ -64,5 +147,10 @@ public class StringInterpolation_differentContexts {
     String someMethod(String param1, int param2) {
         return param1 + " | " + param2;
     }
+
+    String methodReturningInterpolatedString(int value) {
+        return +"Variable value is: ${value}";
+    }
+
 
 }

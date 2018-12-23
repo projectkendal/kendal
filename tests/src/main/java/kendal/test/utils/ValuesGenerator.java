@@ -8,14 +8,14 @@ public class ValuesGenerator {
      * Returns a number.
      */
     public static int i() {
-        return 1;
+        return 123;
     }
 
     /**
      * Returns a string.
      */
     public static String s() {
-        return "str";
+        return "str#ing%$.";
     }
 
     /**
