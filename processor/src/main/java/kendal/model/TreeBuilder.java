@@ -258,6 +258,9 @@ public class TreeBuilder {
             if (def instanceof JCMethodInvocation) {
                 return buildNode((JCMethodInvocation) def);
             }
+            if (def instanceof JCNewClass) {
+                return buildNode((JCNewClass) def);
+            }
             if (def instanceof JCBinary) {
                 return buildNode((JCBinary) def);
             }

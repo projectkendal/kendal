@@ -35,7 +35,7 @@ public class StringInterpolation_differentContexts {
         int param2 = i();
 
         // WHEN
-        int result = someMethod(+"Variable value is: ${someNumber}", param2);
+        String result = someMethod(+"Variable value is: ${someNumber}", param2);
 
         // THEN
         String expected = someMethod("Variable value is: " + someNumber, param2);
