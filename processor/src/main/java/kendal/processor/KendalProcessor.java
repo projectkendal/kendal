@@ -74,7 +74,8 @@ public class KendalProcessor extends AbstractProcessor {
         if(firstRound) {
             handleAnnotationInheritance(forest);
             try {
-                JavaFileObject fileObject = processingEnv.getFiler().createSourceFile("KendalGreatestFrameworkInTheWorld.java", null);
+                // force next processing round
+                JavaFileObject fileObject = processingEnv.getFiler().createSourceFile("KendalGreatestFrameworkInTheWorld", null);
                 Writer writer = fileObject.openWriter();
                 writer.close();
                 firstRoundNodes = forest;
@@ -98,17 +99,16 @@ public class KendalProcessor extends AbstractProcessor {
     }
 
     private void handleAnnotationInheritance(Set<Node> forest) {
-        handleInherit(forest);
+        handleInherit(forest, getAnnotationsDeclMap(forest));
         handleAttribute(forest);
         handleAttrReference(forest);
     }
 
-    private void handleInherit(Set<Node> forest) {
+    private void handleInherit(Set<Node> forest, Map<String, Node<JCClassDecl>> annotationsDeclMap) {
         Set<Node> inherits = getAnnotationsOfType(forest, Inherit.class);
         Set<JCClassDecl> handledAnnotations = new HashSet<>();
         inherits.forEach(node -> handleInheritingAnnotation((JCClassDecl) node.getParent().getObject(),
-                handledAnnotations,
-                getAnnotationsDeclMap(forest)));
+                handledAnnotations, annotationsDeclMap));
     }
 
     private void handleInheritingAnnotation(JCClassDecl annotationDecl, Set<JCClassDecl> handledNodes, Map<String, Node<JCClassDecl>> annotationsDeclMap) {
