@@ -71,11 +71,11 @@ public class CloneTest {
     @Retention(RetentionPolicy.RUNTIME)
     @Inherit(@Clone)
     @Attribute.List({
-            @Attribute(name = "onMethod", value = {@RequestMapping(value = @AttrReference("endpoint"), method = "POST")})
+//            @Attribute(name = "onMethod", value = {@RequestMapping(value = @AttrReference("endpoint"), method = "POST")})
     })
     @interface WunderClone {
 
-        String endpoint();
+        String endpoint() default "someValue";
     }
 
     public @interface RequestMapping {

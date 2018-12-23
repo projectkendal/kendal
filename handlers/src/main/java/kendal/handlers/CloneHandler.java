@@ -1,6 +1,7 @@
 package kendal.handlers;
 
 import static kendal.utils.AnnotationUtils.isPutOnAnnotation;
+import static kendal.utils.AnnotationUtils.isPutOnMethod;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -75,7 +76,7 @@ public class CloneHandler implements KendalHandler<Clone> {
      * When method creation is done, its added to the class where the initial method lies.
      */
     private void handleNode(Node<JCAnnotation> annotationNode, Node<JCAnnotation> sourceAnnotationNode) throws KendalException {
-        if (isPutOnAnnotation(annotationNode)) {
+        if (!isPutOnMethod(annotationNode)) {
             return; // because there is nothing to handle in such case
         }
 
