@@ -1,11 +1,11 @@
 package kendal.experiments;
 
-import java.lang.annotation.ElementType;
-import java.lang.annotation.Retention;
-import java.lang.annotation.RetentionPolicy;
-import java.lang.annotation.Target;
+import java.lang.annotation.*;
 
 import kendal.annotations.Clone;
+import kendal.api.inheritance.AttrReference;
+import kendal.api.inheritance.Attribute;
+import kendal.api.inheritance.Inherit;
 import kendal.experiments.subpackage.TestClassTransformer;
 
 public class CloneTest {
@@ -63,4 +63,24 @@ public class CloneTest {
     @interface NamedIndirectClone {
     }
 
+    @Target(ElementType.METHOD)
+    @Retention(RetentionPolicy.RUNTIME)
+    @Inherit(@Clone)
+    @Attribute.List({
+            @Attribute(name = "onMethod", value = {@RequestMapping(value = @AttrReference("endpoint"), method = "POST")})
+    })
+    @interface WunderClone {
+
+        String endpoint();
+    }
+
+    @interface RequestMapping {
+        String value();
+        String method();
+    }
+
+    @interface TestShit {
+        String value();
+        RequestMapping[] mappings();
+    }
 }
