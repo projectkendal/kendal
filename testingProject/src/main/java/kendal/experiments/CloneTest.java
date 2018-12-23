@@ -1,6 +1,10 @@
 package kendal.experiments;
 
 import java.lang.annotation.*;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collection;
+import java.util.List;
 
 import kendal.annotations.Clone;
 import kendal.api.inheritance.AttrReference;
@@ -74,13 +78,16 @@ public class CloneTest {
         String endpoint();
     }
 
-    @interface RequestMapping {
+    public @interface RequestMapping {
         String value();
         String method();
     }
 
-    @interface TestShit {
-        String value();
-        RequestMapping[] mappings();
+    public class CsvTransformer implements Clone.Transformer<Collection<?>, String> {
+
+        @Override
+        public String transform(Collection<?> input) {
+            return "imagine here is input serialized to csv";
+        }
     }
 }
