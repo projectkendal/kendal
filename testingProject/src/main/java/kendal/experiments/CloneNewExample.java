@@ -14,8 +14,7 @@ public class CloneNewExample {
 
     @Inherit(@Clone(transformer = CsvTransformer.class))
 //    @Attribute(name = "onMethod", value = {@RequestMapping(value = @AttrReference("endpoint"), method = "POST")})
-//    @Attribute(name = "onMethod", value = {@RequestMapping(value = "val from Attribute", method = "POST")})
-    @Attribute(name = "methodName", value = "assignedFromAttribute")
+    @Attribute(name = "onMethod", value = {@RequestMapping(value = "val from Attribute", method = "POST")})
     @interface CsvEndpoint {
         String endpoint();
     }

@@ -15,6 +15,10 @@ import java.util.stream.StreamSupport;
 
 import javax.lang.model.element.Name;
 
+import com.sun.tools.javac.code.Attribute;
+import com.sun.tools.javac.code.Scope;
+import com.sun.tools.javac.code.Symbol;
+import com.sun.tools.javac.code.Symtab;
 import com.sun.tools.javac.tree.JCTree;
 import com.sun.tools.javac.tree.JCTree.JCAnnotation;
 import com.sun.tools.javac.tree.JCTree.JCBlock;
@@ -231,6 +235,24 @@ public class AstHelperImpl implements AstHelper {
         }
 
         return annotationToSourceMap;
+    }
+
+    @Override
+    public Map<String, Object> getAnnotationValues(Node<JCAnnotation> annotationNode) {
+        Map<String, Object> values = new HashMap<>();
+        Attribute.Compound attribute = annotationNode.getObject().attribute;
+        // gather defaults
+        for(Scope.Entry entry = ((Symbol.ClassSymbol) attribute.type.tsym).members_field.elems; entry != null; entry = entry.sibling) {
+            if(entry.sym instanceof Symbol.MethodSymbol) {
+                Attribute defaultValue = ((Symbol.MethodSymbol) entry.sym).defaultValue;
+                values.put(entry.sym.name.toString(), defaultValue == null ? null : defaultValue.getValue());
+            }
+        }
+
+        // override with actual
+        attribute.values.forEach(val -> values.put(val.fst.name.toString(), val.snd.getValue()));
+
+        return values;
     }
 
     private <T extends JCTree> List<T> append(List<T> defs, T element, int offset) {

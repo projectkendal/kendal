@@ -4,6 +4,7 @@ import java.util.List;
 
 import kendal.annotations.Protected;
 import kendal.annotations.Public;
+import kendal.api.inheritance.Inherit;
 
 public class TestClass {
     protected int x;
@@ -23,6 +24,6 @@ public class TestClass {
         return a;
     }
 
-    @Public(makeFinal = false)
+    @Inherit(@Public(makeFinal = false))
     private @interface NotFinalPublic { }
 }

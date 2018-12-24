@@ -3,6 +3,7 @@ package kendal.handlers;
 import static kendal.utils.AnnotationUtils.isPutOnAnnotation;
 import static kendal.utils.AnnotationUtils.isPutOnMethod;
 
+import java.lang.annotation.Annotation;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
@@ -62,9 +63,8 @@ public class CloneHandler implements KendalHandler<Clone> {
         this.helper = helper;
         astNodeBuilder = helper.getAstNodeBuilder();
         astUtils = helper.getAstUtils();
-        Map<Node, Node> indirectToSource = helper.getAnnotationSourceMap(annotationNodes, getHandledAnnotationType().getName());
         for (Node annotationNode : annotationNodes) {
-            handleNode(annotationNode, indirectToSource.get(annotationNode));
+            handleNode(annotationNode);
         }
         eraseAnnotationParameters(annotationNodes);
     }
@@ -75,7 +75,7 @@ public class CloneHandler implements KendalHandler<Clone> {
      * Such an expression requires try-catch block around it so it is also added here.
      * When method creation is done, its added to the class where the initial method lies.
      */
-    private void handleNode(Node<JCAnnotation> annotationNode, Node<JCAnnotation> sourceAnnotationNode) throws KendalException {
+    private void handleNode(Node<JCAnnotation> annotationNode) throws KendalException {
         if (!isPutOnMethod(annotationNode)) {
             return; // because there is nothing to handle in such case
         }
@@ -83,16 +83,16 @@ public class CloneHandler implements KendalHandler<Clone> {
         Node<JCMethodDecl> initialMethod = (Node<JCMethodDecl>) annotationNode.getParent();
         Node<JCClassDecl> clazz = (Node<JCClassDecl>) initialMethod.getParent();
         JCMethodDecl m = initialMethod.getObject();
-        Clone cloneAnnotation = getCloneAnnotation(sourceAnnotationNode);
-        Name newMethodName = getNewMethodName(m.name.toString(), cloneAnnotation);
+        Map<String, Object> annotationValues = helper.getAnnotationValues(annotationNode);
+        Name newMethodName = getNewMethodName(m.name.toString(), annotationValues);
         if (!SourceVersion.isIdentifier(newMethodName.toString())) {
             throw new InvalidAnnotationParamsException(String.format("%s is not a valid method identifier!", newMethodName.toString()));
         }
         validateMethodIsUnique(newMethodName, m.params, clazz);
-        Node<JCExpression> transformerClassAccessor = getTransformerClassAccessor(cloneAnnotation);
+        Node<JCExpression> transformerClassAccessor = getTransformerClassAccessor(annotationValues);
         Node<JCBlock> newMethodBlock = buildNewMethodBody(initialMethod, transformerClassAccessor);
         JCModifiers modifiers = getModifiersForNewMethod(m, annotationNode.getObject());
-        JCExpression transformerReturnType = getTransformMethodReturnType(cloneAnnotation);
+        JCExpression transformerReturnType = getTransformMethodReturnType(annotationValues);
         Node<JCMethodDecl> newMethod = astNodeBuilder.methodDecl().build(modifiers, newMethodName, transformerReturnType,
                 m.typarams, m.params, m.thrown, newMethodBlock);
         helper.addElementToClass(clazz, newMethod, Mode.APPEND, 0);
@@ -108,7 +108,6 @@ public class CloneHandler implements KendalHandler<Clone> {
 
     private void eraseAnnotationParameters(Collection<Node> annotationNodes) {
         annotationNodes.stream()
-                .filter(node -> node.getObject().type.tsym.getQualifiedName().contentEquals(getHandledAnnotationType().getName()))
                 .forEach(annotationNode -> {
             JCAnnotation annotation = (JCAnnotation) annotationNode.getObject();
             List<JCExpression> annotationArgsWithoutOnMethod = StreamSupport.stream(annotation.args.spliterator(), false)
@@ -141,35 +140,28 @@ public class CloneHandler implements KendalHandler<Clone> {
      * Returns declared return type of method {@link Clone.Transformer#transform(Object)} defined by class specified
      * as {@link Clone#transformer()} for the method that is to be cloned.
      */
-    private JCExpression getTransformMethodReturnType(Clone cloneAnnotation) {
-        try {
-            cloneAnnotation.transformer();
-        }
-        catch (MirroredTypeException e) {
-            Type.ClassType transformerClassType = (Type.ClassType) e.getTypeMirror();
-            com.sun.tools.javac.util.List<Type> interfaces = transformerClassType.interfaces_field;
-            Type.ClassType transformerInterface = null;
-            while (transformerInterface == null) {
-                // look for the first class in inheritance hierarchy which has an interface
-                while (interfaces == null || interfaces.isEmpty()) {
-                    transformerClassType = (Type.ClassType) transformerClassType.supertype_field;
-                    interfaces = transformerClassType.interfaces_field;
-                }
-                transformerInterface = (Type.ClassType) interfaces.stream()
-                        .filter(i -> i.tsym.getQualifiedName().contentEquals("kendal.annotations.Clone.Transformer"))
-                        .findFirst().orElse(null);
-                // check if one of interfaces is Clone.Transformer, if not, below is null
-                if (transformerInterface == null) {
-                    transformerClassType = (Type.ClassType) transformerClassType.supertype_field;
-                    interfaces = transformerClassType.interfaces_field;
-                }
+    private JCExpression getTransformMethodReturnType(Map<String, Object> annValues) {
+        Type.ClassType transformerClassType = (Type.ClassType) ((Type.ClassType) annValues.get("transformer")).tsym.type;
+        com.sun.tools.javac.util.List<Type> interfaces = transformerClassType.interfaces_field;
+        Type.ClassType transformerInterface = null;
+        while (transformerInterface == null) {
+            // look for the first class in inheritance hierarchy which has an interface
+            while (interfaces == null || interfaces.isEmpty()) {
+                transformerClassType = (Type.ClassType) transformerClassType.supertype_field;
+                interfaces = transformerClassType.interfaces_field;
             }
-            // second type parameter of the interface represents returned type of the transform method, so we have to get(1)
-            Type returnedType = transformerInterface.typarams_field.get(1);
-            return astNodeBuilder.buildType(returnedType);
-
+            transformerInterface = (Type.ClassType) interfaces.stream()
+                    .filter(i -> i.tsym.getQualifiedName().contentEquals("kendal.annotations.Clone.Transformer"))
+                    .findFirst().orElse(null);
+            // check if one of interfaces is Clone.Transformer, if not, below is null
+            if (transformerInterface == null) {
+                transformerClassType = (Type.ClassType) transformerClassType.supertype_field;
+                interfaces = transformerClassType.interfaces_field;
+            }
         }
-        throw new KendalRuntimeException("Could not get transformer method identifier! This should never happen!");
+        // second type parameter of the interface represents returned type of the transform method, so we have to get(1)
+        Type returnedType = transformerInterface.typarams_field.get(1);
+        return astNodeBuilder.buildType(returnedType);
     }
 
     /**
@@ -177,15 +169,9 @@ public class CloneHandler implements KendalHandler<Clone> {
      * class specified as its argument. This method here finds this class and returns accessor to that class.
      * Accessor can be of type either {@link Node<JCIdent>} or {@link Node<JCFieldAccess>}.
      */
-    private Node<JCExpression> getTransformerClassAccessor(Clone cloneAnnotation) {
-        try {
-            cloneAnnotation.transformer();
-        }
-        catch (MirroredTypeException e) {
-            TypeMirror transformerClassType = e.getTypeMirror();
-            return astNodeBuilder.getAccessor(transformerClassType.toString());
-        }
-        throw new KendalRuntimeException("Could not get transformer method identifier! This should never happen!");
+    private Node<JCExpression> getTransformerClassAccessor(Map<String, Object> annValues) {
+        TypeMirror transformerClassType = (TypeMirror) annValues.get("transformer");
+        return astNodeBuilder.getAccessor(transformerClassType.toString());
     }
 
     private Node<JCBlock> buildTryBody(Node<JCMethodDecl> initialMethod, Node<JCExpression> transformerClassAccessor) {
@@ -224,8 +210,8 @@ public class CloneHandler implements KendalHandler<Clone> {
         return astNodeBuilder.block().build(throwStatement);
     }
 
-    private Name getNewMethodName(String originMethodName, Clone cloneAnnotation) {
-        String proposedName = cloneAnnotation.methodName();
+    private Name getNewMethodName(String originMethodName, Map<String, Object> annValues) {
+        String proposedName = (String) annValues.get("methodName");
         String newMethodName = !Objects.equals("", proposedName) ? proposedName : originMethodName + "Clone";
         return astUtils.nameFromString(newMethodName);
     }

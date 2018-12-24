@@ -5,6 +5,7 @@ import com.sun.tools.javac.code.Attribute;
 import com.sun.tools.javac.code.Scope;
 import com.sun.tools.javac.code.Symbol;
 import com.sun.tools.javac.code.Symbol.ClassSymbol;
+import com.sun.tools.javac.code.Type;
 import com.sun.tools.javac.processing.JavacProcessingEnvironment;
 import com.sun.tools.javac.tree.JCTree;
 import com.sun.tools.javac.tree.JCTree.*;
@@ -24,6 +25,7 @@ import kendal.utils.KendalMessager;
 import javax.annotation.processing.*;
 import javax.lang.model.SourceVersion;
 import javax.lang.model.element.TypeElement;
+import javax.lang.model.type.MirroredTypeException;
 import javax.tools.Diagnostic;
 import javax.tools.JavaFileObject;
 import java.io.IOException;
@@ -34,7 +36,7 @@ import java.util.function.Function;
 import java.util.stream.Collectors;
 import java.util.stream.StreamSupport;
 
-import static kendal.utils.AnnotationUtils.*;
+import static kendal.utils.AnnotationUtils.isAnnotationType;
 
 @SupportedAnnotationTypes("*")
 @SupportedSourceVersion(SourceVersion.RELEASE_8)
@@ -67,7 +69,6 @@ public class KendalProcessor extends AbstractProcessor {
         treeMaker = TreeMaker.instance(context);
         long startTime = System.currentTimeMillis();
         messager.printMessage(Diagnostic.Kind.NOTE, "Processor run!");
-//        if (roundEnv.getRootElements().isEmpty()) return false;
         if (roundEnv.processingOver()) return false;
         Set<Node> forest = forestBuilder.buildForest(roundEnv.getRootElements());
 
@@ -126,7 +127,7 @@ public class KendalProcessor extends AbstractProcessor {
                 Node<JCClassDecl> inheritedAnnotation = annotationsDeclMap.get(inheritedAnnotationName);
                 handleInheritingAnnotation(inheritedAnnotation.getObject(), handledNodes, annotationsDeclMap);
                 inheritedDefs = inheritedAnnotation.getObject().defs.stream()
-                        .collect(Collectors.toMap(h -> h.type.tsym.name.toString(), Function.identity()));
+                        .collect(Collectors.toMap(h -> ((JCMethodDecl) h).name.toString(), Function.identity()));
             } else {
                 // inherited annotation has to be retrieved through ClassSymbol
                 ClassSymbol inheritedAnnotationSymbol = (ClassSymbol) ((JCIdent) ((JCAnnotation) ((JCAssign) inheritAnnotation.args.head).rhs).annotationType).sym;
@@ -149,7 +150,11 @@ public class KendalProcessor extends AbstractProcessor {
             }
 
             annotationDecl.defs = annotationDecl.defs.appendList(astHelper.getAstUtils().toJCList(new ArrayList<>(inheritedDefs.values())));
-            inheritAnnotation.args = com.sun.tools.javac.util.List.nil();
+            // store inherited annotation class in metadata field
+            inheritAnnotation.args = com.sun.tools.javac.util.List.of(
+                    treeMaker.Assign(
+                            treeMaker.Ident(astHelper.getAstUtils().nameFromString("inheritedAnnotationClass")),
+                            treeMaker.ClassLiteral(((JCIdent) ((JCAnnotation) ((JCAssign) inheritAnnotation.args.head).rhs).annotationType).sym.type)));
             handledNodes.add(annotationDecl);
         }
     }
@@ -244,32 +249,65 @@ public class KendalProcessor extends AbstractProcessor {
         Map<KendalHandler, Set<Node>> handlersWithNodes = handlers.stream()
                 .collect(Collectors.toMap(Function.identity(), h -> new HashSet<>()));
 
-        Map<String, KendalHandler> handlerAnnotationMap = handlers.stream()
+        // annotation FQN -> Handler
+        // Handler may be null, if annotation is not handled by any handler
+        Map<String, KendalHandler> annotationToHandler = handlers.stream()
                 .filter(kendalHandler -> kendalHandler.getHandledAnnotationType() != null)
                 .collect(Collectors.toMap(h -> h.getHandledAnnotationType().getName(), Function.identity()));
 
-        while(handlerAnnotationMap.size() > 0) {
-            Map<String, KendalHandler> newHandlerAnnotationMap = new HashMap<>();
-            Map<String, KendalHandler> finalHandlerAnnotationMap = handlerAnnotationMap;
-            ForestUtils.traverse(forest, node -> {
-                if (node.is(JCAnnotation.class)) {
-                    finalHandlerAnnotationMap.forEach((annotationName, handler) ->  {
-                        if (annotationNameMatches(node, annotationName)) {
-                            if (isPutOnAnnotation(node)) {
-                                newHandlerAnnotationMap.put(((JCClassDecl) node.getParent().getObject()).sym.type.tsym.getQualifiedName().toString(), handler);
-                            }
-                            handlersWithNodes.get(handler).add(node);
-                            messager.printMessage(Diagnostic.Kind.NOTE, String.format("annotation %s handled by %s",
-                                    node.getObject().toString(), handler.getClass().getName()));
-                        }
-                    });
-                }
-            });
-            handlerAnnotationMap = newHandlerAnnotationMap;
-        }
+        Map<String, Node<JCClassDecl>> annotationsDeclMap = getAnnotationsDeclMap(forest);
+
+        ForestUtils.traverse(forest, node -> {
+            if(node.is(JCAnnotation.class)) {
+                assignNodeToHandler(node, annotationToHandler, handlersWithNodes, annotationsDeclMap);
+            }
+        });
 
         messager.printElapsedTime("Annotations' scanner", startTime);
         return handlersWithNodes;
+    }
+
+    private void assignNodeToHandler(Node<JCAnnotation> node, Map<String, KendalHandler> annotationToHandler,
+                                     Map<KendalHandler, Set<Node>> handlersWithNodes, Map<String, Node<JCClassDecl>> annotationsDeclMap) {
+        String fqn = node.getObject().type.tsym.getQualifiedName().toString();
+        if(annotationToHandler.containsKey(fqn)) {
+            // handler for this annotation type is already cached. Possibly null
+            KendalHandler handler = annotationToHandler.get(fqn);
+            if(handler != null) {
+                handlersWithNodes.get(handler).add(node);
+            }
+        } else {
+            // try to inherit handler
+            Inherit inherit = node.getObject().type.tsym.getAnnotation(Inherit.class);
+            resolveInherit(fqn, inherit, annotationToHandler, annotationsDeclMap);
+            KendalHandler handler = annotationToHandler.get(fqn);
+            if(handler != null) {
+                handlersWithNodes.get(handler).add(node);
+            }
+        }
+    }
+
+    private void resolveInherit(String fqn, Inherit inherit, Map<String, KendalHandler> annotationToHandler, Map<String, Node<JCClassDecl>> annotationsDeclMap) {
+        if(inherit == null) {
+            // we don't inherit, so insert null handler
+            annotationToHandler.put(fqn, null);
+            return;
+        }
+        try {
+            inherit.inheritedAnnotationClass();
+        } catch(MirroredTypeException e) {
+            Type.ClassType inheritedAnnotationType = (Type.ClassType) e.getTypeMirror();
+            String inheritedFqn = inheritedAnnotationType.tsym.getQualifiedName().toString();
+
+            if(annotationToHandler.containsKey(inheritedFqn)) {
+                annotationToHandler.put(fqn, annotationToHandler.get(inheritedFqn));
+            } else {
+                resolveInherit(inheritedFqn, inheritedAnnotationType.tsym.getAnnotation(Inherit.class), annotationToHandler, annotationsDeclMap);
+                annotationToHandler.put(fqn, annotationToHandler.get(inheritedFqn));
+            }
+            return;
+        }
+        throw new KendalRuntimeException("Inherited annotation type mirror could not be resolved for " + fqn); // should never happen, but let's throw just in case
     }
 
     private Set<KendalHandler> getHandlersFromSPI() {

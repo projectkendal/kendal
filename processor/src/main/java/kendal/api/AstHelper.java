@@ -6,10 +6,7 @@ import java.util.Map;
 import javax.lang.model.element.Name;
 
 import com.sun.tools.javac.tree.JCTree;
-import com.sun.tools.javac.tree.JCTree.JCClassDecl;
-import com.sun.tools.javac.tree.JCTree.JCExpressionStatement;
-import com.sun.tools.javac.tree.JCTree.JCMethodDecl;
-import com.sun.tools.javac.tree.JCTree.JCVariableDecl;
+import com.sun.tools.javac.tree.JCTree.*;
 import com.sun.tools.javac.util.Context;
 
 import kendal.api.exceptions.ImproperNodeTypeException;
@@ -45,6 +42,8 @@ public interface AstHelper {
     AstUtils getAstUtils();
 
     Map<Node, Node> getAnnotationSourceMap(Collection<Node> annotationNodes, String sourceQualifiedName);
+
+    Map<String, Object> getAnnotationValues(Node<JCAnnotation> annotationNode);
 
     enum Mode {
         APPEND, PREPEND
