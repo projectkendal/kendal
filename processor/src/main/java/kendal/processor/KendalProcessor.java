@@ -99,8 +99,9 @@ public class KendalProcessor extends AbstractProcessor {
     }
 
     private void handleAnnotationInheritance(Set<Node> forest) {
-        handleInherit(forest, getAnnotationsDeclMap(forest));
-        handleAttribute(forest);
+        Map<String, Node<JCClassDecl>> annotationsDeclMap = getAnnotationsDeclMap(forest);
+        handleInherit(forest, annotationsDeclMap);
+        handleAttribute(forest, annotationsDeclMap);
         handleAttrReference(forest);
     }
 
@@ -153,8 +154,58 @@ public class KendalProcessor extends AbstractProcessor {
         }
     }
 
-    private void handleAttribute(Set<Node> forest) {
+    private void handleAttribute(Set<Node> forest, Map<String, Node<JCClassDecl>> annotationsDeclMap) {
+        annotationsDeclMap.forEach((name, jcClassDeclNode) -> {
+            List<JCAnnotation> attributes = new ArrayList<>();
 
+            jcClassDeclNode.getChildren().forEach(child -> {
+                if(child.is(JCAnnotation.class)) {
+                    if(child.getObject().type.tsym.getQualifiedName().contentEquals(kendal.api.inheritance.Attribute.class.getName())) {
+                        attributes.add((JCAnnotation) child.getObject());
+                    }
+
+                    if(child.getObject().type.tsym.getQualifiedName().contentEquals(kendal.api.inheritance.Attribute.List.class.getName())) {
+                        ((JCNewArray) ((JCAnnotation) child.getObject()).args.head).elems.forEach(elem -> {
+                            attributes.add((JCAnnotation) elem);
+                        });
+                    }
+                }
+            });
+
+            if(attributes.isEmpty()) {
+                return; // no attributes to apply, so we are free
+            }
+
+            List<Node<JCAnnotation>> annotationNodes = new ArrayList<>();
+            ForestUtils.traverse(forest, node -> {
+                if(node.is(JCAnnotation.class) && node.getObject().type.tsym.getQualifiedName().contentEquals(name)) {
+                    annotationNodes.add(node);
+                }
+            });
+            annotationNodes.forEach(node -> node.getObject().args = node.getObject().args
+                    .appendList(astHelper.getAstUtils().toJCList(attributes.stream().map(attr -> {
+                JCIdent attrIdent = attr.args
+                        .stream()
+                        .filter(arg -> ((JCIdent) ((JCAssign) arg).lhs).name.contentEquals("name"))
+                        .map(arg -> ((JCLiteral) ((JCAssign) arg).rhs))
+                        .map(literal -> treeMaker.Ident(astHelper.getAstUtils().nameFromString((String) literal.value)))
+                        .findFirst().orElse(null);
+
+                JCExpression attrValue = attr.args
+                        .stream()
+                        .filter(arg -> ((JCIdent) ((JCAssign) arg).lhs).name.contentEquals("value"))
+                        .findFirst()
+                        .map(arg -> ((JCAssign) arg).rhs)
+                        .orElse(null);
+                return treeMaker.Assign(attrIdent, attrValue);
+            }).collect(Collectors.toList()))));
+
+            attributes.forEach(attr -> {
+                attr.args = astHelper.getAstUtils().toJCList(attr.args.stream()
+                        .filter(arg -> !((JCIdent) ((JCAssign) arg).lhs).name.contentEquals("value"))
+                        .collect(Collectors.toList()));
+            });
+        });
     }
 
     private void handleAttrReference(Set<Node> forest) {
