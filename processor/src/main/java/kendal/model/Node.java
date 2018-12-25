@@ -71,6 +71,10 @@ public class Node <T extends JCTree> {
         newChild.parent = this;
     }
 
+    public void removeChild(Node child) {
+        children.remove(child);
+    }
+
     public boolean is(Class clazz) {
         return clazz.isInstance(object);
     }

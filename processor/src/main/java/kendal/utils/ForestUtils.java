@@ -1,6 +1,7 @@
 package kendal.utils;
 
 import java.util.Collection;
+import java.util.Collections;
 import java.util.HashSet;
 import java.util.Set;
 import java.util.function.Consumer;
@@ -11,6 +12,10 @@ public class ForestUtils {
 
     private ForestUtils() {
         // prevent instantiation
+    }
+
+    public static void traverse(Node root, Consumer<Node> consumer) {
+        new Traverser(Collections.singleton(root), consumer).traverse();
     }
 
     public static void traverse(Collection<Node> roots, Consumer<Node> consumer) {
