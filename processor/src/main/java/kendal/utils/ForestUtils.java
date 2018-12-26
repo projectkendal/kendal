@@ -1,12 +1,12 @@
 package kendal.utils;
 
-import java.util.Collection;
-import java.util.Collections;
-import java.util.HashSet;
-import java.util.Set;
+import java.util.*;
 import java.util.function.Consumer;
 
+import com.sun.tools.javac.tree.JCTree;
 import kendal.model.Node;
+
+import static kendal.utils.AnnotationUtils.isAnnotationType;
 
 public class ForestUtils {
 
@@ -21,6 +21,22 @@ public class ForestUtils {
     public static void traverse(Collection<Node> roots, Consumer<Node> consumer) {
         new Traverser(roots, consumer).traverse();
     }
+
+    /**
+     * Extract from the forest a map containing fully qualified name as key and node with annotation definition as value.
+     * @param forest
+     * @return
+     */
+    public static Map<String, Node<JCTree.JCClassDecl>> getAnnotationsDeclMap(Set<Node> forest) {
+        Map<String, Node<JCTree.JCClassDecl>> result = new HashMap<>();
+        ForestUtils.traverse(forest, node -> {
+            if(isAnnotationType(node)) {
+                result.put(((JCTree.JCClassDecl) node.getObject()).sym.type.tsym.getQualifiedName().toString(), node);
+            }
+        });
+        return result;
+    }
+
 
     private static class Traverser {
         private Collection<Node> roots;
