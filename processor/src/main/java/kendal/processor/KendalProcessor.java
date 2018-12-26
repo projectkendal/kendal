@@ -1,27 +1,20 @@
 package kendal.processor;
 
 import com.sun.source.util.Trees;
-import com.sun.tools.javac.code.Attribute;
-import com.sun.tools.javac.code.Scope;
-import com.sun.tools.javac.code.Symbol;
-import com.sun.tools.javac.code.Symbol.ClassSymbol;
 import com.sun.tools.javac.code.Type;
 import com.sun.tools.javac.processing.JavacProcessingEnvironment;
-import com.sun.tools.javac.tree.JCTree;
-import com.sun.tools.javac.tree.JCTree.*;
+import com.sun.tools.javac.tree.JCTree.JCAnnotation;
+import com.sun.tools.javac.tree.JCTree.JCClassDecl;
 import com.sun.tools.javac.tree.TreeMaker;
 import com.sun.tools.javac.util.Context;
 import kendal.api.AstHelper;
 import kendal.api.KendalHandler;
-import kendal.api.exceptions.ImproperNodeTypeException;
 import kendal.api.exceptions.KendalException;
 import kendal.api.exceptions.KendalRuntimeException;
 import kendal.api.impl.AstHelperImpl;
-import kendal.api.inheritance.AttrReference;
 import kendal.api.inheritance.Inherit;
 import kendal.model.ForestBuilder;
 import kendal.model.Node;
-import kendal.model.TreeBuilder;
 import kendal.utils.ForestUtils;
 import kendal.utils.KendalMessager;
 
@@ -33,13 +26,13 @@ import javax.tools.Diagnostic;
 import javax.tools.JavaFileObject;
 import java.io.IOException;
 import java.io.Writer;
-import java.lang.annotation.Annotation;
-import java.util.*;
+import java.util.HashSet;
+import java.util.Map;
+import java.util.ServiceLoader;
+import java.util.Set;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 import java.util.stream.StreamSupport;
-
-import static kendal.utils.AnnotationUtils.isAnnotationType;
 
 @SupportedAnnotationTypes("*")
 @SupportedSourceVersion(SourceVersion.RELEASE_8)
@@ -76,12 +69,9 @@ public class KendalProcessor extends AbstractProcessor {
         Set<Node> forest = forestBuilder.buildForest(roundEnv.getRootElements());
 
         if(firstRound) {
-            handleAnnotationInheritance(forest);
+            new AnnotationInheritanceHandler(astHelper, treeMaker).handleAnnotationInheritance(forest);
             try {
-                // force next processing round
-                JavaFileObject fileObject = processingEnv.getFiler().createSourceFile("KendalGreatestFrameworkInTheWorld", null);
-                Writer writer = fileObject.openWriter();
-                writer.close();
+                forceNewProcessingRound();
                 firstRoundNodes = forest;
                 firstRound = false;
             } catch (IOException e) {
@@ -89,7 +79,7 @@ public class KendalProcessor extends AbstractProcessor {
             }
         } else {
             if(firstRoundNodes != null) {
-                // handle nodes found on the first round, which we could not handle then because of annotation extending processing
+                // handle nodes found on the first round, which we could not handle then because of annotation inheritance processing
                 forest.addAll(firstRoundNodes);
                 firstRoundNodes = null;
             }
@@ -102,200 +92,10 @@ public class KendalProcessor extends AbstractProcessor {
         return false;
     }
 
-    private void handleAnnotationInheritance(Set<Node> forest) {
-        Map<String, Node<JCClassDecl>> annotationsDeclMap = getAnnotationsDeclMap(forest);
-        handleInherit(forest, annotationsDeclMap);
-        handleAttribute(forest, annotationsDeclMap);
-        handleAttrReference(forest);
-    }
-
-    private void handleInherit(Set<Node> forest, Map<String, Node<JCClassDecl>> annotationsDeclMap) {
-        Set<Node> inherits = getAnnotationsOfType(forest, Inherit.class);
-        Set<JCClassDecl> handledAnnotations = new HashSet<>();
-        inherits.forEach(node -> handleInheritingAnnotation(node.getParent(),
-                handledAnnotations, annotationsDeclMap));
-    }
-
-    private void handleInheritingAnnotation(Node<JCClassDecl> annotationDeclNode, Set<JCClassDecl> handledNodes, Map<String, Node<JCClassDecl>> annotationsDeclMap) {
-        JCClassDecl annotationDecl = annotationDeclNode.getObject();
-        if(handledNodes.contains(annotationDecl)) {
-            return;
-        }
-        JCAnnotation inheritAnnotation = getJCAnnotation(annotationDecl, Inherit.class);
-        if(inheritAnnotation != null) {
-            String inheritedAnnotationName = ((JCIdent) ((JCAnnotation) ((JCAssign) inheritAnnotation.args.head).rhs).annotationType).sym.getQualifiedName().toString();
-
-            Map<String, JCMethodDecl> inheritedDefs = new HashMap<>();
-            if(annotationsDeclMap.containsKey(inheritedAnnotationName)) {
-                // inherited annotation is part of the compilation
-                Node<JCClassDecl> inheritedAnnotation = annotationsDeclMap.get(inheritedAnnotationName);
-                handleInheritingAnnotation(inheritedAnnotation, handledNodes, annotationsDeclMap);
-                inheritedDefs = inheritedAnnotation.getObject().defs.stream()
-                        .map(JCMethodDecl.class::cast)
-                        .collect(Collectors.toMap(h -> h.name.toString(), Function.identity()));
-            } else {
-                // inherited annotation has to be retrieved through ClassSymbol
-                ClassSymbol inheritedAnnotationSymbol = (ClassSymbol) ((JCIdent) ((JCAnnotation) ((JCAssign) inheritAnnotation.args.head).rhs).annotationType).sym;
-                for (Scope.Entry entry = inheritedAnnotationSymbol.members().elems; entry != null; entry = entry.sibling) {
-                    if(entry.sym instanceof Symbol.MethodSymbol) {
-                        JCMethodDecl methodDecl = treeMaker.MethodDef((Symbol.MethodSymbol) entry.sym, null);
-                        Attribute defaultValue = ((Symbol.MethodSymbol) entry.sym).defaultValue;
-                        methodDecl.defaultValue = defaultValue == null ? null : treeMaker.Literal(defaultValue.getValue());
-                        inheritedDefs.put(entry.sym.name.toString(), methodDecl);
-                    }
-                }
-            }
-
-            // override default values
-            for (JCExpression arg : ((JCAnnotation) ((JCAssign) inheritAnnotation.args.head).rhs).args) {
-                JCTree def = inheritedDefs.get(((JCIdent) ((JCAssign) arg).lhs).name.toString());
-                if(def instanceof JCMethodDecl) {
-                    ((JCMethodDecl) def).defaultValue = ((JCAssign) arg).rhs;
-                }
-            }
-
-            inheritedDefs.values().forEach(jcMethodDecl -> {
-                Node<JCMethodDecl> newNode = TreeBuilder.buildNode(jcMethodDecl);
-                try {
-                    astHelper.addElementToClass(annotationDeclNode, newNode);
-                } catch (ImproperNodeTypeException e) {
-                    throw new RuntimeException(e);
-                }
-            });
-            // store inherited annotation class in metadata field
-            inheritAnnotation.args = com.sun.tools.javac.util.List.of(
-                    treeMaker.Assign(
-                            treeMaker.Ident(astHelper.getAstUtils().nameFromString("inheritedAnnotationClass")),
-                            treeMaker.ClassLiteral(((JCIdent) ((JCAnnotation) ((JCAssign) inheritAnnotation.args.head).rhs).annotationType).sym.type)));
-            handledNodes.add(annotationDecl);
-        }
-    }
-
-    private void handleAttribute(Set<Node> forest, Map<String, Node<JCClassDecl>> annotationsDeclMap) {
-        annotationsDeclMap.forEach((name, jcClassDeclNode) -> {
-            List<Node<JCAnnotation>> attributes = new ArrayList<>();
-
-            jcClassDeclNode.getChildren().forEach(child -> {
-                if(child.is(JCAnnotation.class)) {
-                    if(child.getObject().type.tsym.getQualifiedName().contentEquals(kendal.api.inheritance.Attribute.class.getName())) {
-                        attributes.add(child);
-                    }
-
-                    if(child.getObject().type.tsym.getQualifiedName().contentEquals(kendal.api.inheritance.Attribute.List.class.getName())) {
-
-                        Node<JCNewArray> attributeListNode = ((Node) ((Node) child.getChildren().get(0)).getChildren().get(1));
-                        attributeListNode.getChildren().forEach(elem -> {
-                            if(elem.is(JCAnnotation.class)) {
-                                attributes.add(elem);
-                            }
-                        });
-                    }
-                }
-            });
-
-            if(attributes.isEmpty()) {
-                return; // no attributes to apply, so we are free
-            }
-
-            List<Node<JCAnnotation>> annotationNodes = new ArrayList<>();
-            ForestUtils.traverse(forest, node -> {
-                if(node.is(JCAnnotation.class) && node.getObject().type.tsym.getQualifiedName().contentEquals(name)) {
-                    annotationNodes.add(node);
-                }
-            });
-            annotationNodes.forEach(node -> attributes.stream().map(attr -> {
-                JCIdent attrIdent = attr.getObject().args
-                        .stream()
-                        .filter(arg -> ((JCIdent) ((JCAssign) arg).lhs).name.contentEquals("name"))
-                        .map(arg -> ((JCLiteral) ((JCAssign) arg).rhs))
-                        .map(literal -> treeMaker.Ident(astHelper.getAstUtils().nameFromString((String) literal.value)))
-                        .findFirst()
-                        .orElseThrow(() -> new KendalRuntimeException("Name of @Attribute is required!"));
-
-                JCExpression attrValue = attr.getObject().args
-                        .stream()
-                        .filter(arg -> ((JCIdent) ((JCAssign) arg).lhs).name.contentEquals("value"))
-                        .map(arg -> ((JCAssign) arg).rhs)
-                        .findFirst()
-                        .orElseThrow(() -> new KendalRuntimeException("Value of @Attribute is required!"));
-                return astHelper.deepClone(treeMaker, treeMaker.Assign(attrIdent, attrValue));
-            }).forEach(attr -> astHelper.addArgToAnnotation(node, TreeBuilder.buildNode(attr))));
-
-            attributes.forEach(attr -> {
-                attr.getObject().args = astHelper.getAstUtils().toJCList(attr.getObject().args.stream()
-                        .filter(arg -> !((JCIdent) ((JCAssign) arg).lhs).name.contentEquals("value"))
-                        .collect(Collectors.toList()));
-                List<Node> children = new ArrayList<>(attr.getChildren());
-                        children.stream()
-                        .filter(child -> (((JCIdent) ((JCAssign) child.getObject()).lhs).name.contentEquals("value")))
-                        .forEach(attr::removeChild);
-            });
-        });
-    }
-
-    private void handleAttrReference(Set<Node> forest) {
-        Set<Node<JCAnnotation>> annotationWithAttributeNodes = new HashSet<>();
-        ForestUtils.traverse(forest, node -> {
-            if(node.is(JCAnnotation.class) && node.getObject().type.tsym.getAnnotation(kendal.api.inheritance.Attribute.class) != null) {
-                annotationWithAttributeNodes.add(node);
-            }
-        });
-
-        annotationWithAttributeNodes.forEach(node -> {
-            Map<Node<JCAnnotation>, Node<JCAnnotation>> attrReferenceToAnnotation = new HashMap<>();
-            ForestUtils.traverse(node, n -> {
-                // resolution does not work on AttrReference annotation put in semantically illegal place.
-                // we recognize it by simple name + the fact that its type is unknown
-                if(n.is(JCAnnotation.class)
-                        && ((JCAnnotation) n.getObject()).annotationType instanceof JCIdent
-                        && ((JCIdent) ((JCAnnotation) n.getObject()).annotationType).name.contentEquals(AttrReference.class.getSimpleName())
-                        && n.getObject().type instanceof Type.UnknownType) {
-
-                    attrReferenceToAnnotation.put(n, node);
-                }
-            });
-            attrReferenceToAnnotation.forEach((attrReferenceNode, annotationNode) -> {
-                String attrName = (String) ((JCLiteral) attrReferenceNode.getObject().args.head).value;
-                JCAssign attr = (JCAssign) annotationNode.getObject().args.stream()
-                        .filter(arg -> ((JCIdent) ((JCAssign) arg).lhs).name.contentEquals(attrName))
-                        .findFirst()
-                        .orElse(Optional.ofNullable(astHelper.getAnnotationValues(annotationNode).get(attrName))
-                                .map(val -> treeMaker.Literal(val))
-                                .orElseThrow(() -> new KendalRuntimeException(String.format("Attribute %s on Annotation %s does not exist", attrName, annotationNode.getObject()))));
-
-                @SuppressWarnings("OptionalGetWithoutIsPresent") Node replacementNode = TreeBuilder.buildNode(attr).getChildren().stream()
-                        .filter(child -> child.getObject() == attr.rhs)
-                        .findFirst().get();
-                astHelper.replaceNode(attrReferenceNode.getParent(), attrReferenceNode, replacementNode);
-            });
-        });
-    }
-
-    private JCAnnotation getJCAnnotation(JCClassDecl classDecl, Class<? extends Annotation> annotationClass) {
-        return classDecl.mods.annotations.stream()
-                .filter(ann -> ann.type.tsym.getQualifiedName().contentEquals(annotationClass.getName()))
-                .findFirst()
-                .orElse(null);
-    }
-
-    private Set<Node> getAnnotationsOfType(Set<Node> forest, Class annotation) {
-        Set<Node> result = new HashSet<>();
-        ForestUtils.traverse(forest, node -> {
-            if(node.is(JCAnnotation.class) && node.getObject().type.tsym.getQualifiedName().contentEquals(annotation.getName())) {
-                result.add(node);
-            }
-        });
-        return result;
-    }
-
-    private Map<String, Node<JCClassDecl>> getAnnotationsDeclMap(Set<Node> forest) {
-        Map<String, Node<JCClassDecl>> result = new HashMap<>();
-        ForestUtils.traverse(forest, node -> {
-            if(isAnnotationType(node)) {
-                result.put(((JCClassDecl) node.getObject()).sym.type.tsym.getQualifiedName().toString(), node);
-            }
-        });
-        return result;
+    private void forceNewProcessingRound() throws IOException {
+        JavaFileObject fileObject = processingEnv.getFiler().createSourceFile("KendalGreatestFrameworkInTheWorld", null);
+        Writer writer = fileObject.openWriter();
+        writer.close();
     }
 
     private Map<KendalHandler, Set<Node>> getHandlerAnnotationsMap(Set<KendalHandler> handlers, Set<Node> forest) {
@@ -309,7 +109,7 @@ public class KendalProcessor extends AbstractProcessor {
                 .filter(kendalHandler -> kendalHandler.getHandledAnnotationType() != null)
                 .collect(Collectors.toMap(h -> h.getHandledAnnotationType().getName(), Function.identity()));
 
-        Map<String, Node<JCClassDecl>> annotationsDeclMap = getAnnotationsDeclMap(forest);
+        Map<String, Node<JCClassDecl>> annotationsDeclMap = ForestUtils.getAnnotationsDeclMap(forest);
 
         ForestUtils.traverse(forest, node -> {
             if(node.is(JCAnnotation.class)) {
