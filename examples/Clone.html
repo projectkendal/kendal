@@ -12,8 +12,9 @@
     <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0-alpha.6/css/bootstrap.min.css" integrity="sha384-rwoIResjU2yc3z8GV/NPeZWAv56rSmLldC3R/AZzGRnGxQQKnKkoFVhFQhNUwEyJ" crossorigin="anonymous">
 
     <!-- Highlight.js -->
-    <link rel="stylesheet" href="cdnjs.cloudflare.com/ajax/libs/highlight.js/9.13.1/styles/default.min.css">
-    <script src="cdnjs.cloudflare.com/ajax/libs/highlight.js/9.13.1/highlight.min.js"></script>
+    <link rel="stylesheet" href="//cdn.jsdelivr.net/gh/highlightjs/cdn-release@9.13.1/build/styles/default.min.css">
+    <script src="//cdn.jsdelivr.net/gh/highlightjs/cdn-release@9.13.1/build/highlight.min.js"></script>
+    <script>hljs.initHighlightingOnLoad();</script>
 </head>
 
 <body>
@@ -21,7 +22,7 @@
 <nav class="navbar navbar-toggleable-md navbar-inverse bg-inverse">
     <a class="navbar-brand" href="#">Kendal</a>
 
-    <div class="collapse navbar-collapse" id="navbarsExampleDefault">
+    <div class="collapse navbar-collapse">
         <ul class="navbar-nav mr-auto">
             <li class="nav-item">
                 <a class="nav-link" href="TsFields.html">TypeScript Fields</a>
@@ -36,18 +37,64 @@
     </div>
 </nav>
 
-<div class="container">
+<div class="container" style="margin-top: 10px">
     <h3>Vanilla Java</h3>
     <pre><code class="java">
         class SomeClass {
-            int x;
+
+            List&lt;Object1&gt; method1(int oneParam, String anotherParam) {
+                List&lt;Object1&gt; result = new ArrayList();
+                // some logic
+                return result
+            }
+
+            List&lt;Object2&gt; method2(int oneParam, String anotherParam) {
+                List&lt;Object2&gt; result = new ArrayList();
+                // some logic
+                return result
+            }
+
+            String method1Size(int oneParam, String anotherParam) {
+                return new ListToSizeTransformer().transform(method1(oneParam, anotherParam));
+            }
+
+            String method2Size(int oneParam, String anotherParam) {
+                return new ListToSizeTransformer().transform(method2(oneParam, anotherParam));
+            }
+        }
+
+        class ListToSizeTransformer {
+            String transform(List&lt;Object&gt; parametersList) {
+                return String.valueOf(new ArrayList().size());
+            }
         }
     </code></pre>
 
     <h3>Kendal</h3>
     <pre><code class="java">
         class SomeClass {
-            int x;
+
+            @Clone(transformer = ListToSizeTransformer.class, methodName="method1Size")
+            List&lt;Object1&gt; method1(int oneParam, String anotherParam) {
+                List&lt;Object1&gt; result = new ArrayList();
+                // some logic
+                return result
+            }
+
+            @Clone(transformer = ListToSizeTransformer.class, methodName="method2Size")
+            List&lt;Object2&gt; method2(int oneParam, String anotherParam) {
+                List&lt;Object2&gt; result = new ArrayList();
+                // some logic
+                return result
+            }
+
+        }
+
+        class ListToSizeTransformer implements Clone.Transformer&lt;List&lt;Object&gt;, String&gt; {
+            @Override
+            String transform(List&lt;Object&gt; parametersList) {
+                return String.valueOf(new ArrayList().size());
+            }
         }
     </code></pre>
 </div><!-- /.container -->

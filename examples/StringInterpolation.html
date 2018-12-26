@@ -12,8 +12,9 @@
     <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0-alpha.6/css/bootstrap.min.css" integrity="sha384-rwoIResjU2yc3z8GV/NPeZWAv56rSmLldC3R/AZzGRnGxQQKnKkoFVhFQhNUwEyJ" crossorigin="anonymous">
 
     <!-- Highlight.js -->
-    <link rel="stylesheet" href="cdnjs.cloudflare.com/ajax/libs/highlight.js/9.13.1/styles/default.min.css">
-    <script src="cdnjs.cloudflare.com/ajax/libs/highlight.js/9.13.1/highlight.min.js"></script>
+    <link rel="stylesheet" href="//cdn.jsdelivr.net/gh/highlightjs/cdn-release@9.13.1/build/styles/default.min.css">
+    <script src="//cdn.jsdelivr.net/gh/highlightjs/cdn-release@9.13.1/build/highlight.min.js"></script>
+    <script>hljs.initHighlightingOnLoad();</script>
 </head>
 
 <body>
@@ -21,7 +22,7 @@
 <nav class="navbar navbar-toggleable-md navbar-inverse bg-inverse">
     <a class="navbar-brand" href="#">Kendal</a>
 
-    <div class="collapse navbar-collapse" id="navbarsExampleDefault">
+    <div class="collapse navbar-collapse">
         <ul class="navbar-nav mr-auto">
             <li class="nav-item">
                 <a class="nav-link" href="TsFields.html">TypeScript Fields</a>
@@ -36,18 +37,39 @@
     </div>
 </nav>
 
-<div class="container">
+<div class="container" style="margin-top: 10px">
     <h3>Vanilla Java</h3>
     <pre><code class="java">
         class SomeClass {
-            int x;
+
+            // some code
+
+            String generateNameAddingStrings(String component, int postfix) {
+                return "specificPrefix " + component + " (" + someFactory.uniqueIdentifier() + ") " + postfix;
+            }
+
+            String generateNameWithStringFormat(String component, int postfix) {
+                return String.format("specificPrefix %s (%s) %d", component, someFactory.uniqueIdentifier(), postfix);
+            }
+
+            String generateNameWithStringBuilder(String component, int postfix) {
+                return new StringBuilder("specialPrefix ").append(component).append(" (")
+                              .append(someFactory.uniqueIdentifier()).append(") ").append(postfix).toString();
+            }
+
         }
     </code></pre>
 
     <h3>Kendal</h3>
     <pre><code class="java">
         class SomeClass {
-            int x;
+
+            // some code
+
+            String generateNameWithStringInterpolation(String component, int postfix) {
+                return +"specificPrefix ${component} (${someFactory.uniqueIdentifier()}) ${postfix}";
+            }
+
         }
     </code></pre>
 </div><!-- /.container -->
