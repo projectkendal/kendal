@@ -37,7 +37,6 @@ import java.lang.annotation.Annotation;
 import java.util.*;
 import java.util.function.Function;
 import java.util.stream.Collectors;
-import java.util.stream.Stream;
 import java.util.stream.StreamSupport;
 
 import static kendal.utils.AnnotationUtils.isAnnotationType;
@@ -210,14 +209,15 @@ public class KendalProcessor extends AbstractProcessor {
                         .filter(arg -> ((JCIdent) ((JCAssign) arg).lhs).name.contentEquals("name"))
                         .map(arg -> ((JCLiteral) ((JCAssign) arg).rhs))
                         .map(literal -> treeMaker.Ident(astHelper.getAstUtils().nameFromString((String) literal.value)))
-                        .findFirst().orElse(null);
+                        .findFirst()
+                        .orElseThrow(() -> new KendalRuntimeException("Name of @Attribute is required!"));
 
                 JCExpression attrValue = attr.getObject().args
                         .stream()
                         .filter(arg -> ((JCIdent) ((JCAssign) arg).lhs).name.contentEquals("value"))
-                        .findFirst()
                         .map(arg -> ((JCAssign) arg).rhs)
-                        .orElse(null);
+                        .findFirst()
+                        .orElseThrow(() -> new KendalRuntimeException("Value of @Attribute is required!"));
                 return astHelper.deepClone(treeMaker, treeMaker.Assign(attrIdent, attrValue));
             }).forEach(attr -> astHelper.addArgToAnnotation(node, TreeBuilder.buildNode(attr))));
 
@@ -256,18 +256,15 @@ public class KendalProcessor extends AbstractProcessor {
             });
             attrReferenceToAnnotation.forEach((attrReferenceNode, annotationNode) -> {
                 String attrName = (String) ((JCLiteral) attrReferenceNode.getObject().args.head).value;
-                JCExpression attr = annotationNode.getObject().args.stream()
+                JCAssign attr = (JCAssign) annotationNode.getObject().args.stream()
                         .filter(arg -> ((JCIdent) ((JCAssign) arg).lhs).name.contentEquals(attrName))
                         .findFirst()
                         .orElse(Optional.ofNullable(astHelper.getAnnotationValues(annotationNode).get(attrName))
                                 .map(val -> treeMaker.Literal(val))
-                                .orElse(null));
-                if(attr == null) {
-                    throw new KendalRuntimeException(String.format("Attribute %s on Annotation %s does not exist", attrName, annotationNode.getObject()));
-                }
+                                .orElseThrow(() -> new KendalRuntimeException(String.format("Attribute %s on Annotation %s does not exist", attrName, annotationNode.getObject()))));
 
-                @SuppressWarnings("OptionalGetWithoutIsPresent") Node replacementNode = TreeBuilder.buildNode((JCAssign) attr).getChildren().stream()
-                        .filter(child -> child.getObject() == ((JCAssign) attr).rhs)
+                @SuppressWarnings("OptionalGetWithoutIsPresent") Node replacementNode = TreeBuilder.buildNode(attr).getChildren().stream()
+                        .filter(child -> child.getObject() == attr.rhs)
                         .findFirst().get();
                 astHelper.replaceNode(attrReferenceNode.getParent(), attrReferenceNode, replacementNode);
             });
