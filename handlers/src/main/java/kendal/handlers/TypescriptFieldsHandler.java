@@ -6,9 +6,7 @@ import java.lang.annotation.Annotation;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
-import java.util.Map;
 
-import com.sun.tools.javac.code.Symbol;
 import com.sun.tools.javac.tree.JCTree.JCAnnotation;
 import com.sun.tools.javac.tree.JCTree.JCClassDecl;
 import com.sun.tools.javac.tree.JCTree.JCExpressionStatement;
@@ -46,13 +44,12 @@ public abstract class TypescriptFieldsHandler<T extends Annotation> implements K
     public void handle(Collection<Node> annotationNodes, AstHelper helper) throws KendalException {
         this.helper = helper;
         astNodeBuilder = helper.getAstNodeBuilder();
-        Map<Node, Node> indirectToSource = helper.getAnnotationSourceMap(annotationNodes, getHandledAnnotationType().getName());
         for (Node annotationNode : annotationNodes) {
-            handleNode(annotationNode, indirectToSource.get(annotationNode));
+            handleNode(annotationNode);
         }
     }
 
-    private void handleNode(Node<JCAnnotation> annotationNode, Node<JCAnnotation> sourceAnnotationNode) throws KendalException {
+    private void handleNode(Node<JCAnnotation> annotationNode) throws KendalException {
         if (isPutOnAnnotation(annotationNode)) {
             return; // because there is nothing to handle in such case
         }
@@ -63,7 +60,7 @@ public abstract class TypescriptFieldsHandler<T extends Annotation> implements K
                     String.format("%s Annotated element must be parameter of a constructor!", annotationNode.getObject().toString()));
         }
 
-        List<Modifier> modifiers = getModifiers(getFinalParamValue(sourceAnnotationNode));
+        List<Modifier> modifiers = getModifiers(getFinalParamValue(annotationNode));
 
         Node<JCClassDecl> clazz = (Node<JCClassDecl>) constructor.getParent();
         Name name = ((JCVariableDecl)annotationNode.getParent().getObject()).name;
@@ -109,26 +106,13 @@ public abstract class TypescriptFieldsHandler<T extends Annotation> implements K
     }
 
     private boolean getFinalParamValue(Node<JCAnnotation> sourceAnnotationNode) {
-        Symbol symbol;
-        if (sourceAnnotationNode.getParent().is(JCVariableDecl.class)) {
-            symbol = ((JCVariableDecl) sourceAnnotationNode.getParent().getObject()).sym;
-        } else {
-            symbol = ((JCClassDecl) sourceAnnotationNode.getParent().getObject()).sym;
-        }
-        return getMakeFinalValue(symbol.getAnnotation(getHandledAnnotationType()));
+        return (boolean) helper.getAnnotationValues(sourceAnnotationNode).get("makeFinal");
     }
-
-    protected abstract boolean getMakeFinalValue(T annotation);
 
     abstract Modifier getModifier();
     
     public static class PrivateHandler extends TypescriptFieldsHandler<Private> {
 
-
-        @Override
-        protected boolean getMakeFinalValue(Private annotation) {
-            return annotation.makeFinal();
-        }
 
         @Override
         Modifier getModifier() {
@@ -140,11 +124,6 @@ public abstract class TypescriptFieldsHandler<T extends Annotation> implements K
 
 
         @Override
-        protected boolean getMakeFinalValue(Protected annotation) {
-            return annotation.makeFinal();
-        }
-
-        @Override
         Modifier getModifier() {
             return Modifier.PROTECTED;
         }
@@ -153,22 +132,12 @@ public abstract class TypescriptFieldsHandler<T extends Annotation> implements K
     public static class PackagePrivateHandler extends TypescriptFieldsHandler<PackagePrivate> {
 
         @Override
-        protected boolean getMakeFinalValue(PackagePrivate annotation) {
-            return annotation.makeFinal();
-        }
-
-        @Override
         Modifier getModifier() {
             return Modifier.PACKAGE_PRIVATE;
         }
     }
 
     public static class PublicHandler extends TypescriptFieldsHandler<Public> {
-
-        @Override
-        protected boolean getMakeFinalValue(Public annotation) {
-            return annotation.makeFinal();
-        }
 
         @Override
         Modifier getModifier() {

@@ -15,14 +15,13 @@ import java.util.stream.StreamSupport;
 
 import javax.lang.model.element.Name;
 
+import com.sun.tools.javac.code.Attribute;
+import com.sun.tools.javac.code.Scope;
+import com.sun.tools.javac.code.Symbol;
+import com.sun.tools.javac.code.Symtab;
 import com.sun.tools.javac.tree.JCTree;
-import com.sun.tools.javac.tree.JCTree.JCAnnotation;
-import com.sun.tools.javac.tree.JCTree.JCBlock;
-import com.sun.tools.javac.tree.JCTree.JCClassDecl;
-import com.sun.tools.javac.tree.JCTree.JCExpressionStatement;
-import com.sun.tools.javac.tree.JCTree.JCMethodDecl;
-import com.sun.tools.javac.tree.JCTree.JCMethodInvocation;
-import com.sun.tools.javac.tree.JCTree.JCVariableDecl;
+import com.sun.tools.javac.tree.JCTree.*;
+import com.sun.tools.javac.tree.TreeMaker;
 import com.sun.tools.javac.util.Context;
 import com.sun.tools.javac.util.List;
 
@@ -62,6 +61,16 @@ public class AstHelperImpl implements AstHelper {
         JCTree elementDecl = element.getObject();
         if (mode == Mode.APPEND) classDecl.defs = append(classDecl.defs, elementDecl, 0);
         else classDecl.defs = prepend(classDecl.defs, elementDecl, 0);
+    }
+
+    @Override
+    public void addArgToAnnotation(Node<JCAnnotation> annotationNode, Node<JCAssign> arg) {
+        // Update Kendal AST:
+        annotationNode.addChild(arg, Mode.APPEND, 0);
+
+        // Update javac AST:
+
+        annotationNode.getObject().args = annotationNode.getObject().args.append(arg.getObject());
     }
 
     public void replaceNode(Node<? extends JCTree> parent,
@@ -231,6 +240,71 @@ public class AstHelperImpl implements AstHelper {
         }
 
         return annotationToSourceMap;
+    }
+
+    @Override
+    public Map<String, Object> getAnnotationValues(Node<JCAnnotation> annotationNode) {
+        Map<String, Object> values = new HashMap<>();
+        Attribute.Compound attribute = annotationNode.getObject().attribute;
+        // gather defaults
+        for(Scope.Entry entry = ((Symbol.ClassSymbol) attribute.type.tsym).members_field.elems; entry != null; entry = entry.sibling) {
+            if(entry.sym instanceof Symbol.MethodSymbol) {
+                Attribute defaultValue = ((Symbol.MethodSymbol) entry.sym).defaultValue;
+                values.put(entry.sym.name.toString(), defaultValue == null ? null : defaultValue.getValue());
+            }
+        }
+
+        // override with actual
+        attribute.values.forEach(val -> values.put(val.fst.name.toString(), val.snd.getValue()));
+
+        return values;
+    }
+
+    @Override
+    @SuppressWarnings("unchecked")
+    public <T extends JCTree> T deepClone(TreeMaker treeMaker, T tree) {
+        if(tree == null) {
+            return null;
+        }
+
+        if(tree instanceof JCAnnotation) {
+            T annotation = (T) treeMaker.Annotation(deepClone(treeMaker, ((JCAnnotation) tree).annotationType),
+                    astUtils.toJCList(((JCAnnotation) tree).args.stream()
+                            .map(arg -> deepClone(treeMaker, arg)).collect(Collectors.toList())));
+            annotation.setType(tree.type);
+            return annotation;
+        }
+        if(tree instanceof JCNewArray) {
+            T array = (T) treeMaker.NewArray(((JCNewArray) tree).elemtype,
+                    ((JCNewArray) tree).dims,
+                    astUtils.toJCList(((JCNewArray) tree).elems.stream()
+                            .map(elem -> deepClone(treeMaker, elem)).collect(Collectors.toList())));
+            array.setType(tree.type);
+            return array;
+        }
+        if(tree instanceof JCAssign) {
+            T assign = (T) treeMaker.Assign(deepClone(treeMaker, ((JCAssign) tree).lhs), deepClone(treeMaker, ((JCAssign) tree).rhs));
+            assign.setType(tree.type);
+            return assign;
+        }
+        if(tree instanceof JCLiteral) {
+            T literal = (T) treeMaker.Literal(((JCLiteral) tree).typetag, ((JCLiteral) tree).value);
+            literal.setType(tree.type);
+            return literal;
+        }
+        if(tree instanceof JCIdent) {
+            T ident = (T) treeMaker.Ident(((JCIdent) tree).name);
+            ident.setType(tree.type);
+            return ident;
+        }
+        if(tree instanceof JCFieldAccess) {
+            T select = (T) treeMaker.Select(deepClone(treeMaker, ((JCFieldAccess) tree).selected), ((JCFieldAccess) tree).name);
+            select.setType(tree.type);
+            return select;
+        }
+
+        // for objects that we do not need to clone
+        return tree;
     }
 
     private <T extends JCTree> List<T> append(List<T> defs, T element, int offset) {

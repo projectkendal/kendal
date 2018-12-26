@@ -14,8 +14,17 @@ public class AnnotationUtils {
     }
 
     public static boolean isPutOnAnnotation(Node<JCAnnotation> annotationNode) {
-        JCTree parent = annotationNode.getParent().getObject();
-        return parent instanceof JCClassDecl && (((JCClassDecl) parent).mods.flags & Flags.ANNOTATION) != 0;
+        return isAnnotationType(annotationNode.getParent());
+    }
+
+    public static boolean isPutOnMethod(Node<JCAnnotation> annotationNode) {
+        return annotationNode.getParent().getObject() instanceof JCTree.JCMethodDecl;
+    }
+
+
+
+    public static boolean isAnnotationType(Node node) {
+        return node.getObject() instanceof  JCClassDecl && (((JCClassDecl) node.getObject()).mods.flags & Flags.ANNOTATION) != 0;
     }
 
     public static boolean annotationNameMatches(Node<JCAnnotation> annotationNode, String annotationName) {
