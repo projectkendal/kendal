@@ -1,0 +1,2 @@
+Attribute_InvalidAttrTest.java:25:14: compiler.err.cant.resolve.location.args: kindname.method, notExistingAttribute, , , (compiler.misc.location: kindname.annotation, kendal.test.negative.attribute.Attribute_InvalidAttrTest.UsingAttr, null)
+1 error

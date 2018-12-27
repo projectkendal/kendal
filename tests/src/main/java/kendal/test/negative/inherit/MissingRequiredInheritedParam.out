@@ -1,0 +1,2 @@
+MissingRequiredInheritedParam.java:26:5: compiler.err.annotation.missing.default.value: kendal.test.negative.inherit.MissingRequiredInheritedParam.InheritingAnn, requiredParam
+1 error
