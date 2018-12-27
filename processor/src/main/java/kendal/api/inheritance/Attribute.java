@@ -20,7 +20,7 @@ public @interface Attribute {
     String name();
 
     //commented out, but we process it
-//        Annotation value();
+//        Object value();
 
     @Target(ElementType.ANNOTATION_TYPE)
     @Retention(RetentionPolicy.RUNTIME)
