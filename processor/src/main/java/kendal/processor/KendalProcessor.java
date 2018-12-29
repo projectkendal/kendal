@@ -69,7 +69,11 @@ public class KendalProcessor extends AbstractProcessor {
         Set<Node> forest = forestBuilder.buildForest(roundEnv.getRootElements());
 
         if(firstRound) {
-            new AnnotationInheritanceHandler(astHelper, treeMaker).handleAnnotationInheritance(forest);
+            try {
+                new AnnotationInheritanceHandler(astHelper, treeMaker).handleAnnotationInheritance(forest);
+            } catch (KendalRuntimeException e) {
+                messager.printMessage(Diagnostic.Kind.ERROR, e.getMessage());
+            }
             try {
                 forceNewProcessingRound();
                 firstRoundNodes = forest;
