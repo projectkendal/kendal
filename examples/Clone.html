@@ -12,8 +12,8 @@
     <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0-alpha.6/css/bootstrap.min.css" integrity="sha384-rwoIResjU2yc3z8GV/NPeZWAv56rSmLldC3R/AZzGRnGxQQKnKkoFVhFQhNUwEyJ" crossorigin="anonymous">
 
     <!-- Highlight.js -->
-    <link rel="stylesheet" href="default.min.css">
-    <script src="highlight.min.js"></script>
+    <link rel="stylesheet" href="resources/default.min.css">
+    <script src="resources/highlight.min.js"></script>
     <script>hljs.initHighlightingOnLoad();</script>
 </head>
 
@@ -32,6 +32,9 @@
             </li>
             <li class="nav-item active">
                 <a class="nav-link disabled">Clone</a>
+            </li>
+            <li class="nav-item">
+              <a class="nav-link" href="InheritAttributeAndAttrReference.html">Inherit, Attribute & AttrReference</a>
             </li>
         </ul>
     </div>
@@ -79,14 +82,14 @@
             List&lt;Object1&gt; method1(int oneParam, String anotherParam) {
                 List&lt;Object1&gt; result = new ArrayList();
                 // some logic
-                return result
+                return result;
             }
 
             @Clone(transformer = ListToSizeTransformer.class, methodName="method2Size")
             List&lt;Object2&gt; method2(int oneParam, String anotherParam) {
                 List&lt;Object2&gt; result = new ArrayList();
                 // some logic
-                return result
+                return result;
             }
 
         }
@@ -94,7 +97,7 @@
         class ListToSizeTransformer implements Clone.Transformer&lt;List&lt;Object&gt;, String&gt; {
             @Override
             String transform(List&lt;Object&gt; parametersList) {
-                return String.valueOf(new ArrayList().size());
+                return String.valueOf(parametersList.size());
             }
         }
     </code></pre>

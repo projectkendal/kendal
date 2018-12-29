@@ -1,0 +1,128 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+  <meta name="description" content="Page with examples of how Kendal framework can be used">
+  <meta name="author" content="Konrad Gancarz & Arkadiusz Ryszewski">
+
+  <title>Kendal - Examples</title>
+
+  <!-- Bootstrap core CSS -->
+  <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0-alpha.6/css/bootstrap.min.css" integrity="sha384-rwoIResjU2yc3z8GV/NPeZWAv56rSmLldC3R/AZzGRnGxQQKnKkoFVhFQhNUwEyJ" crossorigin="anonymous">
+
+  <!-- Highlight.js -->
+  <link rel="stylesheet" href="resources/default.min.css">
+  <script src="resources/highlight.min.js"></script>
+  <script>hljs.initHighlightingOnLoad();</script>
+</head>
+
+<body>
+
+<nav class="navbar navbar-toggleable-md navbar-inverse bg-inverse">
+  <a class="navbar-brand" href="#">Kendal</a>
+
+  <div class="collapse navbar-collapse">
+    <ul class="navbar-nav mr-auto">
+      <li class="nav-item">
+        <a class="nav-link" href="TsFields.html">TypeScript Fields</a>
+      </li>
+      <li class="nav-item">
+        <a class="nav-link" href="StringInterpolation.html">String Interpolation</a>
+      </li>
+      <li class="nav-item">
+        <a class="nav-link" href="Clone.html">Clone</a>
+      </li>
+      <li class="nav-item active">
+        <a class="nav-link disabled">Inherit, Attribute & AttrReference</a>
+      </li>
+    </ul>
+  </div>
+</nav>
+
+<div class="container" style="margin-top: 10px">
+  <h3>Vanilla Java</h3>
+  <pre><code class="java">
+      public class CloneNewExample {
+
+          @RequestMapping(value = "/method1", method = "POST")
+          public List&lt;Object1&gt; method1() {
+              List&lt;Object1&gt; result = new ArrayList();
+                // some logic
+                return result;
+          }
+
+          @RequestMapping(value = "/method2", method = "POST")
+          public List&lt;Object2&gt; method2() {
+              List&lt;Object2&gt; result = new ArrayList();
+                // some logic
+                return result;
+          }
+
+          @AnotherAnnotation
+          @RequestMapping(value = "/method1/size", method = "POST")
+          public List&lt;Object1&gt; method1() {
+              List&lt;Object1&gt; result = new ArrayList();
+                // some logic
+                return result;
+          }
+
+          @AnotherAnnotation
+          @RequestMapping(value = "/method2/size", method = "POST")
+          public List&lt;Object2&gt; method2() {
+              List&lt;Object2&gt; result = new ArrayList();
+                // some logic
+                return result;
+          }
+
+      }
+
+      class ListToSizeTransformer {
+          String transform(List&lt;Object&gt; parametersList) {
+              return String.valueOf(parametersList.size());
+          }
+      }
+  </code></pre>
+
+  <h3>Kendal</h3>
+  <pre><code class="java">
+      public class CloneNewExample {
+
+          @Inherit(@Clone(transformer = ListToSizeTransformer.class))
+          @Attribute(name = "onMethod", value = {@RequestMapping(value = @AttrReference("endpoint"), method = "POST"),
+                                                  @AnotherAnnotation})
+          @interface CsvEndpoint {
+              String endpoint();
+          }
+
+          @CsvEndpoint(endpoint = "method1/size")
+          @RequestMapping(value = "/method1", method = "POST")
+          public List&lt;Object1&gt; method1() {
+              List&lt;Object1&gt; result = new ArrayList();
+                // some logic
+                return result;
+          }
+
+          @CsvEndpoint(endpoint = "method2/size")
+          @RequestMapping(value = "/method2", method = "POST")
+          public List&lt;Object2&gt; method2() {
+              List&lt;Object2&gt; result = new ArrayList();
+                // some logic
+                return result;
+          }
+
+      }
+
+      class ListToSizeTransformer {
+          String transform(List&lt;Object&gt; parametersList) {
+              return String.valueOf(parametersList.size());
+          }
+      }
+  </code></pre>
+</div><!-- /.container -->
+
+
+<!-- Bootstrap core JavaScript -->
+<script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0-alpha.6/js/bootstrap.min.js" integrity="sha384-vBWWzlZJ8ea9aCX4pEW3rVHjgjt7zpkNpZk+02D9phzyeVkE+jo0ieGizqPLForn" crossorigin="anonymous"></script>
+</body>
+</html>

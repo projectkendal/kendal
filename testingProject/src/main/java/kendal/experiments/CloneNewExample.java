@@ -1,5 +1,10 @@
 package kendal.experiments;
 
+import java.lang.annotation.Retention;
+import java.lang.annotation.RetentionPolicy;
+import java.util.ArrayList;
+import java.util.List;
+
 import kendal.annotations.Clone;
 import kendal.api.inheritance.AttrReference;
 import kendal.api.inheritance.Attribute;
@@ -7,13 +12,10 @@ import kendal.api.inheritance.Inherit;
 import kendal.experiments.CloneTest.CsvTransformer;
 import kendal.experiments.CloneTest.RequestMapping;
 
-import java.util.ArrayList;
-import java.util.List;
-
 public class CloneNewExample {
 
     @Inherit(@Clone(transformer = CsvTransformer.class))
-    @Attribute(name = "onMethod", value = {@RequestMapping(value = @AttrReference("endpoint"), method = "POST")})
+    @Attribute(name = "onMethod", value = {@RequestMapping(value = @AttrReference("endpoint"), method = "POST"), @Anno})
     @interface CsvEndpoint {
         String endpoint();
     }
@@ -36,4 +38,8 @@ public class CloneNewExample {
         return new ArrayList<>();
     }
 
+    @Retention(value = RetentionPolicy.RUNTIME)
+    @interface Anno {
+
+    }
 }
