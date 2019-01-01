@@ -3,12 +3,12 @@
     <parent>
         <artifactId>Kendal</artifactId>
         <groupId>com.github.projectkendal</groupId>
-        <version>0.5</version>
+        <version>0.6-SNAPSHOT</version>
     </parent>
     <modelVersion>4.0.0</modelVersion>
 
     <artifactId>testingProject</artifactId>
-  <version>0.5 </version>
+  <version>0.6-SNAPSHOT </version>
     <dependencies>
         <dependency>
             <groupId>com.github.projectkendal</groupId>
