@@ -14,7 +14,7 @@ import kendal.experiments.CloneTest.RequestMapping;
 
 public class CloneNewExample {
 
-    @Inherit(@Clone(transformer = CsvTransformer.class))
+    @Inherit(@Clone(transformer = CsvTransformer.class, methodName = "clonedMethod1"))
     @Attribute(name = "onMethod", value = {@RequestMapping(value = @AttrReference("endpoint"), method = "POST"), @Anno})
     @interface CsvEndpoint {
         String endpoint();
@@ -26,16 +26,28 @@ public class CloneNewExample {
         return new ArrayList<>();
     }
 
-    @CsvEndpoint(endpoint = "method2/csv")
+    String cloneUserNotWorking() {
+        return clonedMethod1();
+    }
+
+    @Clone(transformer = CsvTransformer.class, methodName = "clonedMethod2")
     @RequestMapping(value = "/method2", method = "POST")
     public List<Object> method2() {
         return new ArrayList<>();
     }
 
-    @CsvEndpoint(endpoint = "method3/csv")
+    String cloneUserWorking() {
+        return clonedMethod2();
+    }
+
+    @Clone(transformer = CsvTransformer.class)
     @RequestMapping(value = "/method3", method = "POST")
     public List<Object> method3() {
         return new ArrayList<>();
+    }
+
+    String cloneUserWorking2() {
+        return method3Clone();
     }
 
     @Retention(value = RetentionPolicy.RUNTIME)
