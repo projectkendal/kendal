@@ -1,0 +1,82 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+    <meta name="description" content="Page with examples of how Kendal framework can be used">
+    <meta name="author" content="Konrad Gancarz & Arkadiusz Ryszewski">
+
+    <title>Kendal - Manual</title>
+
+    <!-- Bootstrap core CSS -->
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0-alpha.6/css/bootstrap.min.css" integrity="sha384-rwoIResjU2yc3z8GV/NPeZWAv56rSmLldC3R/AZzGRnGxQQKnKkoFVhFQhNUwEyJ" crossorigin="anonymous">
+
+    <!-- Highlight.js -->
+    <link rel="stylesheet" href="../resources/default.min.css">
+    <script src="../resources/highlight.min.js"></script>
+    <script>hljs.initHighlightingOnLoad();</script>
+</head>
+
+<body>
+
+<nav class="navbar navbar-toggleable-md navbar-inverse bg-inverse">
+    <a class="navbar-brand" href="#">Kendal</a>
+
+    <div class="collapse navbar-collapse">
+        <ul class="navbar-nav mr-auto">
+            <li class="nav-item">
+                <a class="nav-link" href="pages/TsFields.html">TypeScript Fields</a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link" href="pages/StringInterpolation.html">String Interpolation</a>
+            </li>
+            <li class="nav-item">
+              <a class="nav-link" href="pages/Clone.html">Clone</a>
+            </li>
+            <li class="nav-item">
+              <a class="nav-link" href="pages/InheritAttributeAndAttrReference.html">Inherit, Attribute & AttrReference</a>
+            </li>
+        </ul>
+    </div>
+</nav>
+
+<div class="container" style="margin-top: 10px">
+  <h3>Kendal Manual</h3>
+  <br />
+  <h4>How to add framework to my project?</h4>
+  <br />
+  <h5>1. Maven project (preferred way)</h5>
+  <p>Add 2 dependencies in project's pom.xml file:</p>
+
+  <pre><code class="xml">
+    &lt;dependencies&gt;
+      &lt;dependency&gt;
+        &lt;groupId&gt;com.github.projectkendal&lt;/groupId&gt;
+        &lt;artifactId&gt;handlers&lt;/artifactId&gt;
+        &lt;version&gt;LATEST_KENDAL_VERSION&lt;/version&gt;
+        &lt;scope&gt;compile&lt;/scope&gt;
+      &lt;/dependency&gt;
+      &lt;dependency&gt;
+        &lt;groupId&gt;com.github.projectkendal&lt;/groupId&gt;
+        &lt;artifactId&gt;processor&lt;/artifactId&gt;
+        &lt;version&gt;LATEST_KENDAL_VERSION&lt;/version&gt;
+      &lt;/dependency&gt;
+    &lt;/dependencies&gt;
+  </code></pre>
+
+  <p>
+  Remember to replace LATEST_KENDAL_VERSION with latest Kendal version that is available. <br />
+  You can check it for example here: <a href="https://search.maven.org/search?q=projectkendal" target="_blank">https://search.maven.org/search?q=projectkendal</a>
+  </p>
+
+  <br />
+  <h4>How to use framework's features?</h4>
+  <p>Examples of usage are located in separated pages. You can navigate to them from the top bar menu.</p>
+
+</div><!-- /.container -->
+
+
+<!-- Bootstrap core JavaScript -->
+<script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0-alpha.6/js/bootstrap.min.js" integrity="sha384-vBWWzlZJ8ea9aCX4pEW3rVHjgjt7zpkNpZk+02D9phzyeVkE+jo0ieGizqPLForn" crossorigin="anonymous"></script>
+</body>
+</html>
