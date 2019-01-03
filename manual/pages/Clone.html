@@ -45,16 +45,16 @@
     <pre><code class="java">
         class SomeClass {
 
-            List&lt;Object1&gt; method1(int oneParam, String anotherParam) {
-                List&lt;Object1&gt; result = new ArrayList();
+            List&lt;Object&gt; method1(int oneParam, String anotherParam) {
+                List&lt;Object&gt; result = new ArrayList();
                 // some logic
-                return result
+                return result;
             }
 
-            List&lt;Object2&gt; method2(int oneParam, String anotherParam) {
-                List&lt;Object2&gt; result = new ArrayList();
+            List&lt;Object&gt; method2(int oneParam, String anotherParam) {
+                List&lt;Object&gt; result = new ArrayList();
                 // some logic
-                return result
+                return result;
             }
 
             String method1Size(int oneParam, String anotherParam) {
@@ -79,15 +79,15 @@
         class SomeClass {
 
             @Clone(transformer = ListToSizeTransformer.class, methodName="method1Size")
-            List&lt;Object1&gt; method1(int oneParam, String anotherParam) {
-                List&lt;Object1&gt; result = new ArrayList();
+            List&lt;Object&gt; method1(int oneParam, String anotherParam) {
+                List&lt;Object&gt; result = new ArrayList();
                 // some logic
                 return result;
             }
 
             @Clone(transformer = ListToSizeTransformer.class, methodName="method2Size")
-            List&lt;Object2&gt; method2(int oneParam, String anotherParam) {
-                List&lt;Object2&gt; result = new ArrayList();
+            List&lt;Object&gt; method2(int oneParam, String anotherParam) {
+                List&lt;Object&gt; result = new ArrayList();
                 // some logic
                 return result;
             }
@@ -96,7 +96,7 @@
 
         class ListToSizeTransformer implements Clone.Transformer&lt;List&lt;Object&gt;, String&gt; {
             @Override
-            String transform(List&lt;Object&gt; parametersList) {
+            public String transform(List&lt;Object&gt; parametersList) {
                 return String.valueOf(parametersList.size());
             }
         }
