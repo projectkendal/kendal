@@ -5,6 +5,7 @@ import static kendal.test.utils.ValuesGenerator.l;
 
 /*
  * @test
+ * @summary check if public fields are properly generated and available within class in the same package
  * @library /utils/
  * @library ../
  * @build ValuesGenerator

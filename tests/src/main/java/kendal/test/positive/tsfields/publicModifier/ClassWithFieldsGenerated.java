@@ -9,6 +9,7 @@ import kendal.annotations.Public;
 
 /*
  * @test
+ * @summary check if public fields are properly generated and available within their own class.
  * @library /utils/
  * @build ValuesGenerator
  * @compile ClassWithFieldsGenerated.java

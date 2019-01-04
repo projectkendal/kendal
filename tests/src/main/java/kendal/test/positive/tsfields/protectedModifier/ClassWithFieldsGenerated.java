@@ -9,6 +9,7 @@ import kendal.annotations.Protected;
 
 /*
  * @test
+ * @summary check if protected fields are properly generated and available within their own class.
  * @library /utils/
  * @build ValuesGenerator
  * @compile ClassWithFieldsGenerated.java
