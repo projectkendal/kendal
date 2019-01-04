@@ -9,6 +9,7 @@ import kendal.annotations.Public;
 
 /*
  * @test
+ * @summary check if fields are generated properly in classes which are subclass.
  * @build ClassWithFieldsGenerated
  * @compile Subclass.java
  */
