@@ -1,30 +1,38 @@
 package kendal.test.positive.inherit;
 
-import kendal.api.inheritance.Inherit;
+import static org.testng.Assert.assertEquals;
 
 import java.lang.annotation.ElementType;
 import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
 
+import org.testng.annotations.Test;
+
+import kendal.api.inheritance.Inherit;
+
 /*
  * @test
+ * @summary check if inheriting annotation inherits attributes
  * @build BaseAnn
- * @compile Inherit_OverrideRequiredParam_Test.java
+ * @run testng kendal.test.positive.inherit.Inherit_OverrideRequiredParam_Test
  */
 @SuppressWarnings("unused")
 public class Inherit_OverrideRequiredParam_Test {
 
+    private final static int NUMBER = 17;
+
     @Target(ElementType.METHOD)
     @Retention(RetentionPolicy.RUNTIME)
-    @Inherit(@BaseAnn(requiredParam = 17))
+    @Inherit(@BaseAnn(requiredParam = NUMBER))
     @interface InheritingAnnOverridingParam{
 
     }
 
     @InheritingAnnOverridingParam
-    private void anotherMethod() {
-
+    @Test
+    public void testMethod() throws NoSuchMethodException {
+        assertEquals(getClass().getMethod("testMethod").getAnnotation(InheritingAnnOverridingParam.class).requiredParam(), NUMBER);
     }
 
 }
