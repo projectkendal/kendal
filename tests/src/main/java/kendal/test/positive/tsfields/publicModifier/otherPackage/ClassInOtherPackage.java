@@ -7,6 +7,7 @@ import kendal.test.positive.tsfields.publicModifier.ClassWithFieldsGenerated;
 
 /*
  * @test
+ * @summary check if public fields are properly generated and available within class in other package
  * @library /utils/
  * @library ../
  * @build ValuesGenerator

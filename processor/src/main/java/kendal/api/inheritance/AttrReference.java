@@ -3,7 +3,7 @@ package kendal.api.inheritance;
 /**
  * Java does not allow using parameters of annotation to define other parameters of the same annotation.
  * But sometimes we want to, so here we introduce annotation that will be replaced with value of another parameter.
- * It can be used only inside value expression for {@link Attribute}
+ * It can be used only inside value expression for {@link Attribute}.
  */
 public @interface AttrReference {
 

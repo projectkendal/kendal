@@ -1,6 +1,10 @@
 package kendal.api.inheritance;
 
-import java.lang.annotation.*;
+import java.lang.annotation.Annotation;
+import java.lang.annotation.ElementType;
+import java.lang.annotation.Retention;
+import java.lang.annotation.RetentionPolicy;
+import java.lang.annotation.Target;
 
 /**
  * 1. This annotation causes all parameters from #value() to be inherited.
@@ -21,7 +25,7 @@ public @interface Inherit {
      * Its usage in standard way should be avoided and will be discarded.
      *
      * Default is present here only to suppress errors highlighted by IDE, caused by lack of value passed.
-     * It will be overriden anyway by Kendal.
+     * It will be overridden anyway by Kendal.
      * @return
      */
     Class inheritedAnnotationClass() default Annotation.class;

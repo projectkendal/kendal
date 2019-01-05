@@ -6,21 +6,21 @@
     <meta name="description" content="Page with examples of how Kendal framework can be used">
     <meta name="author" content="Konrad Gancarz & Arkadiusz Ryszewski">
 
-    <title>Kendal - Examples</title>
+    <title>Kendal - Manual</title>
 
     <!-- Bootstrap core CSS -->
     <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0-alpha.6/css/bootstrap.min.css" integrity="sha384-rwoIResjU2yc3z8GV/NPeZWAv56rSmLldC3R/AZzGRnGxQQKnKkoFVhFQhNUwEyJ" crossorigin="anonymous">
 
     <!-- Highlight.js -->
-    <link rel="stylesheet" href="//cdn.jsdelivr.net/gh/highlightjs/cdn-release@9.13.1/build/styles/default.min.css">
-    <script src="//cdn.jsdelivr.net/gh/highlightjs/cdn-release@9.13.1/build/highlight.min.js"></script>
+    <link rel="stylesheet" href="../resources/default.min.css">
+    <script src="../resources/highlight.min.js"></script>
     <script>hljs.initHighlightingOnLoad();</script>
 </head>
 
 <body>
 
 <nav class="navbar navbar-toggleable-md navbar-inverse bg-inverse">
-    <a class="navbar-brand" href="#">Kendal</a>
+    <a class="navbar-brand" href="../Manual.html">Kendal</a>
 
     <div class="collapse navbar-collapse">
         <ul class="navbar-nav mr-auto">
@@ -33,16 +33,26 @@
             <li class="nav-item">
                 <a class="nav-link" href="Clone.html">Clone</a>
             </li>
+            <li class="nav-item">
+              <a class="nav-link" href="InheritAttributeAndAttrReference.html">Inherit, Attribute & AttrReference</a>
+            </li>
         </ul>
     </div>
 </nav>
 
 <div class="container" style="margin-top: 10px">
-    <h3>Vanilla Java</h3>
+  <p>
+    To use this mechanism is enough to put "+" operator in front of a string literal.
+    Then it is possible to reference expressions inside of the string using <code>${expression}</code> syntax.
+    See example below for details.
+  </p>
+    <h4>Vanilla Java</h4>
     <pre><code class="java">
         class SomeClass {
 
-            // some code
+            SomeFactory someFactory;
+
+            // [...]
 
             String generateNameAddingStrings(String component, int postfix) {
                 return "specificPrefix " + component + " (" + someFactory.uniqueIdentifier() + ") " + postfix;
@@ -60,11 +70,13 @@
         }
     </code></pre>
 
-    <h3>Kendal</h3>
+    <h4>Kendal</h4>
     <pre><code class="java">
         class SomeClass {
 
-            // some code
+            SomeFactory someFactory;
+
+            // [...]
 
             String generateNameWithStringInterpolation(String component, int postfix) {
                 return +"specificPrefix ${component} (${someFactory.uniqueIdentifier()}) ${postfix}";

@@ -9,6 +9,7 @@ import kendal.annotations.PackagePrivate;
 
 /*
  * @test
+ * @summary check if packagePrivate fields are properly generated and available within their own class.
  * @library /utils/
  * @build ValuesGenerator
  * @compile ClassWithFieldsGenerated.java

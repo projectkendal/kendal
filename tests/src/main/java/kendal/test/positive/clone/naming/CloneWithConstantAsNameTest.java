@@ -9,14 +9,15 @@ import kendal.annotations.Clone;
 
 /*
  * @test
+ * @summary check whether created clone method has proper name when it is defined using constant
  * @library /utils/
  * @build ValuesGenerator
  * @build TestTransformer
- * @compile CloneWithConstantAsName.java
+ * @compile CloneWithConstantAsNameTest.java
  */
 
 @SuppressWarnings("unused")
-class CloneWithConstantAsName {
+class CloneWithConstantAsNameTest {
 
     private static final String NEW_METHOD_NAME = "clonedMethod";
 

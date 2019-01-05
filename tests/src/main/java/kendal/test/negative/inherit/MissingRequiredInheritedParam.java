@@ -1,14 +1,15 @@
 package kendal.test.negative.inherit;
 
-import kendal.api.inheritance.Inherit;
-
 import java.lang.annotation.ElementType;
 import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
 
+import kendal.api.inheritance.Inherit;
+
 /*
  * @test
+ * @summary check whether @Inherit does not work when required parameter is missing
  * @build BaseAnn
  * @compile/fail/ref=MissingRequiredInheritedParam.out MissingRequiredInheritedParam.java -XDrawDiagnostics
  */

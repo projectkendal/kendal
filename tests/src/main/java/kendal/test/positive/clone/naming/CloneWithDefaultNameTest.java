@@ -8,13 +8,14 @@ import java.util.List;
 import kendal.annotations.Clone;
 /*
  * @test
+ * @summary check whether created clone method has default name when no other name is specified
  * @library /utils/
  * @build ValuesGenerator
  * @build TestTransformer
- * @compile CloneWithDefaultName.java
+ * @compile CloneWithDefaultNameTest.java
  */
 @SuppressWarnings("unused")
-class CloneWithDefaultName {
+class CloneWithDefaultNameTest {
 
     @Clone(transformer = TestTransformer.class)
     int method(int param1, String param2) {

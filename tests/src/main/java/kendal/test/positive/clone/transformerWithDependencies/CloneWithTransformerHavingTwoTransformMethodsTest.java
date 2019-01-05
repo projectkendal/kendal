@@ -9,14 +9,15 @@ import kendal.annotations.Clone;
 
 /*
  * @test
+ * @summary check whether clone method is properly created when transformer has two methods named "transform"
  * @library /utils/
  * @build ValuesGenerator
  * @build AbstractClassWithTransformMethod
  * @build TransformerWithDependencies
- * @compile TestClone.java
+ * @compile CloneWithTransformerHavingTwoTransformMethodsTest.java
  */
 @SuppressWarnings("unused")
-public class TestClone {
+public class CloneWithTransformerHavingTwoTransformMethodsTest {
 
     @Clone(transformer = TransformerWithDependencies.class, methodName = "newMethod")
     int method(int param1, String param2) {

@@ -1,10 +1,5 @@
 package kendal.test.negative.attribute;
 
-import kendal.annotations.Clone;
-import kendal.api.inheritance.AttrReference;
-import kendal.api.inheritance.Attribute;
-import kendal.api.inheritance.Inherit;
-
 import java.lang.annotation.ElementType;
 import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
@@ -12,8 +7,13 @@ import java.lang.annotation.Target;
 import java.util.Collections;
 import java.util.List;
 
+import kendal.annotations.Clone;
+import kendal.api.inheritance.Attribute;
+import kendal.api.inheritance.Inherit;
+
 /*
  * @test
+ * @summary check whether @Attribute does not work when trying to define nonexistent attribute
  * @build BaseAnn
  * @compile/fail/ref=Attribute_InvalidAttrTest.out Attribute_InvalidAttrTest.java -XDrawDiagnostics
  */

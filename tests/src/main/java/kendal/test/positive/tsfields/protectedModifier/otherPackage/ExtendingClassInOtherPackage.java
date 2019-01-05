@@ -9,6 +9,7 @@ import kendal.test.positive.tsfields.protectedModifier.ClassWithFieldsGenerated;
 
 /*
  * @test
+ * @summary check if protected fields are properly generated and available within class in other package extending class with generated fields
  * @library /utils/
  * @library ../
  * @build ValuesGenerator

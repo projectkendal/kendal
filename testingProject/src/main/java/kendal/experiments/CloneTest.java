@@ -1,10 +1,15 @@
 package kendal.experiments;
 
-import java.lang.annotation.*;
-import java.util.Collection;
-
 import kendal.annotations.Clone;
+import kendal.api.inheritance.Attribute;
+import kendal.api.inheritance.Inherit;
 import kendal.experiments.subpackage.TestClassTransformer;
+
+import java.lang.annotation.ElementType;
+import java.lang.annotation.Retention;
+import java.lang.annotation.RetentionPolicy;
+import java.lang.annotation.Target;
+import java.util.Collection;
 
 public class CloneTest {
     public static final String CLONE_METHOD_NAME = "transformedMethod";

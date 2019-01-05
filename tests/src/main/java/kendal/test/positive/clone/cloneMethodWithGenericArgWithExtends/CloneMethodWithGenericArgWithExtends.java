@@ -10,6 +10,7 @@ import kendal.annotations.Clone;
 
 /*
  * @test
+ * @summary check whether clone for method with generic with extends argument is created properly
  * @library /utils/
  * @build ValuesGenerator
  * @build TestTransformer

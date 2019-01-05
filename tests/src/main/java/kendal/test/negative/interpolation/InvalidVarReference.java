@@ -8,7 +8,7 @@ package kendal.test.negative.interpolation;
 @SuppressWarnings("unused")
 public class InvalidVarReference {
 
-    void methodReferingToMissingVar() {
+    void methodReferringToMissingVar() {
         System.out.println(+"${missingVariable}");
     }
 }

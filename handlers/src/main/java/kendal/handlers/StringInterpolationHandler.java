@@ -18,6 +18,16 @@ import kendal.model.Node;
 import kendal.model.TreeBuilder;
 import kendal.utils.ForestUtils;
 
+/**
+ * Enables String interpolation mechanism by performing a replacement of interpolated strings with a sequence of concatenated
+ * strings  and actual values (those referenced in original string literal).
+ * To use this mechanism is enough to put "+" operator in front of a string literal.
+ * Then it is possible to reference expressions inside of the string using ${expression} syntax.
+ *
+ * Example:
+ *      int someVariable = 19;
+ *      String text = +"a text with interpolated value: ${someVariable}";
+ */
 public class StringInterpolationHandler implements KendalHandler {
 
     private AstNodeBuilder astNodeBuilder;

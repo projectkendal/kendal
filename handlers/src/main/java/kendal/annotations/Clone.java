@@ -3,12 +3,11 @@ package kendal.annotations;
 import java.lang.annotation.ElementType;
 import java.lang.annotation.Target;
 
-import javax.annotation.Generated;
-
 /**
- * Applied to a method creates new method with name from {@link #methodName()} and list of parameters same as original method.
+ * Applied to a method creates new method with name from {@link #methodName()} attribute and list of parameters same as original method.
  * Generated method calls the original method, passes the result to an instance of {@link #transformer()}
- * and returns transformed value.
+ * and returns transformed value. If {@link #methodName()} is not specified, clone with default name is created.
+ * Default name is: originalName + "Clone"
  * Return type of generated method is extracted from declaration of {@link #transformer()} class.
  */
 @Target({ElementType.METHOD, ElementType.ANNOTATION_TYPE})

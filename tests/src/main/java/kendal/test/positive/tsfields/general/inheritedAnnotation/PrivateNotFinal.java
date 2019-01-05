@@ -1,4 +1,4 @@
-package kendal.test.positive.tsfields.general.indirectAnnotation;
+package kendal.test.positive.tsfields.general.inheritedAnnotation;
 
 import java.lang.annotation.ElementType;
 import java.lang.annotation.Target;
