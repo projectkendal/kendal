@@ -13,14 +13,14 @@ import kendal.api.inheritance.Inherit;
 
 /*
  * @test
- * @summary check if inheriting annotation inherits attributes
+ * @summary check if inheriting annotation inherits attributes when they are put in source of inheriting annotation
  * @build BaseAnn
- * @run testng kendal.test.positive.inherit.Inherit_OverrideRequiredParam_Test
+ * @run testng kendal.test.positive.inherit.InheritWhenParamsDefinedOnInheritingAnnotationDeclarationTest
  */
 @SuppressWarnings("unused")
-public class Inherit_OverrideRequiredParam_Test {
+public class InheritWhenParamsDefinedOnInheritingAnnotationDeclarationTest {
 
-    private final static int NUMBER = 17;
+    private static final int NUMBER = 17;
 
     @Target(ElementType.METHOD)
     @Retention(RetentionPolicy.RUNTIME)
