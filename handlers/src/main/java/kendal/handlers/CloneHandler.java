@@ -1,9 +1,7 @@
 package kendal.handlers;
 
-import static kendal.utils.AnnotationUtils.isPutOnAnnotation;
 import static kendal.utils.AnnotationUtils.isPutOnMethod;
 
-import java.lang.annotation.Annotation;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
@@ -16,7 +14,6 @@ import java.util.stream.Collectors;
 import java.util.stream.StreamSupport;
 
 import javax.lang.model.SourceVersion;
-import javax.lang.model.type.MirroredTypeException;
 import javax.lang.model.type.TypeMirror;
 
 import com.sun.tools.javac.code.Type;
@@ -49,7 +46,6 @@ import kendal.api.KendalHandler;
 import kendal.api.exceptions.DuplicatedElementsException;
 import kendal.api.exceptions.InvalidAnnotationParamsException;
 import kendal.api.exceptions.KendalException;
-import kendal.api.exceptions.KendalRuntimeException;
 import kendal.model.Node;
 
 public class CloneHandler implements KendalHandler<Clone> {
@@ -260,7 +256,6 @@ public class CloneHandler implements KendalHandler<Clone> {
                         .map(annotation -> (JCTree.JCAnnotation) annotation).collect(Collectors.toList()));
             }
         }
-        // todo: add annotations based on @Clone annotation parameter https://trello.com/c/ec4NE8Eb/30-clone-add-possibility-to-put-annotations-on-newly-created-method
         return newModifiers;
     }
 }
