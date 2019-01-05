@@ -1,15 +1,9 @@
 package kendal.experiments;
 
 import java.lang.annotation.*;
-import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Collection;
-import java.util.List;
 
 import kendal.annotations.Clone;
-import kendal.api.inheritance.AttrReference;
-import kendal.api.inheritance.Attribute;
-import kendal.api.inheritance.Inherit;
 import kendal.experiments.subpackage.TestClassTransformer;
 
 public class CloneTest {
@@ -42,6 +36,13 @@ public class CloneTest {
         return param1 + param2;
     }
 
+
+    @WunderClone(endpoint = "theChosenValue")
+    public String someMethod5(String param1, int param2) {
+        return param1 + param2;
+    }
+
+
     @Target(ElementType.METHOD)
     @Retention(RetentionPolicy.RUNTIME)
     public @interface TestAnnotation {
@@ -65,17 +66,6 @@ public class CloneTest {
     @Retention(RetentionPolicy.RUNTIME)
     @Clone(transformer = TestClassTransformer.class, methodName = "indirectMethodName")
     @interface NamedIndirectClone {
-    }
-
-    @Target(ElementType.METHOD)
-    @Retention(RetentionPolicy.RUNTIME)
-    @Inherit(@Clone)
-    @Attribute.List({
-//            @Attribute(name = "onMethod", value = {@RequestMapping(value = @AttrReference("endpoint"), method = "POST")})
-    })
-    @interface WunderClone {
-
-        String endpoint() default "someValue";
     }
 
     public @interface RequestMapping {

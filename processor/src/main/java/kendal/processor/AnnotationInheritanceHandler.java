@@ -172,7 +172,7 @@ public class AnnotationInheritanceHandler {
                     attributes.add(child);
                 }
 
-                if(child.getObject().type.tsym.getQualifiedName().contentEquals(kendal.api.inheritance.Attribute.List.class.getName())) {
+                if(child.getObject().type.tsym.getQualifiedName().contentEquals(kendal.api.inheritance.Attribute.List.class.getCanonicalName())) {
 
                     Node<JCTree.JCNewArray> attributeListNode = ((Node) ((Node) child.getChildren().get(0)).getChildren().get(1));
                     attributeListNode.getChildren().forEach(elem -> {
@@ -192,6 +192,9 @@ public class AnnotationInheritanceHandler {
             if(node.is(JCTree.JCAnnotation.class) && node.getObject().type.tsym.getAnnotation(kendal.api.inheritance.Attribute.class) != null) {
                 annotationWithAttributeNodes.add(node);
             }
+            if(node.is(JCTree.JCAnnotation.class) && node.getObject().type.tsym.getAnnotation(kendal.api.inheritance.Attribute.List.class) != null) {
+                annotationWithAttributeNodes.add(node);
+            }
         });
 
         annotationWithAttributeNodes.forEach(node -> {
@@ -207,7 +210,7 @@ public class AnnotationInheritanceHandler {
                         .filter(arg -> ((JCTree.JCIdent) ((JCTree.JCAssign) arg).lhs).name.contentEquals(attrName))
                         .findFirst()
                         .orElse(Optional.ofNullable(astHelper.getAnnotationValues(annotationNode).get(attrName))
-                                .map(val -> treeMaker.Literal(val))
+                                .map(val -> treeMaker.Assign(treeMaker.Ident(astHelper.getAstUtils().nameFromString(attrName)), treeMaker.Literal(val)))
                                 .orElseThrow(() -> new KendalRuntimeException(String.format("Attribute %s on Annotation %s does not exist", attrName, annotationNode.getObject()))));
 
                 @SuppressWarnings("OptionalGetWithoutIsPresent") Node replacementNode = TreeBuilder.buildNode(attr).getChildren().stream()
