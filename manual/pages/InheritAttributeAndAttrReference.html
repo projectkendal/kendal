@@ -41,7 +41,8 @@
 </nav>
 
 <div class="container" style="margin-top: 10px">
-  <h3>Vanilla Java</h3>
+  <h3>Example with Clone</h3>
+  <h4>Vanilla Java</h4>
   <pre><code class="java">
       public class CloneNewExample {
 
@@ -84,7 +85,10 @@
       }
   </code></pre>
 
-  <h3>Kendal</h3>
+  <h4>Kendal without @Inherit</h4>
+  <p style="font-size: 20px; color: red;">Impossible!</p>
+
+  <h4>Kendal with @Inherit</h4>
   <pre><code class="java">
       public class CloneNewExample {
 
@@ -118,6 +122,52 @@
               return String.valueOf(parametersList.size());
           }
       }
+  </code></pre>
+
+  <br /><br />
+  <h3>Example with TypeScript Fields</h3>
+  <h4>Vanilla Java</h4>
+  <pre><code class="java">
+      class SomeClass {
+
+          int primitiveField;
+
+          SomeClass(int primitiveField) {
+              this.primitiveField = primitiveField;
+          }
+
+          private int aMethod() {
+              return this.primitiveField + 15;
+          }
+      }
+  </code></pre>
+
+  <h4>Kendal without @Inherit</h4>
+  <pre><code class="java">
+      class SomeClass {
+
+          SomeClass(@Private(makeFinal = false) int primitiveField) { }
+
+          private int aMethod() {
+              return this.primitiveField + 15;
+          }
+      }
+  </code></pre>
+
+  <h4>Kendal with @Inherit</h4>
+  <pre><code class="java">
+      class SomeClass {
+
+          SomeClass(@PrivateNotFinal int primitiveField) { }
+
+          private int aMethod() {
+              return this.primitiveField + 15;
+          }
+      }
+
+      @Inherit(@Private(makeFinal = false))
+      @Target(ElementType.PARAMETER)
+      @interface PrivateNotFinal { }
   </code></pre>
 </div><!-- /.container -->
 
