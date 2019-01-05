@@ -18,7 +18,7 @@ import kendal.api.inheritance.Inherit;
 
 /*
  * @test
- * @summary check whether @AttrReference works
+ * @summary check whether \@AttrReference works
  * @build BaseAnn
  * @build AttrReferenceTest
  * @run testng kendal.test.positive.attrReference.AttrReferenceTest

@@ -1,2 +1,2 @@
-Inherit_OverrideRequiredParam_InvalidValue_Test.java:20:39: compiler.err.prob.found.req: (compiler.misc.inconvertible.types: java.lang.String, int)
+Inherit_OverrideRequiredParam_InvalidValue_Test.java:21:39: compiler.err.prob.found.req: (compiler.misc.inconvertible.types: java.lang.String, int)
 1 error

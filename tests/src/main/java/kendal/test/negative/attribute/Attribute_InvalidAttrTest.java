@@ -13,7 +13,7 @@ import kendal.api.inheritance.Inherit;
 
 /*
  * @test
- * @summary check whether @Attribute does not work when trying to define nonexistent attribute
+ * @summary check whether \@Attribute does not work when trying to define nonexistent attribute
  * @build BaseAnn
  * @compile/fail/ref=Attribute_InvalidAttrTest.out Attribute_InvalidAttrTest.java -XDrawDiagnostics
  */

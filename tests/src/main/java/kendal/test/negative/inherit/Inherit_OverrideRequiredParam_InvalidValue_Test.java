@@ -9,7 +9,7 @@ import kendal.api.inheritance.Inherit;
 
 /*
  * @test
- * @summary check whether @Inherit does not work when trying override required parameter with value of wrong type
+ * @summary check whether \@Inherit does not work when trying override required parameter with value of wrong type
  * @build BaseAnn
  * @compile/fail/ref=Inherit_OverrideRequiredParam_InvalidValue_Test.out Inherit_OverrideRequiredParam_InvalidValue_Test.java -XDrawDiagnostics
  */

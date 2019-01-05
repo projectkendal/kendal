@@ -14,7 +14,7 @@ import kendal.api.inheritance.Inherit;
 
 /*
  * @test
- * @summary check whether @AttrReference does not work when trying to reference nonexistent attribute
+ * @summary check whether \@AttrReference does not work when trying to reference nonexistent attribute
  * @build BaseAnn
  * @compile/fail/ref=AttrReference_InvalidAttrTest.out AttrReference_InvalidAttrTest.java -XDrawDiagnostics
  */

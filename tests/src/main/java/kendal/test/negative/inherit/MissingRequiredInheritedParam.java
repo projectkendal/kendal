@@ -9,7 +9,7 @@ import kendal.api.inheritance.Inherit;
 
 /*
  * @test
- * @summary check whether @Inherit does not work when required parameter is missing
+ * @summary check whether \@Inherit does not work when required parameter is missing
  * @build BaseAnn
  * @compile/fail/ref=MissingRequiredInheritedParam.out MissingRequiredInheritedParam.java -XDrawDiagnostics
  */

@@ -14,7 +14,7 @@ import kendal.api.inheritance.Inherit;
 
 /*
  * @test
- * @summary check whether @Attribute works
+ * @summary check whether \@Attribute works
  * @build BaseAnn
  * @build AttributeTest
  * @run testng kendal.test.positive.attribute.AttributeTest

@@ -1,5 +1,5 @@
-AttrReference_InvalidAttrTest.java:25:14: compiler.err.cant.resolve.location.args: kindname.method, value, , , (compiler.misc.location: kindname.annotation, kendal.api.inheritance.Inherit, null)
-AttrReference_InvalidAttrTest.java:26:43: compiler.err.cant.resolve.location.args: kindname.method, value, , , (compiler.misc.location: kindname.annotation, kendal.api.inheritance.Attribute, null)
+AttrReference_InvalidAttrTest.java:26:14: compiler.err.cant.resolve.location.args: kindname.method, value, , , (compiler.misc.location: kindname.annotation, kendal.api.inheritance.Inherit, null)
+AttrReference_InvalidAttrTest.java:27:43: compiler.err.cant.resolve.location.args: kindname.method, value, , , (compiler.misc.location: kindname.annotation, kendal.api.inheritance.Attribute, null)
 - compiler.err.proc.messager: [Kendal] Attribute notExistingAttr on Annotation @UsingAttr(onMethod = {@InnerAnnotation(value = @AttrReference("notExistingAttr"))}) does not exist
-AttrReference_InvalidAttrTest.java:30:31: compiler.err.cant.resolve.location.args: kindname.method, onMethod, , , (compiler.misc.location: kindname.annotation, kendal.test.negative.attrReference.AttrReference_InvalidAttrTest.UsingAttr, null)
+AttrReference_InvalidAttrTest.java:31:31: compiler.err.cant.resolve.location.args: kindname.method, onMethod, , , (compiler.misc.location: kindname.annotation, kendal.test.negative.attrReference.AttrReference_InvalidAttrTest.UsingAttr, null)
 4 errors
