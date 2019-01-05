@@ -1,10 +1,5 @@
 package kendal.test.negative.attrReference;
 
-import kendal.annotations.Clone;
-import kendal.api.inheritance.AttrReference;
-import kendal.api.inheritance.Attribute;
-import kendal.api.inheritance.Inherit;
-
 import java.lang.annotation.ElementType;
 import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
@@ -12,8 +7,14 @@ import java.lang.annotation.Target;
 import java.util.Collections;
 import java.util.List;
 
+import kendal.annotations.Clone;
+import kendal.api.inheritance.AttrReference;
+import kendal.api.inheritance.Attribute;
+import kendal.api.inheritance.Inherit;
+
 /*
  * @test
+ * @summary check whether @AttrReference does not work when trying to reference nonexistent attribute
  * @build BaseAnn
  * @compile/fail/ref=AttrReference_InvalidAttrTest.out AttrReference_InvalidAttrTest.java -XDrawDiagnostics
  */

@@ -1,10 +1,6 @@
 package kendal.test.positive.attrReference;
 
-import kendal.annotations.Clone;
-import kendal.api.inheritance.AttrReference;
-import kendal.api.inheritance.Attribute;
-import kendal.api.inheritance.Inherit;
-import org.testng.annotations.Test;
+import static org.testng.Assert.assertEquals;
 
 import java.lang.annotation.ElementType;
 import java.lang.annotation.Retention;
@@ -13,10 +9,16 @@ import java.lang.annotation.Target;
 import java.util.Collections;
 import java.util.List;
 
-import static org.testng.Assert.assertEquals;
+import org.testng.annotations.Test;
+
+import kendal.annotations.Clone;
+import kendal.api.inheritance.AttrReference;
+import kendal.api.inheritance.Attribute;
+import kendal.api.inheritance.Inherit;
 
 /*
  * @test
+ * @summary check whether @AttrReference works
  * @build BaseAnn
  * @build AttrReferenceTest
  * @run testng kendal.test.positive.attrReference.AttrReferenceTest

@@ -1,18 +1,20 @@
 package kendal.test.positive.attribute;
 
-import kendal.api.inheritance.Attribute;
-import kendal.api.inheritance.Inherit;
-import org.testng.annotations.Test;
+import static org.testng.Assert.assertEquals;
 
 import java.lang.annotation.ElementType;
 import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
 
-import static org.testng.Assert.assertEquals;
+import org.testng.annotations.Test;
+
+import kendal.api.inheritance.Attribute;
+import kendal.api.inheritance.Inherit;
 
 /*
  * @test
+ * @summary check whether @Attribute works
  * @build BaseAnn
  * @build AttributeTest
  * @run testng kendal.test.positive.attribute.AttributeTest
