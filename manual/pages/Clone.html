@@ -41,7 +41,15 @@
 </nav>
 
 <div class="container" style="margin-top: 10px">
-    <h3>Vanilla Java</h3>
+  <p>
+    Applied to a method creates new method with name from <code>methodName</code> attribute and list of parameters same as original method.
+    Generated method calls the original method, passes the result to an instance of transformer specified with <code>transformer</code> attribute
+    and returns transformed value. If <code>methodName</code> is not specified, clone with default name is created.
+    Default name is: <code>originalName + "Clone"</code>.
+    Return type of generated method is extracted from declaration of the transformer class.
+  </p>
+
+    <h4>Vanilla Java</h4>
     <pre><code class="java">
         class SomeClass {
 
@@ -74,7 +82,7 @@
         }
     </code></pre>
 
-    <h3>Kendal</h3>
+    <h4>Kendal</h4>
     <pre><code class="java">
         class SomeClass {
 

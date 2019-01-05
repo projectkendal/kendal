@@ -41,6 +41,21 @@
 </nav>
 
 <div class="container" style="margin-top: 10px">
+  <h5>@Inherit</h5>
+  <p>
+    1. This annotation causes all parameters from <code>value</code> attribute to be inherited. Remember that <code>value</code> must be an annotation.<br />
+    2. Kendal handlers handling <code>value</code> will receive also annotations that inherit parameters from <code>value</code> using <code>@Inherit</code>.<br />
+    Note that this relation is transitive.
+  </p>
+  <h5>@Attribute</h5>
+  <p>
+    This annotation will add named parameter to all usages of annotated annotation.
+    Use List to add multiple parameters.
+    Parameters will be added to usages of annotation before handlers are called.
+    After handlers are called, Kendal will perform cleanup of added attributes.
+    Use <code>AttrReference</code> as placeholder for values of any other attributes.
+  </p>
+
   <h3>Example with Clone</h3>
   <h4>Vanilla Java</h4>
   <pre><code class="java">

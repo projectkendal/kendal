@@ -1,13 +1,12 @@
 package kendal.experiments;
 
-import java.lang.annotation.*;
-import java.util.ArrayList;
-import java.util.Arrays;
+import java.lang.annotation.ElementType;
+import java.lang.annotation.Retention;
+import java.lang.annotation.RetentionPolicy;
+import java.lang.annotation.Target;
 import java.util.Collection;
-import java.util.List;
 
 import kendal.annotations.Clone;
-import kendal.api.inheritance.AttrReference;
 import kendal.api.inheritance.Attribute;
 import kendal.api.inheritance.Inherit;
 import kendal.experiments.subpackage.TestClassTransformer;
