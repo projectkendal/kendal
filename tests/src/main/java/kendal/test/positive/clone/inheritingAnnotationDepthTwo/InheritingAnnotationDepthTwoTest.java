@@ -1,21 +1,21 @@
-package kendal.test.positive.clone.indirectAnnotation;
+package kendal.test.positive.clone.inheritingAnnotationDepthTwo;
 
 import static kendal.test.utils.ValuesGenerator.i;
 import static kendal.test.utils.ValuesGenerator.s;
 
 /*
  * @test
- * @summary check whether clone for method is created properly when using inheritance mechanism
+ * @summary check whether clone for method is created properly when using inheritance mechanism of depth 2
  * @library /utils/
  * @build ValuesGenerator
  * @build TestTransformer
  * @build AuxiliaryAnnotation
- * @compile InheritingAnnotation.java InheritingAnnotationTest.java
+ * @compile IndirectAnnotationDepthOne.java InheritingAnnotationDepthTwo.java InheritingAnnotationDepthTwoTest.java
  */
 @SuppressWarnings("unused")
-public class InheritingAnnotationTest {
+public class InheritingAnnotationDepthTwoTest {
 
-    @InheritingAnnotation
+    @InheritingAnnotationDepthTwo
     public String aMethod(String param, int anotherParam) {
         return "params: " + param + " " + anotherParam;
     }

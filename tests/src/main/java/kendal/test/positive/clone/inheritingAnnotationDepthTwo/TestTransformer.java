@@ -1,4 +1,4 @@
-package kendal.test.positive.clone.IndirectAnnotationDepthTwo;
+package kendal.test.positive.clone.inheritingAnnotationDepthTwo;
 
 import kendal.annotations.Clone;
 

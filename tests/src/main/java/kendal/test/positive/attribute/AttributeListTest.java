@@ -1,15 +1,16 @@
 package kendal.test.positive.attribute;
 
-import kendal.api.inheritance.Attribute;
-import kendal.api.inheritance.Inherit;
-import org.testng.annotations.Test;
+import static org.testng.Assert.assertEquals;
 
 import java.lang.annotation.ElementType;
 import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
 
-import static org.testng.Assert.assertEquals;
+import org.testng.annotations.Test;
+
+import kendal.api.inheritance.Attribute;
+import kendal.api.inheritance.Inherit;
 
 /*
  * @test
@@ -23,8 +24,9 @@ public class AttributeListTest {
 
     @Target(ElementType.METHOD)
     @Retention(RetentionPolicy.RUNTIME)
-    @Inherit(@BaseAnn(requiredParam = 17))
+    @Inherit(@BaseAnn)
     @Attribute.List({
+            @Attribute(name = "requiredParam", value = 17),
             @Attribute(name = "requiredAttr", value = "some value")
     })
     @interface UsingAttrList {

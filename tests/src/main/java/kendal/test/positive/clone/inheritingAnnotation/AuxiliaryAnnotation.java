@@ -1,4 +1,4 @@
-package kendal.test.positive.clone.IndirectAnnotationDepthTwo;
+package kendal.test.positive.clone.inheritingAnnotation;
 
 import java.lang.annotation.ElementType;
 import java.lang.annotation.Retention;
