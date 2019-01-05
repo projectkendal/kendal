@@ -48,6 +48,9 @@ import kendal.api.exceptions.InvalidAnnotationParamsException;
 import kendal.api.exceptions.KendalException;
 import kendal.model.Node;
 
+/**
+ * Performs clone method generation for methods annotated with {@link Clone} annotation. See {@link Clone} for details.
+ */
 public class CloneHandler implements KendalHandler<Clone> {
 
     private AstNodeBuilder astNodeBuilder;

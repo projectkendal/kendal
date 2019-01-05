@@ -31,6 +31,12 @@ import kendal.api.exceptions.InvalidAnnotationException;
 import kendal.api.exceptions.KendalException;
 import kendal.model.Node;
 
+/**
+ * Performs field generation for classes with constructors having parameters annotated with one of "TypeScript Fields" feature annotations.
+ * These are {@link Private}, {@link PackagePrivate}, {@link Protected} and {@link Public}.
+ *
+ * @param <T> parameter specifying which exact annotation is handled by a given handler.
+ */
 public abstract class TypescriptFieldsHandler<T extends Annotation> implements KendalHandler<T> {
 
     private AstHelper helper;
