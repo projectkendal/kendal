@@ -53,7 +53,13 @@
     Use List to add multiple parameters.
     Parameters will be added to usages of annotation before handlers are called.
     After handlers are called, Kendal will perform cleanup of added attributes.
-    Use <code>AttrReference</code> as placeholder for values of any other attributes.
+    Use <code>@AttrReference</code> as placeholder for values of any other attributes.
+  </p>
+  <h5>@AttrReference</h5>
+  <p>
+    Java does not allow using parameters of annotation to define other parameters of the same annotation.
+    But sometimes we want to, so here we introduce annotation that will be replaced with value of another parameter.
+    It can be used only inside value expression for <code>@Attribute</code>.
   </p>
 
   <h3>Example with Clone</h3>
