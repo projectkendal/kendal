@@ -5,16 +5,17 @@ import static kendal.test.utils.ValuesGenerator.s;
 
 /*
  * @test
+ * @summary check whether clone for method is created properly when using inheritance mechanism
  * @library /utils/
  * @build ValuesGenerator
  * @build TestTransformer
  * @build AuxiliaryAnnotation
- * @compile IndirectAnnotation.java IndirectAnnotationTest.java
+ * @compile InheritingAnnotation.java InheritingAnnotationTest.java
  */
 @SuppressWarnings("unused")
-public class IndirectAnnotationTest {
+public class InheritingAnnotationTest {
 
-    @IndirectAnnotation
+    @InheritingAnnotation
     public String aMethod(String param, int anotherParam) {
         return "params: " + param + " " + anotherParam;
     }

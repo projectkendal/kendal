@@ -1,4 +1,4 @@
-package kendal.test.positive.clone.transformerBeingSubSubclass;
+package kendal.test.positive.clone.cloneMethodThrowingException;
 
 import static kendal.test.utils.ValuesGenerator.i;
 import static kendal.test.utils.ValuesGenerator.s;
@@ -9,18 +9,18 @@ import kendal.annotations.Clone;
 
 /*
  * @test
+ * @summary check whether clone for method throwing exception is created properly
  * @library /utils/
  * @build ValuesGenerator
- * @build SuperSuperTransformer
- * @build SuperTransformer
  * @build TestTransformer
- * @compile CloneWithSubSubclassTransformer.java
+ * @compile CloneMethodThrowingExceptionTest.java
  */
 @SuppressWarnings("unused")
-public class CloneWithSubSubclassTransformer {
+public class CloneMethodThrowingExceptionTest {
 
     @Clone(transformer = TestTransformer.class)
-    int method(int param1, String param2) {
+    int method(int param1, String param2) throws Exception {
+        if (param1 == 12) throw new Exception("Some exception!");
         return param1 + param2.length();
     }
 
@@ -28,7 +28,7 @@ public class CloneWithSubSubclassTransformer {
 
     // ### Compilation - Test cases ###
 
-    List<Integer> shouldBeAbleToUseGeneratedMethod() {
+    List<Integer> shouldBeAbleToUseGeneratedMethod() throws Exception {
         return methodClone(i(), s());
     }
 }

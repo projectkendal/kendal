@@ -12,13 +12,14 @@ import kendal.annotations.Clone;
 
 /*
  * @test
+ * @summary check whether created clone method actually invokes transformer specified as the attribute for the annotation
  * @library /utils/
  * @build ValuesGenerator
  * @build TestTransformer
- * @run testng kendal.test.positive.clone.invokeTransformer.CloneInvokingTransformer
+ * @run testng kendal.test.positive.clone.invokeTransformer.CloneInvokingTransformerTest
  */
 @SuppressWarnings("unused")
-public class CloneInvokingTransformer {
+public class CloneInvokingTransformerTest {
 
     @Clone(transformer = TestTransformer.class, methodName = "newMethod")
     int method(int param1, String param2) {

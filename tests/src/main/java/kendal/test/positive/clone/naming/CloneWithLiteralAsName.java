@@ -9,6 +9,7 @@ import kendal.annotations.Clone;
 
 /*
  * @test
+ * @summary check whether created clone method has proper name when it is defined using string literal
  * @library /utils/
  * @build ValuesGenerator
  * @build TestTransformer

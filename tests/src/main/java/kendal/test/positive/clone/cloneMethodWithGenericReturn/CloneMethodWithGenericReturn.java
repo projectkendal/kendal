@@ -2,6 +2,7 @@ package kendal.test.positive.clone.cloneMethodWithGenericReturn;
 
 /*
  * @//test
+ * @summary check whether clone for method with generic return type is created properly
  * @library /utils/
  * @build ValuesGenerator
  * @build TestTransformer

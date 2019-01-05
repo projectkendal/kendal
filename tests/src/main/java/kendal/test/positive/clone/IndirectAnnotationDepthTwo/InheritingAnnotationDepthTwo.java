@@ -7,5 +7,5 @@ import kendal.api.inheritance.Inherit;
 
 @Target(ElementType.METHOD)
 @Inherit(@IndirectAnnotationDepthOne)
-@interface IndirectAnnotationDepthTwo {
+@interface InheritingAnnotationDepthTwo {
 }
