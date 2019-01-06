@@ -87,40 +87,41 @@
 
           class CsvTransformer {
               String transform(List&lt;Object&gt; inputCollection) {
-                  return "imagine here is the original collection serialized to csv"
+                  return "imagine here is the original collection serialized to csv";
               }
           }
 
           @RequestMapping(value = "/method1", method = "POST")
-          public List&lt;Object1&gt; method1(RequestBody body) {
-              List&lt;Object1&gt; result = new ArrayList();
+          public List&lt;Object&gt; method1(RequestBody body) {
+              List&lt;Object&gt; result = new ArrayList();
                 // some logic
                 return result;
           }
 
           @RequestMapping(value = "/method2", method = "POST")
-          public List&lt;Object2&gt; method2(RequestBody body) {
-              List&lt;Object2&gt; result = new ArrayList();
+          public List&lt;Object&gt; method2(RequestBody body) {
+              List&lt;Object&gt; result = new ArrayList();
                 // some logic
                 return result;
           }
 
           @AnotherAnnotation
           @RequestMapping(value = "/method1/csv", method = "POST")
-          public List&lt;Object1&gt; method1Csv(RequestBody body) {
-              List&lt;Object1&gt; result = new ArrayList();
+          public String method1Csv(RequestBody body) {
+              List&lt;Object&gt; result = new ArrayList();
                 // some logic
                 return new CsvTransformer().transform(result);
           }
 
           @AnotherAnnotation
           @RequestMapping(value = "/method2/csv", method = "POST")
-          public List&lt;Object2&gt; method2Csv(RequestBody body) {
-              List&lt;Object2&gt; result = new ArrayList();
+          public String method2Csv(RequestBody body) {
+              List&lt;Object&gt; result = new ArrayList();
                 // some logic
                 return new CsvTransformer().transform(result);
           }
 
+          @interface AnotherAnnotation {}
       }
   </code></pre>
 
@@ -138,28 +139,30 @@
               String endpoint();
           }
 
-          class CsvTransformer implements Clone.Transformer&lt;Collection&lt;?&gt;, String&gt; {
-              String transform(List&lt;Object&gt; inputCollection) {
-                  return "imagine here is the original collection serialized to csv"
+          class CsvTransformer implements Clone.Transformer&lt;List&lt;Object&gt;, String&gt; {
+              @Override
+              public String transform(List&lt;Object&gt; inputCollection) {
+                  return "imagine here is the original collection serialized to csv";
               }
           }
 
-          @CsvEndpoint(endpoint = "method1/csv")
+          @CsvEndpoint(endpoint = "method1/csv", methodName = "method1Csv")
           @RequestMapping(value = "/method1", method = "POST")
-          public List&lt;Object1&gt; method1(RequestBody body) {
-              List&lt;Object1&gt; result = new ArrayList();
+          public List&lt;Object&gt; method1(RequestBody body) {
+              List&lt;Object&gt; result = new ArrayList();
                 // some logic
                 return result;
           }
 
-          @CsvEndpoint(endpoint = "method2/csv")
+          @CsvEndpoint(endpoint = "method2/csv", methodName = "method2Csv")
           @RequestMapping(value = "/method2", method = "POST")
-          public List&lt;Object2&gt; method2(RequestBody body) {
-              List&lt;Object2&gt; result = new ArrayList();
+          public List&lt;Object&gt; method2(RequestBody body) {
+              List&lt;Object&gt; result = new ArrayList();
                 // some logic
                 return result;
           }
 
+          @interface AnotherAnnotation {}
       }
   </code></pre>
 

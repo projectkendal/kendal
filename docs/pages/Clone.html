@@ -67,6 +67,12 @@
   <pre><code class="java">
       class SomeClass {
 
+          class CsvTransformer {
+              String transform(List&lt;Object&gt; inputCollection) {
+                  return "imagine here is the original collection serialized to csv";
+              }
+          }
+
           List&lt;Object&gt; method1(int oneParam, String anotherParam) {
               List&lt;Object&gt; result = new ArrayList();
               // some logic
@@ -79,20 +85,14 @@
               return result;
           }
 
-          String method1Size(int oneParam, String anotherParam) {
-              return new ListToSizeTransformer().transform(method1(oneParam, anotherParam));
+          String method1Csv(int oneParam, String anotherParam) {
+              return new CsvTransformer().transform(method1(oneParam, anotherParam));
           }
 
-          String method2Size(int oneParam, String anotherParam) {
-              return new ListToSizeTransformer().transform(method2(oneParam, anotherParam));
+          String method2Csv(int oneParam, String anotherParam) {
+              return new CsvTransformer().transform(method2(oneParam, anotherParam));
           }
 
-      }
-
-      class ListToSizeTransformer {
-          String transform(List&lt;Object&gt; parametersList) {
-              return String.valueOf(new ArrayList().size());
-          }
       }
   </code></pre>
 
@@ -100,27 +100,27 @@
   <pre><code class="java">
       class SomeClass {
 
-          @Clone(transformer = ListToSizeTransformer.class, methodName="method1Size")
+          class CsvTransformer implements Clone.Transformer&lt;List&lt;Object&gt;, String&gt; {
+              @Override
+              public String transform(List&lt;Object&gt; inputCollection) {
+                  return "imagine here is the original collection serialized to csv";
+              }
+          }
+
+          @Clone(transformer = CsvTransformer.class, methodName="method1Csv")
           List&lt;Object&gt; method1(int oneParam, String anotherParam) {
               List&lt;Object&gt; result = new ArrayList();
               // some logic
               return result;
           }
 
-          @Clone(transformer = ListToSizeTransformer.class, methodName="method2Size")
+          @Clone(transformer = CsvTransformer.class, methodName="method2Csv")
           List&lt;Object&gt; method2(int oneParam, String anotherParam) {
               List&lt;Object&gt; result = new ArrayList();
               // some logic
               return result;
           }
 
-      }
-
-      class ListToSizeTransformer implements Clone.Transformer&lt;List&lt;Object&gt;, String&gt; {
-          @Override
-          public String transform(List&lt;Object&gt; parametersList) {
-              return String.valueOf(parametersList.size());
-          }
       }
   </code></pre>
 </div><!-- /.container -->

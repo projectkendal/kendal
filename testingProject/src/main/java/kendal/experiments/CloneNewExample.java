@@ -1,7 +1,5 @@
 package kendal.experiments;
 
-import java.lang.annotation.Retention;
-import java.lang.annotation.RetentionPolicy;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -9,49 +7,40 @@ import kendal.annotations.Clone;
 import kendal.api.inheritance.AttrReference;
 import kendal.api.inheritance.Attribute;
 import kendal.api.inheritance.Inherit;
-import kendal.experiments.CloneTest.CsvTransformer;
 import kendal.experiments.CloneTest.RequestMapping;
 
 public class CloneNewExample {
 
-    @Inherit(@Clone(transformer = CsvTransformer.class, methodName = "clonedMethod1"))
-    @Attribute(name = "onMethod", value = {@RequestMapping(value = @AttrReference("endpoint"), method = "POST"), @Anno})
+    @Inherit(@Clone(transformer = CsvTransformer.class))
+    @Attribute(name = "onMethod", value = {@RequestMapping(value = @AttrReference("endpoint"), method = "POST"),
+            @AnotherAnnotation})
     @interface CsvEndpoint {
         String endpoint();
     }
 
-    @CsvEndpoint(endpoint = "method1/csv")
+    class CsvTransformer implements Clone.Transformer<List<Object>, String> {
+        @Override
+        public String transform(List<Object> inputCollection) {
+            return "imagine here is the original collection serialized to csv";
+        }
+    }
+
+    @CsvEndpoint(endpoint = "method1/csv", methodName = "method1Csv")
     @RequestMapping(value = "/method1", method = "POST")
-    public List<Object> method1() {
-        return new ArrayList<>();
+    public List<Object> method1(Object body) {
+        List<Object> result = new ArrayList();
+        // some logic
+        return result;
     }
 
-    String cloneUserNotWorking() {
-        return clonedMethod1();
-    }
-
-    @Clone(transformer = CsvTransformer.class, methodName = "clonedMethod2")
+    @CsvEndpoint(endpoint = "method2/csv", methodName = "method2Csv")
     @RequestMapping(value = "/method2", method = "POST")
-    public List<Object> method2() {
-        return new ArrayList<>();
+    public List<Object> method2(Object body) {
+        List<Object> result = new ArrayList();
+        // some logic
+        method1Csv(new ArrayList<>());
+        return result;
     }
 
-    String cloneUserWorking() {
-        return clonedMethod2();
-    }
-
-    @Clone(transformer = CsvTransformer.class)
-    @RequestMapping(value = "/method3", method = "POST")
-    public List<Object> method3() {
-        return new ArrayList<>();
-    }
-
-    String cloneUserWorking2() {
-        return method3Clone();
-    }
-
-    @Retention(value = RetentionPolicy.RUNTIME)
-    @interface Anno {
-
-    }
+    @interface AnotherAnnotation {}
 }
