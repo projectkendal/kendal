@@ -1,5 +1,26 @@
 package kendal.processor;
 
+import java.io.IOException;
+import java.io.Writer;
+import java.util.HashSet;
+import java.util.Map;
+import java.util.ServiceLoader;
+import java.util.Set;
+import java.util.function.Function;
+import java.util.stream.Collectors;
+import java.util.stream.StreamSupport;
+
+import javax.annotation.processing.AbstractProcessor;
+import javax.annotation.processing.ProcessingEnvironment;
+import javax.annotation.processing.RoundEnvironment;
+import javax.annotation.processing.SupportedAnnotationTypes;
+import javax.annotation.processing.SupportedSourceVersion;
+import javax.lang.model.SourceVersion;
+import javax.lang.model.element.TypeElement;
+import javax.lang.model.type.MirroredTypeException;
+import javax.tools.Diagnostic;
+import javax.tools.JavaFileObject;
+
 import com.sun.source.util.Trees;
 import com.sun.tools.javac.code.Type;
 import com.sun.tools.javac.processing.JavacProcessingEnvironment;
@@ -7,6 +28,7 @@ import com.sun.tools.javac.tree.JCTree.JCAnnotation;
 import com.sun.tools.javac.tree.JCTree.JCClassDecl;
 import com.sun.tools.javac.tree.TreeMaker;
 import com.sun.tools.javac.util.Context;
+
 import kendal.api.AstHelper;
 import kendal.api.KendalHandler;
 import kendal.api.exceptions.KendalException;
@@ -17,22 +39,6 @@ import kendal.model.ForestBuilder;
 import kendal.model.Node;
 import kendal.utils.ForestUtils;
 import kendal.utils.KendalMessager;
-
-import javax.annotation.processing.*;
-import javax.lang.model.SourceVersion;
-import javax.lang.model.element.TypeElement;
-import javax.lang.model.type.MirroredTypeException;
-import javax.tools.Diagnostic;
-import javax.tools.JavaFileObject;
-import java.io.IOException;
-import java.io.Writer;
-import java.util.HashSet;
-import java.util.Map;
-import java.util.ServiceLoader;
-import java.util.Set;
-import java.util.function.Function;
-import java.util.stream.Collectors;
-import java.util.stream.StreamSupport;
 
 @SupportedAnnotationTypes("*")
 @SupportedSourceVersion(SourceVersion.RELEASE_8)
@@ -82,7 +88,7 @@ public class KendalProcessor extends AbstractProcessor {
                 throw new KendalRuntimeException(e.getMessage());
             }
         } else {
-            if(firstRoundNodes != null) {
+            if (firstRoundNodes != null) {
                 // handle nodes found on the first round, which we could not handle then because of annotation inheritance processing
                 forest.addAll(firstRoundNodes);
                 firstRoundNodes = null;
@@ -146,7 +152,7 @@ public class KendalProcessor extends AbstractProcessor {
     }
 
     private void resolveInherit(String fqn, Inherit inherit, Map<String, KendalHandler> annotationToHandler, Map<String, Node<JCClassDecl>> annotationsDeclMap) {
-        if(inherit == null) {
+        if (inherit == null) {
             // we don't inherit, so insert null handler
             annotationToHandler.put(fqn, null);
             return;
@@ -157,7 +163,7 @@ public class KendalProcessor extends AbstractProcessor {
             Type.ClassType inheritedAnnotationType = (Type.ClassType) e.getTypeMirror();
             String inheritedFqn = inheritedAnnotationType.tsym.getQualifiedName().toString();
 
-            if(annotationToHandler.containsKey(inheritedFqn)) {
+            if (annotationToHandler.containsKey(inheritedFqn)) {
                 annotationToHandler.put(fqn, annotationToHandler.get(inheritedFqn));
             } else {
                 resolveInherit(inheritedFqn, inheritedAnnotationType.tsym.getAnnotation(Inherit.class), annotationToHandler, annotationsDeclMap);

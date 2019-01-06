@@ -10,7 +10,7 @@ import java.lang.annotation.Target;
  * Default name is: originalName + "Clone"
  * Return type of generated method is extracted from declaration of {@link #transformer()} class.
  */
-@Target({ElementType.METHOD, ElementType.ANNOTATION_TYPE})
+@Target(ElementType.METHOD)
 public @interface Clone {
 
     Class<? extends Transformer> transformer();

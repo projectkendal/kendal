@@ -1,11 +1,23 @@
 package kendal.processor;
 
+import java.lang.annotation.Annotation;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Map;
+import java.util.Optional;
+import java.util.Set;
+import java.util.function.Function;
+import java.util.stream.Collectors;
+
 import com.sun.tools.javac.code.Attribute;
 import com.sun.tools.javac.code.Scope;
 import com.sun.tools.javac.code.Symbol;
 import com.sun.tools.javac.code.Type;
 import com.sun.tools.javac.tree.JCTree;
 import com.sun.tools.javac.tree.TreeMaker;
+
 import kendal.api.AstHelper;
 import kendal.api.exceptions.ImproperNodeTypeException;
 import kendal.api.exceptions.KendalRuntimeException;
@@ -15,22 +27,17 @@ import kendal.model.Node;
 import kendal.model.TreeBuilder;
 import kendal.utils.ForestUtils;
 
-import java.lang.annotation.Annotation;
-import java.util.*;
-import java.util.function.Function;
-import java.util.stream.Collectors;
-
-public class AnnotationInheritanceHandler {
+class AnnotationInheritanceHandler {
 
     private AstHelper astHelper;
     private TreeMaker treeMaker;
 
-    public AnnotationInheritanceHandler(AstHelper astHelper, TreeMaker treeMaker) {
+    AnnotationInheritanceHandler(AstHelper astHelper, TreeMaker treeMaker) {
         this.astHelper = astHelper;
         this.treeMaker = treeMaker;
     }
 
-    public void handleAnnotationInheritance(Set<Node> forest) {
+    void handleAnnotationInheritance(Set<Node> forest) {
         Map<String, Node<JCTree.JCClassDecl>> annotationsDeclMap = ForestUtils.getAnnotationsDeclMap(forest);
         handleInherit(forest, annotationsDeclMap);
         handleAttribute(forest, annotationsDeclMap);
