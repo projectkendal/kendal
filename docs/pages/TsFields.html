@@ -51,50 +51,52 @@
 </nav>
 
 <div class="container" style="margin-top: 10px">
-    <h4>Vanilla Java</h4>
-    <pre><code class="java">
-        @Service
-        class FooService {
+  <h4>TypeScript Fields</h4>
+  <h4>Vanilla Java</h4>
 
-            private final SomeFactory someFactory;
-            private final SpecialValidator specialValidator;
-            private final ItemRepository itemRepository;
+  <pre><code class="java">
+      @Service
+      class FooService {
 
-            @Autowired
-            FooService(SomeFactory someFactory, SpecialValidator specialValidator, ItemRepository itemRepository) {
-                this.someFactory = someFactory;
-                this.specialValidator = specialValidator;
-                this.itemRepository = itemRepository;
+          private final SomeFactory someFactory;
+          private final SpecialValidator specialValidator;
+          private final ItemRepository itemRepository;
 
-                // some logic
-            }
+          @Autowired
+          FooService(SomeFactory someFactory, SpecialValidator specialValidator, ItemRepository itemRepository) {
+              this.someFactory = someFactory;
+              this.specialValidator = specialValidator;
+              this.itemRepository = itemRepository;
 
-            Object createNewItem(Object newItemDto) {
-                specialValidator.validate(newItemDto);
-                Object newItem = someFactory.construct(newItemDto);
-                return itemRepository.save(newItem);
-            }
-        }
-    </code></pre>
+              // some logic
+          }
 
-    <h4>Kendal</h4>
-    <pre><code class="java">
-        @Service
-        class FooService {
+          Object createNewItem(Object newItemDto) {
+              specialValidator.validate(newItemDto);
+              Object newItem = someFactory.construct(newItemDto);
+              return itemRepository.save(newItem);
+          }
+      }
+  </code></pre>
 
-            @Autowired
-            FooService(@Private SomeFactory someFactory, @Private SpecialValidator specialValidator,
-                        @Private ItemRepository itemRepository) {
-                // some logic
-            }
+  <h4>Kendal</h4>
+  <pre><code class="java">
+      @Service
+      class FooService {
 
-            Object createNewItem(Object newItemDto) {
-                specialValidator.validate(newItemDto);
-                Object newItem = someFactory.construct(newItemDto);
-                return itemRepository.save(newItem);
-            }
-        }
-    </code></pre>
+          @Autowired
+          FooService(@Private SomeFactory someFactory, @Private SpecialValidator specialValidator,
+                      @Private ItemRepository itemRepository) {
+              // some logic
+          }
+
+          Object createNewItem(Object newItemDto) {
+              specialValidator.validate(newItemDto);
+              Object newItem = someFactory.construct(newItemDto);
+              return itemRepository.save(newItem);
+          }
+      }
+  </code></pre>
 </div><!-- /.container -->
 
 </body>

@@ -51,6 +51,7 @@
 </nav>
 
 <div class="container" style="margin-top: 10px">
+  <h4>Clone</h4>
   <p>
     Applied to a method creates new method with name from <code>methodName</code> attribute and list of parameters same as original method.
     Generated method calls the original method, passes the result to an instance of transformer specified with <code>transformer</code> attribute
@@ -59,66 +60,66 @@
     Return type of generated method is extracted from declaration of the transformer class.
   </p>
 
-    <h4>Vanilla Java</h4>
-    <pre><code class="java">
-        class SomeClass {
+  <h4>Vanilla Java</h4>
+  <pre><code class="java">
+      class SomeClass {
 
-            List&lt;Object&gt; method1(int oneParam, String anotherParam) {
-                List&lt;Object&gt; result = new ArrayList();
-                // some logic
-                return result;
-            }
+          List&lt;Object&gt; method1(int oneParam, String anotherParam) {
+              List&lt;Object&gt; result = new ArrayList();
+              // some logic
+              return result;
+          }
 
-            List&lt;Object&gt; method2(int oneParam, String anotherParam) {
-                List&lt;Object&gt; result = new ArrayList();
-                // some logic
-                return result;
-            }
+          List&lt;Object&gt; method2(int oneParam, String anotherParam) {
+              List&lt;Object&gt; result = new ArrayList();
+              // some logic
+              return result;
+          }
 
-            String method1Size(int oneParam, String anotherParam) {
-                return new ListToSizeTransformer().transform(method1(oneParam, anotherParam));
-            }
+          String method1Size(int oneParam, String anotherParam) {
+              return new ListToSizeTransformer().transform(method1(oneParam, anotherParam));
+          }
 
-            String method2Size(int oneParam, String anotherParam) {
-                return new ListToSizeTransformer().transform(method2(oneParam, anotherParam));
-            }
+          String method2Size(int oneParam, String anotherParam) {
+              return new ListToSizeTransformer().transform(method2(oneParam, anotherParam));
+          }
 
-        }
+      }
 
-        class ListToSizeTransformer {
-            String transform(List&lt;Object&gt; parametersList) {
-                return String.valueOf(new ArrayList().size());
-            }
-        }
-    </code></pre>
+      class ListToSizeTransformer {
+          String transform(List&lt;Object&gt; parametersList) {
+              return String.valueOf(new ArrayList().size());
+          }
+      }
+  </code></pre>
 
-    <h4>Kendal</h4>
-    <pre><code class="java">
-        class SomeClass {
+  <h4>Kendal</h4>
+  <pre><code class="java">
+      class SomeClass {
 
-            @Clone(transformer = ListToSizeTransformer.class, methodName="method1Size")
-            List&lt;Object&gt; method1(int oneParam, String anotherParam) {
-                List&lt;Object&gt; result = new ArrayList();
-                // some logic
-                return result;
-            }
+          @Clone(transformer = ListToSizeTransformer.class, methodName="method1Size")
+          List&lt;Object&gt; method1(int oneParam, String anotherParam) {
+              List&lt;Object&gt; result = new ArrayList();
+              // some logic
+              return result;
+          }
 
-            @Clone(transformer = ListToSizeTransformer.class, methodName="method2Size")
-            List&lt;Object&gt; method2(int oneParam, String anotherParam) {
-                List&lt;Object&gt; result = new ArrayList();
-                // some logic
-                return result;
-            }
+          @Clone(transformer = ListToSizeTransformer.class, methodName="method2Size")
+          List&lt;Object&gt; method2(int oneParam, String anotherParam) {
+              List&lt;Object&gt; result = new ArrayList();
+              // some logic
+              return result;
+          }
 
-        }
+      }
 
-        class ListToSizeTransformer implements Clone.Transformer&lt;List&lt;Object&gt;, String&gt; {
-            @Override
-            public String transform(List&lt;Object&gt; parametersList) {
-                return String.valueOf(parametersList.size());
-            }
-        }
-    </code></pre>
+      class ListToSizeTransformer implements Clone.Transformer&lt;List&lt;Object&gt;, String&gt; {
+          @Override
+          public String transform(List&lt;Object&gt; parametersList) {
+              return String.valueOf(parametersList.size());
+          }
+      }
+  </code></pre>
 </div><!-- /.container -->
 
 </body>
