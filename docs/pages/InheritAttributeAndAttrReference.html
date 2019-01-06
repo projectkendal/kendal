@@ -9,7 +9,8 @@
   <title>Kendal - Manual</title>
 
   <!-- Bootstrap core CSS -->
-  <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0-alpha.6/css/bootstrap.min.css" integrity="sha384-rwoIResjU2yc3z8GV/NPeZWAv56rSmLldC3R/AZzGRnGxQQKnKkoFVhFQhNUwEyJ" crossorigin="anonymous">
+  <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0-alpha.6/css/bootstrap.min.css"
+        integrity="sha384-rwoIResjU2yc3z8GV/NPeZWAv56rSmLldC3R/AZzGRnGxQQKnKkoFVhFQhNUwEyJ" crossorigin="anonymous">
 
   <!-- Highlight.js -->
   <link rel="stylesheet" href="../resources/default.min.css">
@@ -43,8 +44,10 @@
 <div class="container" style="margin-top: 10px">
   <h5>@Inherit</h5>
   <p>
-    1. This annotation causes all parameters from <code>value</code> attribute to be inherited. Remember that <code>value</code> must be an annotation.<br />
-    2. Kendal handlers handling <code>value</code> will receive also annotations that inherit parameters from <code>value</code> using <code>@Inherit</code>.<br />
+    1. This annotation causes all parameters from <code>value</code> attribute to be inherited. Remember that <code>value</code>
+    must be an annotation.<br />
+    2. Kendal handlers handling <code>value</code> will receive also annotations that inherit parameters from <code>value</code>
+    using <code>@Inherit</code>.<br />
     Note that this relation is transitive.
   </p>
   <h5>@Attribute</h5>
@@ -59,7 +62,9 @@
     Java does not allow using parameters of annotation to define other parameters of the same annotation.
     But sometimes we want to, so here we introduce annotation that will be replaced with value of another parameter.<br/>
     It can be used only inside value expression for <code>@Attribute</code>.
-    Some expressions using @AttrReference will cause the compiler to break compilation before annotation processing - in such case @AttrReference will never work. This feature is currently considered a proof of concept showing that it is possible to access other attributes of annotation to define value of attribute.
+    Some expressions using @AttrReference will cause the compiler to break compilation before annotation processing -
+    in such case @AttrReference will never work. This feature is currently considered a proof of concept showing that it
+    is possible to access other attributes of annotation to define value of attribute.
   </p>
 
   <h3>Example with Clone</h3>
