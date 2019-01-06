@@ -34,71 +34,41 @@
 
   <div class="collapse navbar-collapse" id="menu-navbar">
     <ul class="navbar-nav mr-auto">
-      <li class="nav-item">
-        <a class="nav-link" href="TsFields.html">TypeScript Fields</a>
-      </li>
-      <li class="nav-item active">
-        <a class="nav-link disabled">String Interpolation</a>
-      </li>
-      <li class="nav-item">
-        <a class="nav-link" href="Clone.html">Clone</a>
-      </li>
-      <li class="nav-item">
-        <a class="nav-link" href="InheritAttributeAndAttrReference.html">Inherit, Attribute & AttrReference</a>
-      </li>
+        <li class="nav-item">
+            <a class="nav-link" href="TsFields.html">TypeScript Fields</a>
+        </li>
+        <li class="nav-item">
+            <a class="nav-link" href="StringInterpolation.html">String Interpolation</a>
+        </li>
+        <li class="nav-item">
+          <a class="nav-link" href="Clone.html">Clone</a>
+        </li>
+        <li class="nav-item">
+          <a class="nav-link" href="InheritAttributeAndAttrReference.html">Inherit, Attribute & AttrReference</a>
+        </li>
     </ul>
     <ul class="navbar-nav navbar-right">
-      <li><a class="nav-link" href="Plugin.html">Plugin</a></li>
+      <li class="nav-item active">
+        <a class="nav-link disabled">Plugin</a>
+      </li>
     </ul>
   </div>
 </nav>
 
 <div class="container" style="margin-top: 10px">
-  <h4>String Interpolation</h4>
-  <p>
-    To use this mechanism is enough to put "+" operator in front of a string literal.
-    Then it is possible to use any valid Java expressions inside of the string using <code>${expression}</code> syntax.
-    See example below for details.
-  </p>
+  <h3>Kendal Plugin Manual</h3>
+  <br />
+  <h4>How to add plugin to IntelliJ IDEA?</h4>
+  <ol>
+    <li>Click "File"</li>
+    <li>Click "Settings"</li>
+    <li>Select "Plugins" tab</li>
+    <li>Click "Browse repositories..." button</li>
+    <li>Search for "Kendal"</li>
+    <li>Click  "Install"</li>
+    <li>Restart IntelliJ IDEA</li>
+  </ol>
 
-  <h4>Vanilla Java</h4>
-  <pre><code class="java">
-      class SomeClass {
-
-          SomeFactory someFactory;
-
-          // [...]
-
-          String generateNameAddingStrings(String component, int postfix) {
-              return "specificPrefix " + component + " (" + someFactory.uniqueIdentifier() + ") " + postfix;
-          }
-
-          String generateNameWithStringFormat(String component, int postfix) {
-              return String.format("specificPrefix %s (%s) %d", component, someFactory.uniqueIdentifier(), postfix);
-          }
-
-          String generateNameWithStringBuilder(String component, int postfix) {
-              return new StringBuilder("specialPrefix ").append(component).append(" (")
-                            .append(someFactory.uniqueIdentifier()).append(") ").append(postfix).toString();
-          }
-
-      }
-  </code></pre>
-
-  <h4>Kendal</h4>
-  <pre><code class="java">
-      class SomeClass {
-
-          SomeFactory someFactory;
-
-          // [...]
-
-          String generateNameWithStringInterpolation(String component, int postfix) {
-              return +"specificPrefix ${component} (${someFactory.uniqueIdentifier()}) ${postfix}";
-          }
-
-      }
-  </code></pre>
 </div><!-- /.container -->
 
 </body>
