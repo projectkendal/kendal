@@ -35,11 +35,11 @@ public class StringInterpolationHandler implements KendalHandler {
     private AstHelper astHelper;
 
     @Override
-    public void handle(Collection annotationNodes, AstHelper helper) {
+    public void handle(Collection handledNodes, AstHelper helper) {
         this.astNodeBuilder = helper.getAstNodeBuilder();
         this.parserFactory = ParserFactory.instance(helper.getContext());
         this.astHelper = helper;
-        interpolate(annotationNodes);
+        interpolate(handledNodes);
     }
 
     private void interpolate(Collection<Node> nodes) {

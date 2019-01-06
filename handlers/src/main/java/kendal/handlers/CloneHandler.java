@@ -58,14 +58,14 @@ public class CloneHandler implements KendalHandler<Clone> {
     private AstUtils astUtils;
 
     @Override
-    public void handle(Collection<Node> annotationNodes, AstHelper helper) throws KendalException {
+    public void handle(Collection<Node> handledNodes, AstHelper helper) throws KendalException {
         this.helper = helper;
         astNodeBuilder = helper.getAstNodeBuilder();
         astUtils = helper.getAstUtils();
-        for (Node annotationNode : annotationNodes) {
+        for (Node annotationNode : handledNodes) {
             handleNode(annotationNode);
         }
-        eraseAnnotationParameters(annotationNodes);
+        eraseAnnotationParameters(handledNodes);
     }
 
     /**

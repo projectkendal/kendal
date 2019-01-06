@@ -47,10 +47,10 @@ public abstract class TypescriptFieldsHandler<T extends Annotation> implements K
      * {@link PackagePrivate}, {@link Private}, {@link Protected}, {@link Public}.
      */
     @Override
-    public void handle(Collection<Node> annotationNodes, AstHelper helper) throws KendalException {
+    public void handle(Collection<Node> handledNodes, AstHelper helper) throws KendalException {
         this.helper = helper;
         astNodeBuilder = helper.getAstNodeBuilder();
-        for (Node annotationNode : annotationNodes) {
+        for (Node annotationNode : handledNodes) {
             handleNode(annotationNode);
         }
     }

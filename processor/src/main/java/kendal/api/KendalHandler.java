@@ -16,11 +16,13 @@ public interface KendalHandler<T extends Annotation> {
 
     /**
      *
-     * @param annotationNodes kendal AST nodes representing annotation of type returned by {@link #getHandledAnnotationType()}
+     * @param handledNodes if handled annotation type is not null,
+     * kendal AST nodes representing annotation of type returned by {@link #getHandledAnnotationType()}
+     * Otherwise, all root nodes of the compilation.
      * @param helper
      * @throws InvalidAnnotationException
      */
-    void handle(Collection<Node> annotationNodes, AstHelper helper) throws KendalException;
+    void handle(Collection<Node> handledNodes, AstHelper helper) throws KendalException;
 
     /**
      * Returns annotation that given handler supports. If returns null, it means this handler's functionality is not
