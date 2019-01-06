@@ -83,7 +83,7 @@
   <h3>Example with Clone</h3>
   <h4>Vanilla Java</h4>
   <pre><code class="java">
-      public class CloneNewExample {
+      public class SomeClass {
 
           class CsvTransformer {
               String transform(List&lt;Object&gt; inputCollection) {
@@ -130,7 +130,7 @@
 
   <h4>Kendal with @Inherit</h4>
   <pre><code class="java">
-      public class CloneNewExample {
+      public class SomeClass {
 
           @Inherit(@Clone(transformer = CsvTransformer.class))
           @Attribute(name = "onMethod", value = {@RequestMapping(value = @AttrReference("endpoint"), method = "POST"),
