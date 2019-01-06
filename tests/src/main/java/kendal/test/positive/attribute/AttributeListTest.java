@@ -22,12 +22,15 @@ import kendal.api.inheritance.Inherit;
 @SuppressWarnings("unused")
 public class AttributeListTest {
 
+    private static final int NUMBER = 17;
+    private static final String TEXT = "some value";
+
     @Target(ElementType.METHOD)
     @Retention(RetentionPolicy.RUNTIME)
     @Inherit(@BaseAnn)
     @Attribute.List({
-            @Attribute(name = "requiredParam", value = 17),
-            @Attribute(name = "requiredAttr", value = "some value")
+            @Attribute(name = "requiredParam", value = NUMBER),
+            @Attribute(name = "requiredAttr", value = TEXT)
     })
     @interface UsingAttrList {
 
@@ -38,7 +41,8 @@ public class AttributeListTest {
     @UsingAttrList
     @Test
     public void testMethod() throws NoSuchMethodException {
-        assertEquals(getClass().getMethod("testMethod").getAnnotation(UsingAttrList.class).requiredAttr(), "some value");
+        assertEquals(getClass().getMethod("testMethod").getAnnotation(UsingAttrList.class).requiredParam(), NUMBER);
+        assertEquals(getClass().getMethod("testMethod").getAnnotation(UsingAttrList.class).requiredAttr(), TEXT);
     }
 
 }
