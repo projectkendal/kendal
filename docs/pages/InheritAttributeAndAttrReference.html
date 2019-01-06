@@ -205,11 +205,11 @@
           private int aMethod() {
               return this.primitiveField + 15;
           }
-      }
 
-      @Inherit(@Private(makeFinal = false))
-      @Target(ElementType.PARAMETER)
-      @interface PrivateNotFinal { }
+          @Inherit(@Private(makeFinal = false))
+          @Target(ElementType.PARAMETER)
+          @interface PrivateNotFinal { }
+      }
   </code></pre>
 </div><!-- /.container -->
 
