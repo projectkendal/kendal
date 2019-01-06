@@ -9,7 +9,6 @@ import java.lang.annotation.Target;
  * This annotation will add named parameter to all usages of annotated annotation.
  * Use {@link List} to add multiple parameters.
  * Parameters will be added to usages of annotation before handlers are called.
- * After handlers are called, Kendal will perform cleanup of added attributes.
  *
  * Use {@link AttrReference} as placeholder for values of any other attributes.
  */

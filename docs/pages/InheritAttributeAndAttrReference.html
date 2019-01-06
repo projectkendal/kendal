@@ -50,16 +50,16 @@
   <h5>@Attribute</h5>
   <p>
     This annotation will add named parameter to all usages of annotated annotation.
-    Use List to add multiple parameters.
-    Parameters will be added to usages of annotation before handlers are called.
-    After handlers are called, Kendal will perform cleanup of added attributes.
+    Use <code>@Attribute.List</code> to add multiple parameters.
+    Parameters will be added to usages of annotation before handlers are called.<br/>
     Use <code>@AttrReference</code> as placeholder for values of any other attributes.
   </p>
   <h5>@AttrReference</h5>
   <p>
     Java does not allow using parameters of annotation to define other parameters of the same annotation.
-    But sometimes we want to, so here we introduce annotation that will be replaced with value of another parameter.
+    But sometimes we want to, so here we introduce annotation that will be replaced with value of another parameter.<br/>
     It can be used only inside value expression for <code>@Attribute</code>.
+    Some expressions using @AttrReference will cause the compiler to break compilation before annotation processing - in such case @AttrReference will never work. This feature is currently considered a proof of concept showing that it is possible to access other attributes of annotation to define value of attribute.
   </p>
 
   <h3>Example with Clone</h3>
@@ -67,42 +67,42 @@
   <pre><code class="java">
       public class CloneNewExample {
 
+          class CsvTransformer {
+              String transform(List&lt;Object&gt; inputCollection) {
+                  return "imagine here is the original collection serialized to csv"
+              }
+          }
+
           @RequestMapping(value = "/method1", method = "POST")
-          public List&lt;Object1&gt; method1() {
+          public List&lt;Object1&gt; method1(RequestBody body) {
               List&lt;Object1&gt; result = new ArrayList();
                 // some logic
                 return result;
           }
 
           @RequestMapping(value = "/method2", method = "POST")
-          public List&lt;Object2&gt; method2() {
+          public List&lt;Object2&gt; method2(RequestBody body) {
               List&lt;Object2&gt; result = new ArrayList();
                 // some logic
                 return result;
           }
 
           @AnotherAnnotation
-          @RequestMapping(value = "/method1/size", method = "POST")
-          public List&lt;Object1&gt; method1Size() {
+          @RequestMapping(value = "/method1/csv", method = "POST")
+          public List&lt;Object1&gt; method1Csv(RequestBody body) {
               List&lt;Object1&gt; result = new ArrayList();
                 // some logic
-                return result;
+                return new CsvTransformer().transform(result);
           }
 
           @AnotherAnnotation
-          @RequestMapping(value = "/method2/size", method = "POST")
-          public List&lt;Object2&gt; method2Size() {
+          @RequestMapping(value = "/method2/csv", method = "POST")
+          public List&lt;Object2&gt; method2Csv(RequestBody body) {
               List&lt;Object2&gt; result = new ArrayList();
                 // some logic
-                return result;
+                return new CsvTransformer().transform(result);
           }
 
-      }
-
-      class ListToSizeTransformer {
-          String transform(List&lt;Object&gt; parametersList) {
-              return String.valueOf(parametersList.size());
-          }
       }
   </code></pre>
 
@@ -113,35 +113,35 @@
   <pre><code class="java">
       public class CloneNewExample {
 
-          @Inherit(@Clone(transformer = ListToSizeTransformer.class))
+          @Inherit(@Clone(transformer = CsvTransformer.class))
           @Attribute(name = "onMethod", value = {@RequestMapping(value = @AttrReference("endpoint"), method = "POST"),
                                                   @AnotherAnnotation})
           @interface CsvEndpoint {
               String endpoint();
           }
 
-          @CsvEndpoint(endpoint = "method1/size")
+          class CsvTransformer implements Clone.Transformer&lt;Collection&lt;?&gt;, String&gt; {
+              String transform(List&lt;Object&gt; inputCollection) {
+                  return "imagine here is the original collection serialized to csv"
+              }
+          }
+
+          @CsvEndpoint(endpoint = "method1/csv")
           @RequestMapping(value = "/method1", method = "POST")
-          public List&lt;Object1&gt; method1() {
+          public List&lt;Object1&gt; method1(RequestBody body) {
               List&lt;Object1&gt; result = new ArrayList();
                 // some logic
                 return result;
           }
 
-          @CsvEndpoint(endpoint = "method2/size")
+          @CsvEndpoint(endpoint = "method2/csv")
           @RequestMapping(value = "/method2", method = "POST")
-          public List&lt;Object2&gt; method2() {
+          public List&lt;Object2&gt; method2(RequestBody body) {
               List&lt;Object2&gt; result = new ArrayList();
                 // some logic
                 return result;
           }
 
-      }
-
-      class ListToSizeTransformer {
-          String transform(List&lt;Object&gt; parametersList) {
-              return String.valueOf(parametersList.size());
-          }
       }
   </code></pre>
 
