@@ -97,14 +97,6 @@ public class CloneHandler implements KendalHandler<Clone> {
         helper.addElementToClass(clazz, newMethod, Mode.APPEND, 0);
     }
 
-    private Clone getCloneAnnotation(Node<JCAnnotation> annotationNode) {
-        if (annotationNode.getParent().is(JCMethodDecl.class)) {
-            return ((JCMethodDecl) annotationNode.getParent().getObject()).sym.getAnnotation(Clone.class);
-        } else {
-            return ((JCClassDecl) annotationNode.getParent().getObject()).sym.getAnnotation(Clone.class);
-        }
-    }
-
     private void eraseAnnotationParameters(Collection<Node> annotationNodes) {
         annotationNodes.stream()
                 .forEach(annotationNode -> {

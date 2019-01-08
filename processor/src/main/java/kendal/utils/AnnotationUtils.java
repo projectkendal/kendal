@@ -21,13 +21,7 @@ public class AnnotationUtils {
         return annotationNode.getParent().getObject() instanceof JCTree.JCMethodDecl;
     }
 
-
-
     public static boolean isAnnotationType(Node node) {
         return node.getObject() instanceof  JCClassDecl && (((JCClassDecl) node.getObject()).mods.flags & Flags.ANNOTATION) != 0;
-    }
-
-    public static boolean annotationNameMatches(Node<JCAnnotation> annotationNode, String annotationName) {
-        return annotationNode.getObject().type.tsym.getQualifiedName().contentEquals(annotationName);
     }
 }
