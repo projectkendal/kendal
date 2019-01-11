@@ -44,7 +44,7 @@ public abstract class TypescriptFieldsHandler<T extends Annotation> implements K
 
     /**
      * This method assumes that all passed annotatedNodes are annotated with one of the following annotations:
-     * {@link PackagePrivate}, {@link Private}, {@link Protected}, {@link Public}.
+     *  {@link Private}, {@link PackagePrivate}, {@link Protected}, {@link Public}.
      */
     @Override
     public void handle(Collection<Node> handledNodes, AstHelper helper) throws KendalException {

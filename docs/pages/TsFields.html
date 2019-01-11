@@ -55,6 +55,17 @@
 
 <div class="container" style="margin-top: 10px">
   <h4>TypeScript Fields</h4>
+  <p>
+    Main inspiration for that feature have been dependency injection frameworks. Preferred way to inject fields'
+    values to classes is to do it via constructor. This forces very repetitive construction of constructors where
+    we always have argument passed and assigned to the corresponding field in a class. TypeScript Fields feature
+    is designed to let programmer get rid of that redundancy with possibility of automatic fields' generation.
+    There are 4 annotations that contribute to that feature: <code>@Private</code>, <code>@PackagePrivate</code>,
+    <code>@Protected</code> and <code>@Public</code>. Each of it should be applied to the constructor in a class
+    and causes Kendal to generate field with proper access modifier. There is also an optional attribute
+    <code>makeFinal</code> which let's programmer decide whether new field should be final or not. It defaults to <code>true</code>.
+  </p>
+
   <h4>Vanilla Java</h4>
 
   <pre><code class="java">
