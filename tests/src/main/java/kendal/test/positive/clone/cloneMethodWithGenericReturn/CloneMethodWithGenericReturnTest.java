@@ -1,18 +1,22 @@
 package kendal.test.positive.clone.cloneMethodWithGenericReturn;
 
+import static kendal.test.utils.ValuesGenerator.s;
+
+import java.util.List;
+
+import kendal.annotations.Clone;
+
 /*
- * @//test
+ * @test
  * @summary check whether clone for method with generic return type is created properly
  * @library /utils/
  * @build ValuesGenerator
  * @build TestTransformer
- * @compile CloneMethodWithGenericReturn.java
+ * @compile CloneMethodWithGenericReturnTest.java
  */
 @SuppressWarnings("unused")
-public class CloneMethodWithGenericReturn {
+public class CloneMethodWithGenericReturnTest {
 
-     /*
-    todo: https://trello.com/c/jgLmn2pe/50-clone-clone-methods-with-generic-return-type
     @Clone(transformer = TestTransformer.class)
     <T> T method(T param1, String param2) {
         return param1;
@@ -27,5 +31,5 @@ public class CloneMethodWithGenericReturn {
     }
 
     private class SomeType { }
-    */
+
 }

@@ -1,20 +1,25 @@
 package kendal.test.positive.clone.cloneMethodWithGenericReturnWithExtends;
 
+import static kendal.test.utils.ValuesGenerator.s;
+
+import java.util.List;
+
+import kendal.annotations.Clone;
+
 /*
- * @//test
+ * @test
  * @summary check whether clone for method with generic with extends return type is created properly
  * @library /utils/
+ * @build SuperType
  * @build ValuesGenerator
  * @build TestTransformer
- * @compile CloneMethodWithGenericReturnWithExtends.java
+ * @compile CloneMethodWithGenericReturnWithExtendsTest.java
  */
 @SuppressWarnings("unused")
-public class CloneMethodWithGenericReturnWithExtends {
+public class CloneMethodWithGenericReturnWithExtendsTest {
 
-     /*
-    todo: https://trello.com/c/jgLmn2pe/50-clone-clone-methods-with-generic-return-type
     @Clone(transformer = TestTransformer.class)
-    <T extends Collection> T method(T param1, String param2) {
+    <T extends SuperType> T method(T param1, String param2) {
         return param1;
     }
 
@@ -26,6 +31,6 @@ public class CloneMethodWithGenericReturnWithExtends {
         return methodClone(new SomeType(), s());
     }
 
-    private class SomeType { }
-    */
+    private class SomeType extends SuperType { }
+
 }

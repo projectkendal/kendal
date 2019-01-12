@@ -14,10 +14,10 @@ import kendal.annotations.Clone;
  * @library /utils/
  * @build ValuesGenerator
  * @build TestTransformer
- * @compile CloneMethodWithGenericArgWithExtends.java
+ * @compile CloneMethodWithGenericArgWithExtendsTest.java
  */
 @SuppressWarnings("unused")
-public class CloneMethodWithGenericArgWithExtends {
+public class CloneMethodWithGenericArgWithExtendsTest {
 
     @Clone(transformer = TestTransformer.class)
     <T extends Collection> int method(T param1, String param2) {

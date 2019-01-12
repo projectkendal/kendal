@@ -26,6 +26,7 @@ public class Subclass extends ClassWithFieldsGenerated {
     // ### Compilation - Test cases ###
 
     private int shouldAccessGeneratedField() {
-        return publicField + protectedField.size() + packagePrivateField + privateField.size();
+        return publicField + protectedField.size() + packagePrivateField + privateField.size() +
+                primitiveField + listField.size();
     }
 }
