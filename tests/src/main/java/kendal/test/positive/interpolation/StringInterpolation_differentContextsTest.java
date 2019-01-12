@@ -12,9 +12,9 @@ import org.testng.annotations.Test;
  * @library /utils/
  * @build ValuesGenerator
  * @build AuxiliaryClass
- * @run testng kendal.test.positive.interpolation.StringInterpolation_differentContexts
+ * @run testng kendal.test.positive.interpolation.StringInterpolation_differentContextsTest
  */
-public class StringInterpolation_differentContexts {
+public class StringInterpolation_differentContextsTest {
 
     @Test
     public void shouldInterpolate_stringLiteral() {
