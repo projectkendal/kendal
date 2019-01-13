@@ -64,7 +64,8 @@
   </p>
   <h4>1. Create project</h4>
   <p>
-    First thing that has to be done is obviously project creation. It should be just a standard Java Maven project.
+    First thing that has to be done is obviously project creation. Although Kendal works in any kind of Java project,
+    and using any build system, for simplicity reasons we are going to create a Maven project.
     This project will contain handler implementation and annotation definition. It will be also responsible for
     handler registration to Kendal.
   </p>
@@ -91,7 +92,8 @@
   <h4>3. Disable annotation processing</h4>
   <p>
     To make SPI mechanism work correctly we have to disable annotation processing in our handler's project.
-    We do it by adding the following to the <code>pom.xml</code> file:
+    It is usually done by adding <code>-proc:none</code> parameter when executing the compiler. It Maven it can be done by
+    adding the following code  to the <code>pom.xml</code> file:
   </p>
   <pre><code class="xml">
     &lt;build&gt;
