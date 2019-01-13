@@ -103,7 +103,7 @@ public class KendalProcessor extends AbstractProcessor {
     }
 
     private void forceNewProcessingRound() throws IOException {
-        JavaFileObject fileObject = processingEnv.getFiler().createSourceFile("KendalGreatestFrameworkInTheWorld", null);
+        JavaFileObject fileObject = processingEnv.getFiler().createSourceFile("KendalGreatestFrameworkInTheWorld");
         Writer writer = fileObject.openWriter();
         writer.close();
     }

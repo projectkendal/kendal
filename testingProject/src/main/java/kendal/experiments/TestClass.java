@@ -5,7 +5,9 @@ import java.util.List;
 import kendal.annotations.Protected;
 import kendal.annotations.Public;
 import kendal.api.inheritance.Inherit;
+import kendal.apiExperiments.handler.Awesome;
 
+@Awesome
 public class TestClass {
     protected int x;
 

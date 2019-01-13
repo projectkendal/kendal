@@ -1,0 +1,206 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+  <meta name="description" content="Page with examples of how Kendal framework can be used">
+  <meta name="author" content="Konrad Gancarz & Arkadiusz Ryszewski">
+
+  <title>Kendal - Manual</title>
+
+  <link rel="stylesheet" href="../resources/default.min.css">
+  <!-- Bootstrap core CSS -->
+  <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css" integrity="sha384-Gn5384xqQ1aoWXA+058RXPxPg6fy4IWvTNh0E263XmFcJlSAwiGgFAW/dAiS6JXm" crossorigin="anonymous">
+
+  <!-- Bootstrap core JavaScript -->
+  <script src="https://code.jquery.com/jquery-3.2.1.slim.min.js" integrity="sha384-KJ3o2DKtIkvYIK3UENzmM7KCkRr/rE9/Qpg6aAZGJwFDMVNA/GpGFF93hXpG5KkN" crossorigin="anonymous"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.12.9/umd/popper.min.js" integrity="sha384-ApNbgh9B+Y1QKtv3Rn7W3mgPxhU9K/ScQsAP7hUibX39j7fakFPskvXusvfa0b4Q" crossorigin="anonymous"></script>
+  <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/js/bootstrap.min.js" integrity="sha384-JZR6Spejh4U02d8jOt6vLEHfe/JQGiRRSQQxSfFWpi1MquVdAyjUar5+76PVCmYl" crossorigin="anonymous"></script>
+
+  <!-- Highlight.js -->
+  <script src="../resources/highlight.min.js"></script>
+
+  <script>hljs.initHighlightingOnLoad();</script>
+</head>
+
+<body>
+
+<nav class="navbar navbar-expand-md navbar-dark bg-dark">
+  <a class="navbar-brand" href="../Manual.html">Kendal</a>
+
+  <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#menu-navbar" aria-controls="menu-navbar" aria-expanded="false" aria-label="Toggle navigation">
+    <span class="navbar-toggler-icon"></span>
+  </button>
+
+  <div class="collapse navbar-collapse" id="menu-navbar">
+    <ul class="navbar-nav mr-auto">
+      <li class="nav-item">
+        <a class="nav-link" href="TsFields.html">TypeScript Fields</a>
+      </li>
+      <li class="nav-item">
+        <a class="nav-link" href="StringInterpolation.html">String Interpolation</a>
+      </li>
+      <li class="nav-item">
+        <a class="nav-link" href="Clone.html">Clone</a>
+      </li>
+      <li class="nav-item">
+        <a class="nav-link" href="InheritAttributeAndAttrReference.html">Inherit, Attribute & AttrReference</a>
+      </li>
+    </ul>
+    <ul class="navbar-nav navbar-right">
+      <li class="nav-item active">
+        <a class="nav-link disabled">Kendal API</a>
+      </li>
+      <li><a class="nav-link" href="Plugin.html">Plugin</a></li>
+    </ul>
+  </div>
+</nav>
+
+<div class="container" style="margin-top: 10px">
+  <h3>Kendal API</h3>
+  <p>
+    From the very beginning Kendal was designed to be open for new extensions. Here we present a short guide how
+    to make your own custom functionality.
+  </p>
+  <h4>1. Create project</h4>
+  <p>
+    First thing that has to be done is obviously project creation. It should be just a standard Java Maven project.
+    This project will contain handler implementation and annotation definition. It will be also responsible for
+    handler registration to Kendal.
+  </p>
+  <h4>2. Add dependencies</h4>
+  <p>
+    After project is created is we have to add dependencies to it. In this manual we assume that we work with
+    projects managed by Maven. In such case, it is very easy to add required dependencies. Just add this snipped to your <code>pom.xml</code> file:
+  </p>
+  <pre><code class="xml">
+    &lt;dependencies&gt;
+      &lt;dependency&gt;
+        &lt;groupId&gt;com.github.projectkendal&lt;/groupId&gt;
+        &lt;artifactId&gt;processor&lt;/artifactId&gt;
+        &lt;version&gt;LATEST_KENDAL_VERSION&lt;/version&gt;
+      &lt;/dependency&gt;
+    &lt;/dependencies&gt;
+  </code></pre>
+  <p>
+    Remember to replace LATEST_KENDAL_VERSION with latest Kendal version that is available. <br />
+    You can check it for example here:
+    <a href="https://mvnrepository.com/artifact/com.github.projectkendal/Kendal" target="_blank">https://mvnrepository.com/artifact/com.github.projectkendal/Kendal</a>
+  </p>
+
+  <h4>3. Disable annotation processing</h4>
+  <p>
+    To make SPI mechanism work correctly we have to disable annotation processing in our handler's project.
+    We do it by adding the following to the <code>pom.xml</code> file:
+  </p>
+  <pre><code class="xml">
+    &lt;build&gt;
+        &lt;plugins&gt;
+            &lt;plugin&gt;
+                &lt;groupId&gt;org.apache.maven.plugins&lt;/groupId&gt;
+                &lt;artifactId&gt;maven-compiler-plugin&lt;/artifactId&gt;
+                &lt;version&gt;3.7.0&lt;/version&gt;
+                &lt;configuration&gt;
+                    &lt;source&gt;1.8&lt;/source&gt;
+                  &lt;target&gt;1.8&lt;/target&gt;
+                  &lt;!-- Disable annotation processing for ourselves. --&gt;
+                    &lt;compilerArgument&gt;-proc:none&lt;/compilerArgument&gt;
+                &lt;/configuration&gt;
+            &lt;/plugin&gt;
+        &lt;/plugins&gt;
+    &lt;/build&gt;
+  </code></pre>
+
+  <h4>4. Create handler</h4>
+  <p>
+    Whatever logic you may want to implement, you must attach it to the Kendal processing process.
+    First step to do it is to create a class implementing <code>kendal.api.KendalHandler&lt;T extends Annotation&gt;</code> interface.
+    This interface defines one method: <code>void handle(Collection&lt;Node&gt; handledNodes, AstHelper helper)</code>.
+    This method is called by processor for each registered handler. First parameter collection of nodes
+    representing annotations. In runtime, that collection will contain all occurrences of annotations (or inheriting
+    annotations) of type with which handler is connected via type parameter <code>&lt;T extends Annotation&gt;</code> declaration.
+  </p>
+  <h5>Example</h5>
+  <p>
+    Let's assume we want to create a handler for our awesome feature. This feature will rely on annotation <code>@Awesome</code>,
+    that will be allowed to be put on classes declarations. This way, programmer will claim that he/she wants this class to be
+    automatically refactored to be awesome. First step to achieve this is to create annotation and its corresponding handler:
+  </p>
+  <pre><code class="java">
+      @Target(ElementType.TYPE)
+      public @interface Awesome { }
+
+      public class AwesomeHandler implements KendalHandler&lt;Awesome&gt; {
+
+          @Override
+          public void handle(Collection&lt;Node&gt; handledNodes, AstHelper helper) {
+              // some logic
+          }
+      }
+  </code></pre>
+
+
+  <h4>5. Register handler</h4>
+  <p>
+    Next step is to let Kendal know about your handler. You can do it using SPI mechanism. That is quite simple.
+    It is enough to create in your project's <code>resources</code> directory a file: <code>META-INF/services/kendal.api.KendalHandler</code>.
+    This file should contain a list of handlers implemented in the project, each in the new line.
+  </p>
+  <h5>Example</h5>
+  <p>In the case of our example project, this file's content will be very simple:</p>
+  <pre><code>
+      kendal.apiExperiments.handler.AwesomeHandler
+  </code></pre>
+  <p>After this is done, our project is fully functional Kendal handler.</p>
+
+
+  <h4>6. Utilizing AstHelper</h4>
+  <p>
+    Now we can start implementing our awesome feature. As you already learned, method <code>handle</code> is the core of a handler.
+    We know that first parameter is a collection of annotation nodes. Now it is time to learn about the second parameter - <code>AstHelper helper</code>.
+    This is a very useful class, it aims at facilitating whatever you may want to do to AST tree.
+    It delivers methods that allow AST nodes modification. It also shares some more specific helpers:
+    <code>AstNodeBuilder</code>, <code>AstValidator</code> and <code>AstUtils</code>. They contain methods which are
+    often needed in projects of this kind. Using them saves your time and lines of code.
+  </p>
+
+  <h4>7. Using own handler</h4>
+  <p>
+    After we finish our handler, we can start using it in other projects. In order to do this, we have to add some
+    dependencies to the target project. These are <code>com.github.projectkendal.processor</code> and your own project.
+  </p>
+  <h5>Example</h5>
+  <p>
+    If we want to add our custom handler to some other application we have to add the following code to the <code>pom.xml</code> file of that application:
+  </p>
+  <pre><code class="xml">
+    &lt;dependencies&gt;
+      &lt;dependency&gt;
+        &lt;groupId&gt;com.github.projectkendal&lt;/groupId&gt;
+        &lt;artifactId&gt;processor&lt;/artifactId&gt;
+        &lt;version&gt;LATEST_KENDAL_VERSION&lt;/version&gt;
+      &lt;/dependency&gt;
+      &lt;dependency&gt;
+        &lt;groupId&gt;your.package&lt;/groupId&gt;
+        &lt;artifactId&gt;awesome&lt;/artifactId&gt;
+        &lt;version&gt;AWESOME_HANDLER_VERSION&lt;/version&gt;
+      &lt;/dependency&gt;
+    &lt;/dependencies&gt;
+  </code></pre>
+  <p>
+    Then we can start using our annotation:
+  </p>
+  <pre><code class="java">
+      @Awesome
+      public class SomeClass {
+          // logic
+      }
+  </code></pre>
+  <p>Our <code>AwesomeHandler</code> will be run whenever there is at least one usage of <code>@Awesome</code> annotation
+  in the target project. Each such usage will be included in <code>handledNodes</code> collection that is passed
+  to <code>handle</code> method of our handler.</p>
+
+</div><!-- /.container -->
+
+</body>
+</html>

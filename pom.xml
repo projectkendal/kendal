@@ -36,6 +36,7 @@
         <module>processor</module>
         <module>handlers</module>
         <module>testingProject</module>
+        <module>testingApi</module>
         <!--excluded from compilation-->
         <!--<module>tests</module>-->
     </modules>
